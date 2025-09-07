@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 const prescriptionSchema = new mongoose.Schema({
   patientId: {
     type: String,
-    ref: 'user',
+    ref: 'User',
     required: true
   },
   doctorId: {
     type: String,
-    ref: 'user',
+    ref: 'User',
     required: true
   },
   date: {

@@ -4,387 +4,687 @@
   <meta charset="UTF-8" />
   <title>MediVault | Patient Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+ 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+ 
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+ 
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     :root {
       --primary: #4361ee;
       --primary-dark: #3a56d4;
-      --secondary: #3f37c9;
+      --secondary: #7209b7;
+      --accent: #f72585;
       --success: #4cc9f0;
-      --danger: #f72585;
-      --light: #f8f9fa;
       --dark: #212529;
       --gray: #6c757d;
+      --light-gray: #f8f9fa;
       --white: #ffffff;
-      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-      --radius-sm: 8px;
-      --transition: all 0.3s ease;
+      --gradient-primary: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+      --gradient-secondary: linear-gradient(135deg, #f72585 0%, #4361ee 100%);
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
+      --shadow-xl: 0 16px 48px rgba(0,0,0,0.18);
+      --radius: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #f5f7ff 0%, #e8edff 100%);
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 50%, #f0f8ff 100%);
       color: var(--dark);
-      display: flex;
       min-height: 100vh;
+      overflow-x: hidden;
     }
-
-    nav {
-      width: 220px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: var(--white);
-      padding: 2rem 1rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+    /* Animated Background */
+    body::before {
+      content: '';
       position: fixed;
-      height: 100vh;
-      z-index: 100;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(67, 97, 238, 0.08) 0%, transparent 50%);
+      animation: float 8s ease-in-out infinite;
+      z-index: -1;
     }
-
-    .nav-header {
-      font-size: 1.6rem;
-      font-weight: bold;
-      margin-bottom: 2rem;
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+    /* Header - Matching Home Page */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+    .logo {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-    }
-
-    .menu {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .menu a {
-      color: var(--white);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
       text-decoration: none;
-      padding: 0.6rem 1rem;
-      border-radius: var(--radius-sm);
       transition: var(--transition);
+    }
+    .logo:hover {
+      transform: scale(1.05);
+    }
+    .logo i {
+      font-size: 1.8rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-menu {
       display: flex;
+      list-style: none;
+      gap: 2rem;
       align-items: center;
-      gap: 0.6rem;
+    }
+    .nav-menu a {
+      text-decoration: none;
+      color: var(--dark);
       font-weight: 500;
-    }
-
-    .menu a:hover, .menu a.active {
-      background: rgba(255,255,255,0.1);
-      box-shadow: 0 0 20px rgba(255,255,255,0.3);
-      transform: translateY(-2px);
-    }
-
-    .logout-btn {
-      background: var(--danger);
-      color: var(--white);
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius-sm);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 600;
-      transition: var(--transition);
-    }
-
-    .logout-btn:hover {
-      background: #e5177e;
-      box-shadow: 0 0 20px rgba(247, 37, 133, 0.5);
-      transform: translateY(-2px);
-    }
-
-    main {
-      margin-left: 220px;
-      padding: 2rem 1.5rem;
-      flex: 1;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.2rem;
-    }
-
-    .card {
-      background: var(--white);
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-md);
-      padding: 1rem;
       position: relative;
       transition: var(--transition);
-      overflow: hidden;
-      cursor: pointer;
+      padding: 0.5rem 0;
     }
-
-    .card::before {
+    .nav-menu a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+      transition: width 0.3s ease;
+    }
+    .nav-menu a:hover::after,
+    .nav-menu a.active::after {
+      width: 100%;
+    }
+    .nav-menu a:hover,
+    .nav-menu a.active {
+      color: var(--primary);
+    }
+    /* 🚀 Enhanced Notification Bell Styling */
+    .notification-item {
+      position: relative;
+      cursor: pointer;
+      padding: 0.8rem;
+      border-radius: 8px;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(67, 97, 238, 0.05);
+      min-width: 60px;
+      min-height: 50px;
+    }
+    .notification-item:hover {
+      background: rgba(67, 97, 238, 0.1);
+      transform: scale(1.05);
+    }
+    .notification-bell {
+      color: var(--primary);
+      font-weight: 500;
+      position: relative;
+      transition: var(--transition);
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+    .notification-bell:hover {
+      color: var(--primary-dark);
+    }
+    .notification-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      animation: pulse 2s infinite;
+      box-shadow: 0 2px 8px rgba(247, 37, 133, 0.3);
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    /* 🎯 Enhanced Notification Dropdown */
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 420px;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(67, 97, 238, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: var(--transition);
+      z-index: 1001;
+      max-height: 500px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    .notification-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .notification-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--light-gray);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--gradient-primary);
+      color: white;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .notification-header h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    .clear-all-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    .clear-all-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+    .notification-list {
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    .notification-item-dropdown {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--light-gray);
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+    }
+    .notification-item-dropdown:hover {
+      background: var(--light-gray);
+      transform: translateX(5px);
+    }
+    .notification-item-dropdown:last-child {
+      border-bottom: none;
+    }
+    .notification-item-dropdown.unread {
+      background: rgba(67, 97, 238, 0.05);
+      border-left: 4px solid var(--primary);
+    }
+    .notification-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+    }
+    .notification-icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .notification-text {
+      flex: 1;
+    }
+    .notification-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+    .notification-message {
+      font-size: 0.9rem;
+      color: var(--gray);
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+    .notification-time {
+      font-size: 0.8rem;
+      color: var(--gray);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .priority-badge {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-left: 0.5rem;
+    }
+    .priority-normal {
+      background: rgba(76, 201, 240, 0.2);
+      color: var(--success);
+    }
+    .priority-high {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+    }
+    .priority-urgent {
+      background: rgba(247, 37, 133, 0.2);
+      color: var(--accent);
+    }
+    .no-notifications {
+      padding: 3rem 2rem;
+      text-align: center;
+      color: var(--gray);
+    }
+    .no-notifications i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    .logout-btn {
+      background: var(--gradient-primary);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .logout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    }
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      z-index: 1001;
+    }
+    .mobile-menu-toggle.active {
+      color: var(--accent);
+    }
+    /* Main Content */
+    .main-container {
+      padding-top: 70px;
+    }
+    .dashboard-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .page-title {
+      margin-bottom: 2rem;
+    }
+    .page-title h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    .page-title p {
+      color: var(--gray);
+      font-size: 1.1rem;
+    }
+    /* Dashboard Cards Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.1);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
       content: '';
       position: absolute;
       top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
+      left: 0;
+      right: 0;
       height: 4px;
-      background: #b197fc;
-      transition: width 0.3s ease;
-      border-radius: 999px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius) var(--radius) 0 0;
     }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.12), 0 0 25px rgba(67, 97, 238, 0.3);
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
     }
-
-    .card:hover::before {
-      width: 80%;
+    .stat-card .icon {
+      width: 60px;
+      height: 60px;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      color: white;
+      font-size: 1.5rem;
     }
-
-    .card .title {
-      color: var(--primary);
-      font-weight: 600;
-      margin-bottom: 0.4rem;
+    .stat-card .title {
+      color: var(--gray);
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-card .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--dark);
+      word-break: break-word;
+    }
+    /* Upload Section */
+    .upload-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.1);
+      margin-bottom: 2rem;
+      transition: var(--transition);
+    }
+    .upload-section:hover {
+      box-shadow: var(--shadow-md);
+    }
+    .section-title {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-    }
-
-    .card .value {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--primary-dark);
-      word-wrap: break-word;
-    }
-
-    .upload-form {
-      margin-top: 2rem;
-      background: var(--white);
-      padding: 1.5rem;
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-md);
-      position: relative;
-      transition: var(--transition);
-    }
-
-    .upload-form:hover {
-      box-shadow: 0 0 20px rgba(67, 97, 238, 0.2);
-    }
-
-    .upload-form h3 {
-      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      font-weight: 700;
       color: var(--primary);
+      margin-bottom: 1.5rem;
+    }
+    .upload-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .form-group label {
       font-weight: 600;
-    }
-
-    .upload-form input {
-      width: 100%;
-      padding: 0.6rem;
-      margin-bottom: 0.8rem;
-      border-radius: var(--radius-sm);
-      border: 1px solid #d1d5db;
+      color: var(--dark);
       font-size: 0.9rem;
-      transition: var(--transition);
     }
-
-    .upload-form input:focus {
+    .form-group input {
+      padding: 0.8rem;
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      transition: var(--transition);
+      background: var(--white);
+      font-family: 'Inter', sans-serif;
+    }
+    .form-group input:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 10px rgba(67, 97, 238, 0.3);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
     }
-
-    /* Compact Upload Button */
-    .upload-form button {
-      background: var(--primary);
-      color: var(--white);
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .suggestions {
+      position: absolute;
+      background: var(--white);
+      border: 1px solid #e2e8f0;
+      border-top: none;
+      max-height: 200px;
+      overflow-y: auto;
+      width: 100%;
+      z-index: 10;
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: var(--shadow-md);
+      display: none;
+    }
+    .suggestions div {
+      padding: 0.8rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border-bottom: 1px solid #f1f1f1;
+    }
+    .suggestions div:hover {
+      background: var(--light-gray);
+      color: var(--primary);
+    }
+    /* Upload Button */
+    .upload-btn {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: var(--radius);
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.3rem;
-      width: auto !important;
-      padding: 0.4rem 1rem !important;
-      font-size: 0.85rem !important;
-      border-radius: var(--radius-sm);
-      border: 1px solid transparent;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      width: auto;
       align-self: flex-start;
-      margin-bottom: 0.5rem;
     }
-
-    .upload-form button:hover {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 0 15px rgba(67, 97, 238, 0.4);
+    .upload-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
     }
-
-    .suggestions {
-      position: absolute;
+    .upload-btn:disabled {
+      background: var(--gray);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    /* Reports Section */
+    .reports-section {
       background: var(--white);
-      border: 1px solid #ccc;
-      border-top: none;
-      max-height: 150px;
-      overflow-y: auto;
-      width: calc(100% - 3rem);
-      z-index: 10;
-      display: none;
-      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.1);
+      margin-bottom: 2rem;
     }
-
-    .suggestions div {
-      padding: 0.6rem;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .suggestions div:hover {
-      background: #f1f1f1;
-      color: var(--primary);
-    }
-
-    .filter-section {
-      margin-top: 2rem;
+    .reports-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .filter-select {
+      padding: 0.6rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius);
       background: var(--white);
-      padding: 1rem;
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-md);
+      color: var(--dark);
+      font-weight: 500;
       transition: var(--transition);
+      min-width: 150px;
     }
-
-    .filter-section:hover {
-      box-shadow: 0 0 15px rgba(67, 97, 238, 0.2);
-    }
-
-    .filter-section h2 {
-      color: var(--primary);
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .filter-section select {
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: var(--radius-sm);
-      font-size: 1rem;
-      background: var(--white);
-      transition: var(--transition);
-    }
-
-    .filter-section select:focus {
+    .filter-select:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 10px rgba(67, 97, 238, 0.3);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
     }
-
+    .reports-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
     .report-item {
       background: var(--white);
-      border-radius: var(--radius-sm);
-      padding: 1rem;
-      margin: 1rem 0;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius);
+      padding: 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: var(--shadow-md);
       transition: var(--transition);
     }
-
     .report-item:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15), 0 0 20px rgba(67, 97, 238, 0.25);
-      border-left: 4px solid var(--primary);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
     }
-
-    .report-item .details {
+    .report-details {
       flex: 1;
     }
-
-    .report-item .details strong {
-      display: block;
-      color: var(--dark);
+    .report-details .report-type {
+      font-size: 1.1rem;
       font-weight: 600;
-      margin-bottom: 0.2rem;
+      color: var(--dark);
+      margin-bottom: 0.3rem;
     }
-
-    .report-item .details small {
+    .report-details .report-date {
       color: var(--gray);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
-
-    .report-item .actions {
+    .report-actions {
       display: flex;
       gap: 0.5rem;
     }
-
     .btn {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.8rem;
-      border-radius: var(--radius-sm);
+      padding: 0.5rem 1rem;
       border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
       cursor: pointer;
-      font-weight: 500;
+      transition: var(--transition);
       display: flex;
       align-items: center;
       gap: 0.3rem;
+      font-size: 0.85rem;
       text-decoration: none;
-      transition: var(--transition);
     }
-
     .btn:hover {
       transform: translateY(-1px);
-      opacity: 0.9;
     }
-
-    .btn-success { 
-      background: var(--success); 
-      color: white; 
+    .btn-view {
+      background: var(--success);
+      color: white;
     }
-    .btn-success:hover {
-      box-shadow: 0 0 15px rgba(76, 201, 240, 0.5);
+    .btn-view:hover {
+      box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
     }
-
-    .btn-primary { 
-      background: var(--primary); 
-      color: white; 
+    .btn-download {
+      background: var(--primary);
+      color: white;
     }
-    .btn-primary:hover {
-      box-shadow: 0 0 15px rgba(67, 97, 238, 0.5);
+    .btn-download:hover {
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
     }
-
-    .btn-danger { 
-      background: var(--danger); 
-      color: white; 
+    .btn-delete {
+      background: var(--accent);
+      color: white;
     }
-    .btn-danger:hover {
-      box-shadow: 0 0 15px rgba(247, 37, 133, 0.5);
+    .btn-delete:hover {
+      box-shadow: 0 4px 12px rgba(247, 37, 133, 0.3);
     }
-
     .no-reports {
-      margin-top: 1rem;
-      padding: 3rem 2rem;
       text-align: center;
-      background: var(--white);
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow-md);
+      padding: 3rem 2rem;
       color: var(--gray);
-      transition: var(--transition);
     }
-
-    .no-reports:hover {
-      box-shadow: 0 0 15px rgba(108, 117, 125, 0.2);
-    }
-
     .no-reports i {
-      font-size: 3rem;
+      font-size: 4rem;
       margin-bottom: 1rem;
       opacity: 0.5;
     }
-
-    /* Document-style Modal Design */
+    /* Modal Styles */
     .modal {
       display: none;
       position: fixed;
@@ -397,202 +697,72 @@
       backdrop-filter: blur(5px);
       animation: modalFadeIn 0.3s ease;
     }
-
     .modal-content {
       position: absolute;
-      background: #ffffff;
+      background: var(--white);
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       width: 90%;
-      max-width: 900px;
+      max-width: 1000px;
       height: 90vh;
-      border-radius: 8px;
+      border-radius: var(--radius);
       overflow: hidden;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       animation: modalSlideIn 0.3s ease;
-      border: 2px solid #e0e0e0;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    /* Window State Classes */
-    .modal-content.minimized {
-      width: 360px !important;
-      height: 50px !important;
-      border-radius: 8px;
-      overflow: hidden;
-      top: auto !important;
-      bottom: 20px !important;
-      left: 20px !important;
-      right: auto !important;
-      transform: none !important;
-      cursor: pointer;
-      animation: minimizeIn 0.3s ease;
-      margin: 0 !important;
-      max-width: none !important;
-    }
-
-    .modal-content.maximized {
-      width: 100vw !important;
-      height: 100vh !important;
-      max-width: none !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      transform: none !important;
-      border-radius: 0 !important;
-      margin: 0 !important;
-      animation: maximizeIn 0.3s ease;
-      z-index: 2001;
-    }
-
-    /* Normal state definition */
-    .modal-content:not(.minimized):not(.maximized) {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 900px;
-      height: 90vh;
-      border-radius: 8px;
-    }
-
-    /* Document Header */
     .modal-header {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      border-bottom: 3px solid var(--primary);
+      background: var(--gradient-primary);
+      color: white;
       padding: 1rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: relative;
-      cursor: default;
     }
-
-    .modal-header::after {
-      content: '';
-      position: absolute;
-      bottom: -3px;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, #ddd, transparent);
-    }
-
-    .document-title {
+    .modal-title {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
-      color: var(--dark);
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 1.1rem;
     }
-
-    .document-title .icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.2rem;
-    }
-
-    .document-title .text {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .document-title .main-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--primary-dark);
-    }
-
-    .document-title .sub-title {
-      font-size: 0.85rem;
-      color: var(--gray);
-      font-weight: 500;
-    }
-
     .window-controls {
       display: flex;
       gap: 0.3rem;
-      align-items: center;
     }
-
     .control-btn {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid #ddd;
-      color: var(--dark);
-      width: 36px;
-      height: 36px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
       border-radius: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
+      transition: var(--transition);
     }
-
     .control-btn:hover {
-      background: var(--light);
-      border-color: var(--primary);
-      color: var(--primary);
-      transform: translateY(-1px);
-      box-shadow: 0 0 10px rgba(67, 97, 238, 0.3);
+      background: rgba(255, 255, 255, 0.3);
     }
-
-    .control-btn.minimize:hover {
-      background: #ffc107;
-      border-color: #ffc107;
-      color: white;
-      box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
-    }
-
-    .control-btn.maximize:hover {
-      background: #28a745;
-      border-color: #28a745;
-      color: white;
-      box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
-    }
-
     .control-btn.close {
-      background: #dc3545;
-      color: white;
-      border-color: #dc3545;
+      background: rgba(247, 37, 133, 0.8);
     }
-
     .control-btn.close:hover {
-      background: #c82333;
-      border-color: #c82333;
-      color: white;
-      box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+      background: var(--accent);
     }
-
-    /* Document Body */
     .modal-body {
-      padding: 0;
-      height: calc(100% - 80px);
-      background: #fafafa;
+      height: calc(100% - 70px);
+      background: var(--light-gray);
       position: relative;
-      border: 1px solid #e9ecef;
-      border-top: none;
     }
-
     .modal-body iframe {
       width: 100%;
       height: 100%;
       border: none;
       background: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      border-radius: 4px;
     }
-
-    /* Loading State */
     .modal-loading {
       position: absolute;
       top: 50%;
@@ -603,256 +773,732 @@
       align-items: center;
       gap: 1rem;
       z-index: 10;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255, 255, 255, 0.95);
       padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
     }
-
-    .document-spinner {
-      width: 35px;
-      height: 35px;
+    .spinner {
+      width: 40px;
+      height: 40px;
       border: 3px solid #f3f3f3;
       border-top: 3px solid var(--primary);
       border-radius: 50%;
-      animation: documentSpin 1s linear infinite;
+      animation: spin 1s linear infinite;
     }
-
-    .loading-text {
-      color: var(--gray);
-      font-weight: 500;
-      font-size: 0.9rem;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-
-    /* Animations */
     @keyframes modalFadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-
     @keyframes modalSlideIn {
-      from { 
+      from {
         transform: translate(-50%, -50%) scale(0.95);
         opacity: 0;
       }
-      to { 
+      to {
         transform: translate(-50%, -50%) scale(1);
         opacity: 1;
       }
     }
-
-    @keyframes minimizeIn {
-      from { 
-        transform: translate(-50%, -50%) scale(1);
+    /* 🔄 Updated Prescription Section */
+    .prescription-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.1);
+      margin-bottom: 2rem;
+    }
+    /* Prescription Styles */
+    .prescriptions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .prescription-item {
+      background: var(--white);
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: var(--transition);
+      border-left: 4px solid var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+    .prescription-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+    .prescription-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .prescription-info h3 {
+      color: var(--primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .prescription-info p {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .prescription-date {
+      background: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .prescription-medications {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--light-gray);
+    }
+    .prescription-medications h4 {
+      color: var(--dark);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .medication-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .medication-tag {
+      background: var(--light-gray);
+      color: var(--dark);
+      padding: 0.2rem 0.6rem;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      border: 1px solid #e2e8f0;
+    }
+    .loading-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--gray);
+    }
+    .loading-state .spinner {
+      margin: 0 auto 1rem;
+    }
+    .no-prescriptions {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--gray);
+      background: var(--light-gray);
+      border-radius: var(--radius);
+      margin-top: 1rem;
+    }
+    .no-prescriptions i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+      color: var(--primary);
+    }
+    /* 🔄 NEW: Prescription Actions Styles */
+    .prescription-actions {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--light-gray);
+      display: flex;
+      gap: 0.8rem;
+      justify-content: flex-end;
+    }
+    .prescription-btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .prescription-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+    .prescription-btn.btn-view {
+      background: var(--success);
+      color: white;
+      border: 1px solid var(--success);
+    }
+    .prescription-btn.btn-view:hover {
+      background: #36b3d9;
+      box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
+    }
+    .prescription-btn.btn-delete {
+      background: var(--accent);
+      color: white;
+      border: 1px solid var(--accent);
+    }
+    .prescription-btn.btn-delete:hover {
+      background: #e01e5a;
+      box-shadow: 0 4px 12px rgba(247, 37, 133, 0.3);
+    }
+    .prescription-btn:disabled {
+      background: var(--gray);
+      color: white;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    /* Prescription Modal Styles */
+    .modal-prescription {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content-prescription {
+      background: var(--white);
+      border-radius: var(--radius);
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+    }
+    .modal-body-prescription {
+      padding: 2rem;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    .prescription-details {
+      padding: 0;
+    }
+    .detail-row {
+      display: flex;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--light-gray);
+      padding-bottom: 0.5rem;
+    }
+    .detail-label {
+      font-weight: 600;
+      color: var(--dark);
+      min-width: 120px;
+      flex-shrink: 0;
+    }
+    .detail-value {
+      color: var(--gray);
+      flex: 1;
+    }
+    .medications-detail {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid var(--light-gray);
+    }
+    .medications-detail h4 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .medication-item {
+      background: var(--light-gray);
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 0.8rem;
+      border-left: 3px solid var(--primary);
+    }
+    .medication-name {
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+    }
+    /* 🔄 NEW: Confirmation Dialog Styles */
+    .confirmation-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(3px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+    .confirmation-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .confirmation-dialog {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: var(--shadow-xl);
+      text-align: center;
+      transform: scale(0.9);
+      transition: var(--transition);
+    }
+    .confirmation-overlay.show .confirmation-dialog {
+      transform: scale(1);
+    }
+    .confirmation-dialog h3 {
+      color: var(--dark);
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+    .confirmation-dialog p {
+      color: var(--gray);
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+    .confirmation-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .confirm-btn {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+    .confirm-btn.danger {
+      background: var(--accent);
+      color: white;
+    }
+    .confirm-btn.danger:hover {
+      background: #e01e5a;
+      transform: translateY(-1px);
+    }
+    .confirm-btn.cancel {
+      background: var(--light-gray);
+      color: var(--dark);
+      border: 1px solid #e2e8f0;
+    }
+    .confirm-btn.cancel:hover {
+      background: #e2e8f0;
+      transform: translateY(-1px);
+    }
+    /* 🔄 NEW: Toast Animations */
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
         opacity: 1;
       }
-      to { 
-        transform: none scale(0.8);
+    }
+    @keyframes slideOutRight {
+      from {
+        transform: translateX(0);
         opacity: 1;
       }
-    }
-
-    @keyframes maximizeIn {
-      from { 
-        transform: translate(-50%, -50%) scale(0.9);
-      }
-      to { 
-        transform: none scale(1);
+      to {
+        transform: translateX(100%);
+        opacity: 0;
       }
     }
-
-    @keyframes documentSpin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Responsive Design */
+    /* Mobile Responsive Styles */
     @media (max-width: 768px) {
-      nav { 
-        width: 100%; 
-        height: auto; 
-        position: static; 
-        flex-direction: row; 
-        justify-content: space-between; 
+      .mobile-menu-toggle {
+        display: block !important;
+      }
+      .nav-menu {
+        display: none;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 1.5rem;
+        gap: 1rem;
+        z-index: 999;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+        max-height: calc(100vh - 70px);
+        overflow-y: auto;
+      }
+      .nav-menu.active {
+        display: flex !important;
+      }
+      .nav-menu a {
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+        text-align: center;
+        font-size: 1.1rem;
+      }
+      .nav-menu a:last-child {
+        border-bottom: none;
+      }
+      .nav-container {
+        padding: 0 1rem;
+      }
+      .dashboard-content {
         padding: 1rem;
       }
-      
-      .nav-header { margin-bottom: 0; font-size: 1.2rem; }
-      .menu { flex-direction: row; gap: 0.5rem; }
-      .menu a { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
-      
-      main { margin-left: 0; padding: 1rem; }
-      
-      .modal-content { 
-        width: 95%; 
-        height: 95vh; 
+      .page-title h1 {
+        font-size: 2rem;
       }
-      
-      .modal-header {
-        padding: 0.8rem;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-      
-      .document-title .main-title {
-        font-size: 1rem;
-      }
-      
-      .control-btn {
-        width: 32px;
-        height: 32px;
-        font-size: 0.8rem;
-      }
-
-      .report-item { 
-        flex-direction: column; 
-        align-items: flex-start; 
-      }
-      
-      .report-item .actions { 
-        width: 100%; 
-        justify-content: flex-start; 
-        margin-top: 0.5rem; 
-      }
-
-      .filter-section {
-        flex-direction: column;
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
-        text-align: center;
       }
-
-      .modal-content.minimized {
-        width: calc(100% - 20px) !important;
-        left: 10px !important;
-        right: 10px !important;
+      .stat-card {
+        padding: 1rem;
       }
-
-      /* Mobile upload button */
-      .upload-form button {
-        width: 100% !important;
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .upload-btn {
+        width: 100%;
         align-self: stretch;
       }
+      .report-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      .report-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+      .user-info {
+        display: none;
+      }
+      .logout-btn span {
+        display: none;
+      }
+      .notification-dropdown {
+        width: 350px;
+        right: -50px;
+      }
+      .notification-item {
+        min-width: 70px;
+        min-height: 60px;
+      }
+      /* Prescription Mobile Styles */
+      .prescription-header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .prescription-date {
+        align-self: flex-start;
+      }
+      .prescription-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .prescription-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .modal-content-prescription {
+        width: 95%;
+        margin: 1rem;
+      }
+      .modal-body-prescription {
+        padding: 1rem;
+      }
+      .detail-row {
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+      .detail-label {
+        min-width: auto;
+        font-size: 0.9rem;
+      }
     }
-
     @media (max-width: 480px) {
-      .modal-content:not(.minimized) {
-        width: 100% !important;
-        height: 100vh !important;
-        margin: 0;
-        border-radius: 0;
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .notification-dropdown {
+        width: calc(100vw - 2rem);
+        right: -80px;
       }
     }
   </style>
 </head>
 <body id="top">
-
-  <!-- Sidebar Navigation -->
-  <nav>
-    <div>
-      <div class="nav-header"><i class="fas fa-heartbeat"></i> MediVault</div>
-      <div class="menu">
-        <a href="#top" class="active"><i class="fas fa-home"></i> Dashboard</a>
-        <a href="#reports"><i class="fas fa-file-medical"></i> Reports</a>
-        <a href="#prescription"><i class="fas fa-prescription-bottle-alt"></i> Prescription</a>
+  <!-- Header -->
+  <header class="header">
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <i class="fas fa-heartbeat"></i>
+        MediVault
+      </a>
+     
+      <nav class="nav-menu" id="navMenu">
+        <a href="#top" class="active">Dashboard</a>
+        <a href="#upload">Upload Reports</a>
+        <a href="#reports">Reports</a>
+       
+        <!-- 🚀 Enhanced Notification Bell -->
+        <div class="notification-item" onclick="toggleNotifications()">
+          <div class="notification-bell">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+          </div>
+         
+          <!-- 🎯 Enhanced Notification Dropdown -->
+          <div class="notification-dropdown" id="notificationDropdown">
+            <div class="notification-header">
+              <h3>Admin Notifications</h3>
+              <button class="clear-all-btn" onclick="clearAllNotifications()">Clear All</button>
+            </div>
+           
+            <div class="notification-list" id="notificationList">
+              <!-- Notifications will be populated here -->
+            </div>
+          </div>
+        </div>
+       
+        <a href="#prescription">Prescriptions</a>
+      </nav>
+      <button class="mobile-menu-toggle" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="user-menu">
+        <div class="user-info">
+          <i class="fas fa-user-circle"></i>
+          <span id="headerUserName">Patient</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </button>
       </div>
     </div>
-    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-  </nav>
+  </header>
 
   <!-- Main Content -->
-  <main>
-    <!-- Dashboard Cards -->
-    <div class="grid">
-      <div class="card">
-        <div class="title"><i class="fas fa-id-card"></i> Patient ID</div>
-        <div class="value" id="userId">Loading...</div>
+  <div class="main-container">
+    <div class="dashboard-content">
+      <!-- Page Title -->
+      <div class="page-title">
+        <h1>Patient Dashboard</h1>
+        <p>Manage your medical records and health information</p>
       </div>
-      <div class="card">
-        <div class="title"><i class="fas fa-user"></i> Name</div>
-        <div class="value" id="userName">Loading...</div>
-      </div>
-      <div class="card">
-        <div class="title"><i class="fas fa-phone"></i> Phone</div>
-        <div class="value" id="userPhone">Loading...</div>
-      </div>
-      <div class="card">
-        <div class="title"><i class="fas fa-envelope"></i> Email</div>
-        <div class="value" id="userEmail">Loading...</div>
-      </div>
-      <div class="card">
-        <div class="title"><i class="fas fa-file-medical"></i> Total Reports</div>
-        <div class="value" id="reportCount">0</div>
-      </div>
-    </div>
 
-    <!-- Upload Section -->
-    <form class="upload-form" id="uploadForm" enctype="multipart/form-data">
-      <h3><i class="fas fa-upload"></i> Upload New Report</h3>
-      <input type="text" id="reportType" name="reportType" placeholder="Report Type (e.g. X-Ray)" required autocomplete="off" />
-      <div id="suggestions" class="suggestions"></div>
-      <input type="file" name="report" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required />
-      <button type="submit"><i class="fas fa-upload"></i> Upload Report</button>
-    </form>
-
-    <!-- Filter & Reports Section -->
-    <div class="filter-section" id="reports">
-      <h2><i class="fas fa-filter"></i> Reports</h2>
-      <select id="filterSelect">
-        <option value="all">Show All Reports</option>
-      </select>
-    </div>
-
-    <!-- Reports List -->
-    <div id="reportList">
-      <div class="no-reports">
-        <i class="fas fa-file-medical"></i>
-        <div>No reports uploaded yet.</div>
-      </div>
-    </div>
-
-    <!-- Placeholder for Prescription -->
-    <div id="prescription" style="margin-top: 50px;">
-      <h2><i class="fas fa-prescription-bottle-alt"></i> Prescriptions</h2>
-      <div style="background: var(--white); padding: 2rem; border-radius: var(--radius-sm); box-shadow: var(--shadow-md); text-align: center; color: var(--gray);">
-        <i class="fas fa-pills" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-        <div>Prescription management coming soon...</div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Document-style Modal with Window Controls -->
-  <div id="reportModal" class="modal">
-    <div class="modal-content" id="modalBox">
-      <div class="modal-header">
-        <div class="document-title">
+      <!-- Dashboard Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="icon">
+            <i class="fas fa-id-card"></i>
+          </div>
+          <div class="title">Patient ID</div>
+          <div class="value" id="userId">Loading...</div>
+        </div>
+       
+        <div class="stat-card">
+          <div class="icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="title">Full Name</div>
+          <div class="value" id="userName">Loading...</div>
+        </div>
+       
+        <div class="stat-card">
+          <div class="icon">
+            <i class="fas fa-phone"></i>
+          </div>
+          <div class="title">Phone Number</div>
+          <div class="value" id="userPhone">Loading...</div>
+        </div>
+       
+        <div class="stat-card">
+          <div class="icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="title">Email Address</div>
+          <div class="value" id="userEmail">Loading...</div>
+        </div>
+       
+        <div class="stat-card">
           <div class="icon">
             <i class="fas fa-file-medical"></i>
           </div>
-          <div class="text">
-            <div class="main-title" id="modalTitle">Medical Report</div>
-            <div class="sub-title">Patient Document Viewer</div>
+          <div class="title">Total Reports</div>
+          <div class="value" id="reportCount">0</div>
+        </div>
+      </div>
+
+      <!-- Upload Section -->
+      <div class="upload-section" id="upload">
+        <h2 class="section-title">
+          <i class="fas fa-upload"></i>
+          Upload New Report
+        </h2>
+       
+        <form class="upload-form" id="uploadForm" enctype="multipart/form-data">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reportType">Report Type</label>
+              <input
+                type="text"
+                id="reportType"
+                name="reportType"
+                placeholder="e.g., X-Ray, Blood Test, MRI"
+                required
+                autocomplete="off"
+              />
+              <div id="suggestions" class="suggestions"></div>
+            </div>
+           
+            <div class="form-group">
+              <label for="reportFile">Select File</label>
+              <input
+                type="file"
+                id="reportFile"
+                name="report"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                required
+              />
+            </div>
+          </div>
+         
+          <button type="submit" class="upload-btn">
+            <i class="fas fa-upload"></i>
+            Upload Report
+          </button>
+        </form>
+      </div>
+
+      <!-- Reports Section -->
+      <div class="reports-section" id="reports">
+        <div class="reports-header">
+          <h2 class="section-title">
+            <i class="fas fa-file-medical"></i>
+            Medical Reports
+          </h2>
+         
+          <select id="filterSelect" class="filter-select">
+            <option value="all">All Reports</option>
+          </select>
+        </div>
+       
+        <div id="reportList" class="reports-list">
+          <div class="no-reports">
+            <i class="fas fa-file-medical"></i>
+            <h3>No reports uploaded yet</h3>
+            <p>Upload your first medical report above</p>
           </div>
         </div>
+      </div>
+
+      <!-- 🔄 Updated Prescription Section -->
+      <div class="prescription-section" id="prescription">
+        <h2 class="section-title">
+          <i class="fas fa-prescription-bottle-alt"></i>
+          My Prescriptions
+        </h2>
         
-        <!-- Window Controls Only -->
+        <!-- Loading State -->
+        <div id="prescriptionLoading" class="loading-state" style="display: none;">
+          <div class="spinner"></div>
+          <p>Loading prescriptions...</p>
+        </div>
+        
+        <!-- Prescriptions List -->
+        <div id="prescriptionsList" class="prescriptions-list">
+          <!-- Prescriptions will be populated here -->
+        </div>
+        
+        <!-- No Prescriptions State -->
+        <div id="noPrescriptions" class="no-prescriptions" style="display: none;">
+          <i class="fas fa-prescription-bottle-alt"></i>
+          <h3>No prescriptions yet</h3>
+          <p>Your doctor's prescriptions will appear here</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Modal -->
+  <div id="reportModal" class="modal">
+    <div class="modal-content" id="modalBox">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-file-medical"></i>
+          <span id="modalTitle">Medical Report</span>
+        </div>
+       
         <div class="window-controls">
-          <button class="control-btn minimize" id="minBtn" title="Minimize">
-            <i class="fas fa-window-minimize"></i>
-          </button>
-          <button class="control-btn maximize" id="maxBtn" title="Maximize">
-            <i class="fas fa-window-maximize"></i>
-          </button>
           <button class="control-btn close" onclick="closeModal()" title="Close">
             <i class="fas fa-times"></i>
           </button>
         </div>
       </div>
+     
       <div class="modal-body">
         <div class="modal-loading" id="modalLoading">
-          <div class="document-spinner"></div>
-          <div class="loading-text">Loading document...</div>
+          <div class="spinner"></div>
+          <div>Loading document...</div>
         </div>
         <iframe id="reportFrame" src="" onload="hideLoading()"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔄 Prescription Detail Modal -->
+  <div id="prescriptionModal" class="modal-prescription" style="display: none;">
+    <div class="modal-content-prescription">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-prescription-bottle-alt"></i>
+          <span>Prescription Details</span>
+        </div>
+        <div class="window-controls">
+          <button class="control-btn close" onclick="closePrescriptionModal()" title="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="modal-body-prescription">
+        <div id="prescriptionDetails">
+          <!-- Prescription details will be loaded here -->
+        </div>
       </div>
     </div>
   </div>
@@ -860,15 +1506,9 @@
   <!-- JavaScript -->
   <script>
     let allReports = [];
-    
-    // Window control state
-    const modal = document.getElementById('reportModal');
-    const modalBox = document.getElementById('modalBox');
-    const minBtn = document.getElementById('minBtn');
-    const maxBtn = document.getElementById('maxBtn');
-    let isMin = false;
-    let isMax = false;
-    
+    let patientNotifications = [];
+    let patientPrescriptions = [];
+   
     const globalReportNames = [
       "X-Ray", "MRI", "CT Scan", "Blood Test", "Urine Test", "Liver Function Test",
       "Kidney Function Test", "Electrocardiogram (ECG)", "EEG", "Lipid Profile", "CBC",
@@ -881,19 +1521,495 @@
       "Vitamin D Test", "Iron Studies", "Immunology Report", "Allergy Test", "COVID-19 Test"
     ];
 
+    // 🔄 Updated load notifications function
+    async function loadNotifications() {
+      try {
+        const response = await fetch('/notifications/patient');
+        if (response.ok) {
+          const data = await response.json();
+          patientNotifications = data.notifications || [];
+        } else {
+          throw new Error('API not available');
+        }
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+        // Fallback to localStorage for demo
+        const patientNotificationsLocal = JSON.parse(localStorage.getItem('notifications_patient')) || [];
+        const allUserNotifications = JSON.parse(localStorage.getItem('notifications_all')) || [];
+       
+        patientNotifications = [...patientNotificationsLocal, ...allUserNotifications];
+        patientNotifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      }
+     
+      updateNotificationUI();
+    }
+
+    function updateNotificationUI() {
+      const notificationList = document.getElementById('notificationList');
+      const notificationBadge = document.getElementById('notificationBadge');
+     
+      const unreadCount = patientNotifications.filter(n => !n.isRead).length;
+     
+      if (unreadCount > 0) {
+        notificationBadge.textContent = unreadCount;
+        notificationBadge.style.display = 'flex';
+      } else {
+        notificationBadge.style.display = 'none';
+      }
+     
+      if (patientNotifications.length === 0) {
+        notificationList.innerHTML = `
+          <div class="no-notifications">
+            <i class="fas fa-bell-slash"></i>
+            <h4>No notifications yet</h4>
+            <p>Admin notifications will appear here</p>
+          </div>
+        `;
+        return;
+      }
+     
+      notificationList.innerHTML = patientNotifications.map(notification => `
+        <div class="notification-item-dropdown ${!notification.isRead ? 'unread' : ''}" onclick="markAsRead('${notification._id || notification.id}')">
+          <div class="notification-content">
+            <div class="notification-icon">
+              <i class="${getNotificationIcon(notification.priority || 'normal')}"></i>
+            </div>
+            <div class="notification-text">
+              <div class="notification-title">${notification.title}</div>
+              <div class="notification-message">${notification.message}</div>
+              <div class="notification-time">
+                <i class="fas fa-clock"></i>
+                ${formatTimeAgo(notification.timestamp)}
+                <span class="priority-badge priority-${notification.priority || 'normal'}">${(notification.priority || 'normal').toUpperCase()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function getNotificationIcon(priority) {
+      switch(priority) {
+        case 'urgent': return 'fas fa-exclamation-triangle';
+        case 'high': return 'fas fa-exclamation-circle';
+        default: return 'fas fa-info-circle';
+      }
+    }
+
+    function formatTimeAgo(timestamp) {
+      const now = new Date();
+      const notificationTime = new Date(timestamp);
+      const diffInMillis = now - notificationTime;
+      const diffInMinutes = Math.floor(diffInMillis / (1000 * 60));
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      const diffInDays = Math.floor(diffInHours / 24);
+     
+      if (diffInMinutes < 1) return 'Just now';
+      if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+      if (diffInHours < 24) return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+    }
+
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notificationDropdown');
+      const isVisible = dropdown.classList.contains('show');
+     
+      if (isVisible) {
+        dropdown.classList.remove('show');
+        document.removeEventListener('click', handleOutsideClick);
+      } else {
+        dropdown.classList.add('show');
+        setTimeout(() => {
+          document.addEventListener('click', handleOutsideClick);
+        }, 100);
+      }
+    }
+
+    function handleOutsideClick(event) {
+      const dropdown = document.getElementById('notificationDropdown');
+      const notificationItem = document.querySelector('.notification-item');
+     
+      if (!dropdown.contains(event.target) && !notificationItem.contains(event.target)) {
+        dropdown.classList.remove('show');
+        document.removeEventListener('click', handleOutsideClick);
+      }
+    }
+
+    // 🔄 Updated mark as read function
+    async function markAsRead(notificationId) {
+      try {
+        await fetch(`/notifications/${notificationId}/read`, { method: 'PUT' });
+        const notification = patientNotifications.find(n => (n._id || n.id) === notificationId);
+        if (notification) {
+          notification.isRead = true;
+          updateNotificationUI();
+        }
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+        // Fallback for demo data
+        const notification = patientNotifications.find(n => (n._id || n.id) === notificationId);
+        if (notification) {
+          notification.isRead = true;
+          updateNotificationUI();
+        }
+      }
+    }
+
+    // 🔄 Updated clear all notifications function
+    async function clearAllNotifications() {
+      if (confirm('Are you sure you want to mark all notifications as read?')) {
+        try {
+          await fetch('/notifications/patient/clear', { method: 'DELETE' });
+          loadNotifications(); // Reload to reflect changes
+        } catch (error) {
+          console.error('Error clearing notifications:', error);
+          // Fallback for demo data
+          patientNotifications.forEach(n => n.isRead = true);
+          updateNotificationUI();
+        }
+      }
+    }
+
+    // 🔄 Load Patient Prescriptions
+    async function loadPrescriptions() {
+      try {
+        const userId = document.getElementById('userId').textContent;
+        
+        if (!userId || userId === 'Loading...') {
+          setTimeout(loadPrescriptions, 1000);
+          return;
+        }
+
+        document.getElementById('prescriptionLoading').style.display = 'block';
+        document.getElementById('prescriptionsList').innerHTML = '';
+        document.getElementById('noPrescriptions').style.display = 'none';
+
+        const response = await fetch(`/api/patient/${userId}/prescriptions`);
+        const data = await response.json();
+
+        if (data.success) {
+          patientPrescriptions = data.prescriptions || [];
+          renderPrescriptions();
+        } else {
+          throw new Error(data.message);
+        }
+      } catch (error) {
+        console.error('Error loading prescriptions:', error);
+        document.getElementById('prescriptionLoading').style.display = 'none';
+        document.getElementById('noPrescriptions').style.display = 'block';
+      }
+    }
+
+    // 🔄 Updated Render Prescriptions with Delete Button
+    function renderPrescriptions() {
+      document.getElementById('prescriptionLoading').style.display = 'none';
+      
+      if (patientPrescriptions.length === 0) {
+        document.getElementById('noPrescriptions').style.display = 'block';
+        document.getElementById('prescriptionsList').innerHTML = '';
+        return;
+      }
+
+      document.getElementById('noPrescriptions').style.display = 'none';
+      const prescriptionsList = document.getElementById('prescriptionsList');
+      
+      prescriptionsList.innerHTML = patientPrescriptions.map(prescription => `
+        <div class="prescription-item">
+          <div class="prescription-header">
+            <div class="prescription-info">
+              <h3>${prescription.diagnosis || 'General Consultation'}</h3>
+              <p><i class="fas fa-user-md"></i> Dr. ${prescription.doctorId?.name || 'Unknown'}</p>
+              <p><i class="fas fa-envelope"></i> ${prescription.doctorId?.email || 'N/A'}</p>
+              ${prescription.followUpDate ? `<p><i class="fas fa-calendar"></i> Follow-up: ${new Date(prescription.followUpDate).toLocaleDateString('en-IN')}</p>` : ''}
+            </div>
+            <div class="prescription-date">
+              ${new Date(prescription.date).toLocaleDateString('en-IN')}
+            </div>
+          </div>
+          
+          ${prescription.medications && prescription.medications.length > 0 ? `
+            <div class="prescription-medications">
+              <h4><i class="fas fa-pills"></i> Medications (${prescription.medications.length})</h4>
+              <div class="medication-list">
+                ${prescription.medications.slice(0, 3).map(med => `
+                  <span class="medication-tag">${med.name}</span>
+                `).join('')}
+                ${prescription.medications.length > 3 ? `<span class="medication-tag">+${prescription.medications.length - 3} more</span>` : ''}
+              </div>
+            </div>
+          ` : ''}
+          
+          <!-- 🔄 NEW: Prescription Actions -->
+          <div class="prescription-actions">
+            <button class="prescription-btn btn-view" onclick="viewPrescriptionDetails('${prescription._id}')">
+              <i class="fas fa-eye"></i> View Details
+            </button>
+            <button class="prescription-btn btn-delete" onclick="deletePrescription('${prescription._id}', '${prescription.diagnosis || 'General Consultation'}')">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 🔄 View Prescription Details
+    async function viewPrescriptionDetails(prescriptionId) {
+      try {
+        const response = await fetch(`/api/prescriptions/${prescriptionId}`);
+        const data = await response.json();
+
+        if (data.success) {
+          const prescription = data.prescription;
+          const detailsContainer = document.getElementById('prescriptionDetails');
+          
+          detailsContainer.innerHTML = `
+            <div class="prescription-details">
+              <div class="detail-row">
+                <span class="detail-label">Doctor:</span>
+                <span class="detail-value">Dr. ${prescription.doctorId?.name || 'Unknown'}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Date:</span>
+                <span class="detail-value">${new Date(prescription.date).toLocaleString('en-IN')}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Diagnosis:</span>
+                <span class="detail-value">${prescription.diagnosis || 'N/A'}</span>
+              </div>
+              ${prescription.notes ? `
+                <div class="detail-row">
+                  <span class="detail-label">Notes:</span>
+                  <span class="detail-value">${prescription.notes}</span>
+                </div>
+              ` : ''}
+              ${prescription.followUpDate ? `
+                <div class="detail-row">
+                  <span class="detail-label">Follow-up:</span>
+                  <span class="detail-value">${new Date(prescription.followUpDate).toLocaleDateString('en-IN')}</span>
+                </div>
+              ` : ''}
+              
+              ${prescription.medications && prescription.medications.length > 0 ? `
+                <div class="medications-detail">
+                  <h4><i class="fas fa-pills"></i> Prescribed Medications</h4>
+                  ${prescription.medications.map(med => `
+                    <div class="medication-item">
+                      <div class="medication-name">${med.name}</div>
+                      ${med.dosage ? `<div style="font-size: 0.9rem; color: var(--gray); margin-top: 0.2rem;">Dosage: ${med.dosage}</div>` : ''}
+                      ${med.frequency ? `<div style="font-size: 0.9rem; color: var(--gray);">Frequency: ${med.frequency}</div>` : ''}
+                      ${med.duration ? `<div style="font-size: 0.9rem; color: var(--gray);">Duration: ${med.duration}</div>` : ''}
+                      ${med.instructions ? `<div style="font-size: 0.9rem; color: var(--gray); margin-top: 0.3rem;">Instructions: ${med.instructions}</div>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              ` : ''}
+            </div>
+          `;
+          
+          document.getElementById('prescriptionModal').style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+        } else {
+          alert('Failed to load prescription details');
+        }
+      } catch (error) {
+        console.error('Error loading prescription details:', error);
+        alert('Error loading prescription details');
+      }
+    }
+
+    // 🔄 NEW: Delete Prescription Function
+    async function deletePrescription(prescriptionId, prescriptionName) {
+      // Show custom confirmation dialog
+      showConfirmationDialog(
+        'Delete Prescription',
+        `Are you sure you want to delete the prescription for "${prescriptionName}"? This action cannot be undone.`,
+        async () => {
+          try {
+            // Show loading state
+            const deleteBtn = document.querySelector(`button[onclick*="${prescriptionId}"]`);
+            const originalHTML = deleteBtn.innerHTML;
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+            deleteBtn.disabled = true;
+
+            const response = await fetch(`/api/prescriptions/${prescriptionId}`, {
+              method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              // Show success message
+              showToast('✅ Prescription deleted successfully!', 'success');
+              
+              // Remove from local array
+              patientPrescriptions = patientPrescriptions.filter(p => p._id !== prescriptionId);
+              
+              // Re-render prescriptions
+              renderPrescriptions();
+            } else {
+              throw new Error(data.message || 'Failed to delete prescription');
+            }
+          } catch (error) {
+            console.error('Error deleting prescription:', error);
+            showToast(`❌ Failed to delete prescription: ${error.message}`, 'error');
+            
+            // Reset button state
+            const deleteBtn = document.querySelector(`button[onclick*="${prescriptionId}"]`);
+            if (deleteBtn) {
+              deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+              deleteBtn.disabled = false;
+            }
+          }
+        }
+      );
+    }
+
+    // 🔄 NEW: Custom Confirmation Dialog
+    function showConfirmationDialog(title, message, onConfirm) {
+      // Remove existing dialog if any
+      const existingDialog = document.querySelector('.confirmation-overlay');
+      if (existingDialog) {
+        existingDialog.remove();
+      }
+
+      // Create confirmation dialog
+      const overlay = document.createElement('div');
+      overlay.className = 'confirmation-overlay';
+      overlay.innerHTML = `
+        <div class="confirmation-dialog">
+          <h3>${title}</h3>
+          <p>${message}</p>
+          <div class="confirmation-actions">
+            <button class="confirm-btn cancel" onclick="hideConfirmationDialog()">Cancel</button>
+            <button class="confirm-btn danger" onclick="confirmDelete()">Delete</button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
+      
+      // Store the confirm callback
+      window.confirmCallback = onConfirm;
+      
+      // Show dialog
+      setTimeout(() => {
+        overlay.classList.add('show');
+      }, 10);
+      
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
+    }
+
+    // 🔄 NEW: Hide Confirmation Dialog
+    function hideConfirmationDialog() {
+      const overlay = document.querySelector('.confirmation-overlay');
+      if (overlay) {
+        overlay.classList.remove('show');
+        setTimeout(() => {
+          overlay.remove();
+        }, 300);
+      }
+      document.body.style.overflow = 'auto';
+      window.confirmCallback = null;
+    }
+
+    // 🔄 NEW: Confirm Delete Action
+    function confirmDelete() {
+      if (window.confirmCallback) {
+        window.confirmCallback();
+      }
+      hideConfirmationDialog();
+    }
+
+    // 🔄 NEW: Toast Notification Function
+    function showToast(message, type = 'success') {
+      // Remove existing toasts
+      const existingToasts = document.querySelectorAll('.toast-notification');
+      existingToasts.forEach(toast => toast.remove());
+
+      // Create new toast
+      const toast = document.createElement('div');
+      toast.className = `toast-notification ${type}`;
+      
+      const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
+      toast.innerHTML = `
+        <i class="${icon}"></i>
+        <span>${message}</span>
+      `;
+      
+      // Add toast styles
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? 'var(--success)' : 'var(--accent)'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        z-index: 4000;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        animation: slideInRight 0.3s ease-out;
+        max-width: 400px;
+        word-wrap: break-word;
+      `;
+      
+      document.body.appendChild(toast);
+      
+      // Auto remove after 4 seconds
+      setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // 🔄 Close Prescription Modal
+    function closePrescriptionModal() {
+      document.getElementById('prescriptionModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Mobile menu toggle
+    function toggleMenu() {
+      const navMenu = document.getElementById('navMenu');
+      const mobileToggle = document.querySelector('.mobile-menu-toggle');
+     
+      navMenu.classList.toggle('active');
+      mobileToggle.classList.toggle('active');
+     
+      if (navMenu.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    function closeMenu() {
+      const navMenu = document.getElementById('navMenu');
+      const mobileToggle = document.querySelector('.mobile-menu-toggle');
+     
+      navMenu.classList.remove('active');
+      mobileToggle.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
     // Load Dashboard Data
     async function loadDashboard() {
       try {
         const res = await fetch('/api/patient-dashboard');
         const data = await res.json();
         allReports = data.reports;
-        
+       
         document.getElementById('userId').textContent = data.user._id;
         document.getElementById('userName').textContent = data.user.name || "N/A";
         document.getElementById('userPhone').textContent = data.user.phone || "N/A";
         document.getElementById('userEmail').textContent = data.user.email || "N/A";
         document.getElementById('reportCount').textContent = allReports.length;
-        
+        document.getElementById('headerUserName').textContent = data.user.name || "Patient";
+       
         populateFilterOptions();
         renderReports(allReports);
       } catch (error) {
@@ -904,11 +2020,10 @@
     // Populate Filter Options
     function populateFilterOptions() {
       const filterSelect = document.getElementById('filterSelect');
-      // Clear existing options except first one
       while(filterSelect.children.length > 1) {
         filterSelect.removeChild(filterSelect.lastChild);
       }
-      
+     
       const types = [...new Set(allReports.map(r => r.reportType))];
       types.forEach(type => {
         const option = document.createElement('option');
@@ -936,7 +2051,6 @@
       const suggestions = globalReportNames.filter(type =>
         type.toLowerCase().includes(input)
       );
-
       if (suggestions.length > 0 && input) {
         suggestionsDiv.innerHTML = suggestions.map(type => `<div>${type}</div>`).join('');
         suggestionsDiv.style.display = 'block';
@@ -945,7 +2059,6 @@
       }
     });
 
-    // Handle suggestion clicks
     document.getElementById('suggestions').addEventListener('click', function (e) {
       if (e.target.tagName === 'DIV') {
         document.getElementById('reportType').value = e.target.textContent;
@@ -953,7 +2066,6 @@
       }
     });
 
-    // Hide suggestions when clicking outside
     document.addEventListener('click', function(e) {
       const suggestions = document.getElementById('suggestions');
       const reportType = document.getElementById('reportType');
@@ -969,167 +2081,83 @@
         reportList.innerHTML = `
           <div class="no-reports">
             <i class="fas fa-file-medical"></i>
-            <div>No reports found.</div>
+            <h3>No reports found</h3>
+            <p>Upload your first medical report above</p>
           </div>`;
         return;
       }
-      
+     
       reportList.innerHTML = reports.map(r => `
         <div class="report-item">
-          <div class="details">
-            <strong>${r.reportType}</strong>
-            <small>Uploaded: ${new Date(r.uploadedAt).toLocaleString()}</small>
+          <div class="report-details">
+            <div class="report-type">${r.reportType}</div>
+            <div class="report-date">Uploaded: ${new Date(r.uploadedAt).toLocaleString()}</div>
           </div>
-          <div class="actions">
-            <button class="btn btn-success" onclick="openReportModal('${r.filePath}', '${r.reportType}')">
+          <div class="report-actions">
+            <button class="btn btn-view" onclick="openReportModal('${r.filePath}', '${r.reportType}')">
               <i class="fas fa-eye"></i> View
             </button>
-            <a href="/${r.filePath}" download class="btn btn-primary">
+            <a href="/${r.filePath}" download class="btn btn-download">
               <i class="fas fa-download"></i> Download
             </a>
-            <button class="btn btn-danger" onclick="deleteReport('${r._id}')">
+            <button class="btn btn-delete" onclick="deleteReport('${r._id}')">
               <i class="fas fa-trash"></i> Delete
             </button>
           </div>
         </div>`).join('');
     }
 
-    // Enhanced Window Controls
-    minBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (!isMin) {
-        // Minimize
-        modalBox.classList.add('minimized');
-        modalBox.classList.remove('maximized');
-        isMin = true;
-        isMax = false;
-        minBtn.innerHTML = '<i class="fas fa-window-restore"></i>';
-        minBtn.title = 'Restore';
-        maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
-        maxBtn.title = 'Maximize';
-      } else {
-        // Restore from minimized
-        modalBox.classList.remove('minimized');
-        isMin = false;
-        minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
-        minBtn.title = 'Minimize';
-      }
-    });
-
-    maxBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (!isMax) {
-        // Maximize to full screen
-        modalBox.classList.add('maximized');
-        modalBox.classList.remove('minimized');
-        isMax = true;
-        isMin = false;
-        maxBtn.innerHTML = '<i class="fas fa-compress"></i>';
-        maxBtn.title = 'Restore';
-        minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
-        minBtn.title = 'Minimize';
-      } else {
-        // Restore from maximized
-        modalBox.classList.remove('maximized');
-        isMax = false;
-        maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
-        maxBtn.title = 'Maximize';
-      }
-    });
-
-    // Double click on header to toggle maximize
-    document.querySelector('.modal-header').addEventListener('dblclick', function() {
-      if (!isMax) {
-        modalBox.classList.add('maximized');
-        modalBox.classList.remove('minimized');
-        isMax = true;
-        isMin = false;
-        maxBtn.innerHTML = '<i class="fas fa-compress"></i>';
-        maxBtn.title = 'Restore';
-      } else {
-        modalBox.classList.remove('maximized');
-        isMax = false;
-        maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
-        maxBtn.title = 'Maximize';
-      }
-    });
-
-    // Restore from minimized state when clicking on the bar
-    modalBox.addEventListener('click', function() {
-      if (isMin) {
-        modalBox.classList.remove('minimized');
-        isMin = false;
-        minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
-        minBtn.title = 'Minimize';
-      }
-    });
-
-    // Document Modal Functions
+    // Modal Functions
     function openReportModal(filePath, reportType) {
       const iframe = document.getElementById('reportFrame');
       const title = document.getElementById('modalTitle');
       const loading = document.getElementById('modalLoading');
-      
+     
       title.textContent = reportType;
       loading.style.display = 'flex';
       iframe.style.display = 'none';
       iframe.src = '/' + filePath;
-      modal.style.display = 'block';
-      
-      // Reset window state
-      modalBox.classList.remove('minimized', 'maximized');
-      isMin = false;
-      isMax = false;
-      minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
-      maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
-      minBtn.title = 'Minimize';
-      maxBtn.title = 'Maximize';
-      
+      document.getElementById('reportModal').style.display = 'block';
       document.body.style.overflow = 'hidden';
     }
 
     function hideLoading() {
-      const loading = document.getElementById('modalLoading');
-      const iframe = document.getElementById('reportFrame');
       setTimeout(() => {
-        loading.style.display = 'none';
-        iframe.style.display = 'block';
+        document.getElementById('modalLoading').style.display = 'none';
+        document.getElementById('reportFrame').style.display = 'block';
       }, 500);
     }
 
     function closeModal() {
-      const iframe = document.getElementById('reportFrame');
-      
-      modal.style.display = 'none';
-      iframe.src = '';
-      
-      // Reset window state
-      modalBox.classList.remove('minimized', 'maximized');
-      isMin = false;
-      isMax = false;
-      minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
-      maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
-      
+      document.getElementById('reportModal').style.display = 'none';
+      document.getElementById('reportFrame').src = '';
       document.body.style.overflow = 'auto';
     }
 
-    // Event Listeners
     window.onclick = function(event) {
-      if (event.target === modal && !isMin) {
+      const modal = document.getElementById('reportModal');
+      const prescriptionModal = document.getElementById('prescriptionModal');
+      
+      if (event.target === modal) {
         closeModal();
+      }
+      if (event.target === prescriptionModal) {
+        closePrescriptionModal();
       }
     }
 
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
         closeModal();
+        closePrescriptionModal();
+        hideConfirmationDialog();
       }
     });
 
     // Delete Report
     async function deleteReport(id) {
       if (!confirm('Are you sure you want to delete this report?')) return;
-      
+     
       try {
         await fetch(`/delete-report/${id}`, { method: 'DELETE' });
         loadDashboard();
@@ -1142,16 +2170,16 @@
     // Upload Form Handler
     document.getElementById('uploadForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-      
-      const submitBtn = this.querySelector('button[type="submit"]');
+     
+      const submitBtn = this.querySelector('.upload-btn');
       const originalText = submitBtn.innerHTML;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
       submitBtn.disabled = true;
-      
+     
       try {
         const formData = new FormData(this);
         const res = await fetch('/upload-report', { method: 'POST', body: formData });
-        
+       
         if (res.ok) {
           alert('✅ Report uploaded successfully!');
           this.reset();
@@ -1182,8 +2210,77 @@
       }
     }
 
-    // Initialize Dashboard
-    loadDashboard();
+    // Smooth scrolling for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+         
+          document.querySelectorAll('.nav-menu a').forEach(link => link.classList.remove('active'));
+          this.classList.add('active');
+         
+          // Load prescriptions when prescription section is clicked
+          if (this.getAttribute('href') === '#prescription') {
+            loadPrescriptions();
+          }
+         
+          closeMenu();
+        }
+      });
+    });
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const navMenu = document.getElementById('navMenu');
+      const mobileToggle = document.querySelector('.mobile-menu-toggle');
+      const logo = document.querySelector('.logo');
+     
+      if (!navMenu.contains(e.target) &&
+          !mobileToggle.contains(e.target) &&
+          !logo.contains(e.target) &&
+          navMenu.classList.contains('active')) {
+        closeMenu();
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        closeMenu();
+      }
+    });
+
+    // Handle ESC key to close menu
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && document.getElementById('navMenu').classList.contains('active')) {
+        closeMenu();
+      }
+    });
+
+    // 🔄 Initialize Dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 Patient Dashboard initializing...');
+      loadDashboard();
+      loadNotifications();
+      
+      // Load prescriptions after dashboard is loaded
+      setTimeout(() => {
+        loadPrescriptions();
+      }, 1500);
+      
+      // Check for new notifications every 30 seconds
+      setInterval(loadNotifications, 30000);
+      
+      // Check for new prescriptions every 60 seconds
+      setInterval(loadPrescriptions, 60000);
+      
+      console.log('✅ Patient Dashboard initialized with notifications and prescriptions');
+    });
   </script>
 </body>
 </html>

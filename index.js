@@ -534,11 +534,29 @@ app.get('/api/patient-dashboard', requireAuth, async (req, res) => {
 });
 
 // PRESCRIPTIONS KE LIYE ROUTES
+const patientRoutes = require('./routes/patient');
 const prescriptionRoutes = require('./routes/prescriptions');
+
+// Use routes (existing app.use statements के बाद add करें)
+app.use('/', patientRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 
-const patientRoutes = require('./routes/patient');
-app.use('/', patientRoutes);
+
+//notification ke liye
+const notificationsRoutes = require('./routes/notifications');
+app.use('/notifications', notificationsRoutes);
+
+//hospital setting ke liye 
+const hospitalSettingsRoutes = require('./routes/hospitalSettings');
+app.use('/', hospitalSettingsRoutes);
+app.get('/hospital-settings', (req, res) => {
+  if (!req.session.userId || req.session.role !== 'hospital_staff') {
+    return res.redirect('/login');
+  }
+  res.sendFile(path.join(__dirname, 'front', 'hospital-settings.html'));
+});
+
+
 
 
 //  Start Server

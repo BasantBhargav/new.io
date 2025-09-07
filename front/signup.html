@@ -3,323 +3,377 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MediVault - Sign Up</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>Sign Up | MediVault</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --primary: #5b6dfa;
-      --primary-dark: #4a5edf;
-      --accent: #36d1dc;
-      --bg: #f6f9fc;
-      --text-dark: #1e1e2f;
-      --text-light: #6b7280;
-      --success: #4CAF50;
-      --warning: #FF9800;
-      --error: #f44336;
-      --nav-bg: linear-gradient(to right, var(--primary), var(--accent));
-    }
 
+  <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
+    }
+
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #7209b7;
+      --accent: #f72585;
+      --success: #4cc9f0;
+      --dark: #212529;
+      --gray: #6c757d;
+      --light-gray: #f8f9fa;
+      --white: #ffffff;
+      --gradient-primary: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+      --gradient-secondary: linear-gradient(135deg, #f72585 0%, #4361ee 100%);
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
+      --radius: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 50%, #f0f8ff 100%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
 
-    /* ----------------- HEADER ----------------- */
-    header {
-      background: var(--nav-bg);
-      color: white;
-      padding: 10px 27px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    /* Animated Background Elements */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(67, 97, 238, 0.1) 0%, transparent 50%);
+      animation: float 8s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+
+    /* Header Styles - Matching Home Page */
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+      padding: 0;
+      box-shadow: var(--shadow-sm);
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
+      right: 0;
       z-index: 1000;
     }
 
-    header .logo {
-      font-size: 24px;
-      font-weight: 600;
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      height: 70px;
     }
 
-    header .logo i {
-      font-size: 24px;
-    }
-
-    header nav {
+    .logo {
       display: flex;
-      gap: 30px;
-    }
-
-    header nav a {
-      color: white;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
       text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .logo i {
+      font-size: 1.8rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    .nav-menu a {
+      text-decoration: none;
+      color: var(--dark);
       font-weight: 500;
-      transition: color 0.3s ease;
-      padding: 5px 0;
       position: relative;
+      transition: var(--transition);
+      padding: 0.5rem 0;
     }
 
-    header nav a:hover {
-      color: #e0e0e0;
-    }
-
-    header nav a::after {
+    .nav-menu a::after {
       content: '';
       position: absolute;
-      width: 0;
-      height: 2px;
-      background: white;
       bottom: 0;
       left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-primary);
       transition: width 0.3s ease;
     }
 
-    header nav a:hover::after {
+    .nav-menu a:hover::after {
       width: 100%;
     }
 
-    
+    .nav-menu a:hover {
+      color: var(--primary);
+    }
 
-    /* ----------------- SIGNUP CONTAINER ----------------- */
+    .nav-menu a.active {
+      color: var(--primary);
+    }
+
+    .nav-menu a.active::after {
+      width: 100%;
+    }
+
+    /* Main Container */
+    .main-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      margin-top: 70px;
+      position: relative;
+    }
+
+    /* Floating Background Elements */
+    .floating-elements {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .floating-card {
+      position: absolute;
+      background: white;
+      padding: 1rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: floatCard 5s ease-in-out infinite;
+      opacity: 0.7;
+    }
+
+    .floating-card:nth-child(1) {
+      top: 5%;
+      left: 8%;
+      animation-delay: 0s;
+    }
+
+    .floating-card:nth-child(2) {
+      top: 15%;
+      right: 10%;
+      animation-delay: 2s;
+    }
+
+    .floating-card:nth-child(3) {
+      bottom: 25%;
+      left: 5%;
+      animation-delay: 1s;
+    }
+
+    .floating-card:nth-child(4) {
+      bottom: 5%;
+      right: 8%;
+      animation-delay: 3s;
+    }
+
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(3deg); }
+    }
+
+    .floating-card i {
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+
+    .floating-card span {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    /* Signup Container */
     .signup-container {
       display: flex;
       width: 100%;
-      max-width: 1000px;
-      min-height: 600px;
-      background: white;
-      border-radius: 20px;
+      max-width: 1100px;
+      min-height: 700px;
+      background: var(--white);
+      border-radius: var(--radius);
       overflow: hidden;
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
-      margin: 90px auto 20px; /* Increased top margin for fixed header */
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 10;
+      border: 1px solid rgba(67, 97, 238, 0.1);
     }
 
+    /* Welcome Section */
     .welcome-section {
       flex: 1;
-      background: linear-gradient(rgba(91, 109, 250, 0.9), rgba(54, 209, 220, 0.9)), url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80');
-      background-size: cover;
-      background-position: center;
+      background: var(--gradient-primary);
       color: white;
-      padding: 40px;
+      padding: 3rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
       text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .welcome-logo {
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .welcome-logo i {
+      font-size: 3rem;
+      color: white;
     }
 
     .welcome-section h1 {
       font-size: 2.5rem;
-      margin-bottom: 20px;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 2;
     }
 
     .welcome-section p {
       font-size: 1.1rem;
-      line-height: 1.6;
-      margin-bottom: 30px;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      position: relative;
+      z-index: 2;
     }
 
-    .logo {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
+    .welcome-section .login-link {
       color: white;
+      text-decoration: underline;
+      font-weight: 600;
+      position: relative;
+      z-index: 2;
     }
 
+    .welcome-section .login-link:hover {
+      opacity: 0.8;
+    }
+
+    /* Form Section */
     .form-section {
-      flex: 1.2;
-      padding: 40px;
+      flex: 1.3;
+      padding: 2.5rem;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
+      max-height: 700px;
     }
 
     .form-header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 2rem;
     }
 
     .form-header h2 {
-      color: var(--primary);
-      margin-bottom: 10px;
-      font-size: 1.8rem;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .form-header p {
-      color: var(--text-light);
+      color: var(--gray);
+      font-size: 1rem;
     }
 
-    .role-selection {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    .role-card {
-      width: 140px;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: 2px solid #e0e0e0;
-      background: white;
-    }
-
-    .role-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-
-    .role-card.active {
-      border-color: var(--primary);
-      background: rgba(91, 109, 250, 0.05);
-    }
-
-    .role-card i {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-      color: var(--primary);
-    }
-
-    .role-card h3 {
-      font-size: 1.1rem;
-      margin-bottom: 5px;
-      color: var(--text-dark);
-    }
-
-    .role-card p {
-      font-size: 0.85rem;
-      color: var(--text-light);
-    }
-
-    .form-container {
-      display: none;
-      animation: fadeIn 0.5s ease;
-    }
-
-    .form-container.active {
-      display: block;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: var(--text-dark);
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 16px;
-      transition: border-color 0.3s;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: var(--primary);
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(91, 109, 250, 0.2);
-    }
-
-    .form-row {
-      display: flex;
-      gap: 20px;
-    }
-
-    .form-row .form-group {
-      flex: 1;
-    }
-
-    .btn {
-      padding: 14px;
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      font-weight: 600;
-      width: 100%;
-    }
-
-    .btn:hover {
-      background-color: #4a5edf;
-    }
-
-    .btn-secondary {
-      background: #e0e0e0;
-      color: var(--text-dark);
-      margin-top: 10px;
-    }
-
-    .btn-secondary:hover {
-      background: #d0d0d0;
-    }
-
-    .progress-bar {
-      height: 6px;
-      background: #e0e0e0;
-      border-radius: 3px;
-      margin: 20px 0;
-      overflow: hidden;
-    }
-
-    .progress {
-      height: 100%;
-      background: var(--primary);
-      width: 33%;
-      transition: width 0.5s ease;
-    }
-
+    /* Progress Indicator */
     .step-indicator {
       display: flex;
       justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: 1.5rem;
     }
 
     .step {
-      width: 30px;
-      height: 30px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: #e0e0e0;
+      background: #e2e8f0;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 10px;
-      font-weight: bold;
-      color: var(--text-light);
+      margin: 0 0.5rem;
+      font-weight: 700;
+      color: var(--gray);
+      transition: var(--transition);
+      position: relative;
     }
 
     .step.active {
       background: var(--primary);
       color: white;
+      box-shadow: 0 0 20px rgba(67, 97, 238, 0.3);
     }
 
     .step.completed {
@@ -327,314 +381,573 @@
       color: white;
     }
 
-    .footer-text {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: var(--text-light);
+    .step::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      width: 40px;
+      height: 2px;
+      background: #e2e8f0;
+      transform: translateY(-50%);
     }
 
-    .footer-text a {
+    .step:last-child::after {
+      display: none;
+    }
+
+    .step.completed::after {
+      background: var(--success);
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      margin: 1.5rem 0;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background: var(--gradient-primary);
+      width: 33%;
+      transition: width 0.5s ease;
+      border-radius: 2px;
+    }
+
+    /* Role Selection */
+    .role-selection {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .role-card {
+      width: 130px;
+      padding: 1.5rem 1rem;
+      border-radius: var(--radius);
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 2px solid #e2e8f0;
+      background: white;
+    }
+
+    .role-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+
+    .role-card.active {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(114, 9, 183, 0.05));
+      box-shadow: 0 0 20px rgba(67, 97, 238, 0.2);
+    }
+
+    .role-card i {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
       color: var(--primary);
-      text-decoration: none;
+    }
+
+    .role-card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--dark);
       font-weight: 600;
     }
 
-    .footer-text a:hover {
-      text-decoration: underline;
+    .role-card p {
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    /* Form Containers */
+    .form-container {
+      display: none;
+      animation: fadeInUp 0.5s ease;
+    }
+
+    .form-container.active {
+      display: block;
+    }
+
+    @keyframes fadeInUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      outline: none;
+      color: var(--dark);
+      transition: var(--transition);
+      background: var(--white);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.8rem 1.5rem;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--dark);
+    }
+
+    .btn-secondary:hover {
+      background: #cbd5e0;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
     .form-navigation {
       display: flex;
-      gap: 10px;
-      margin-top: 20px;
+      gap: 1rem;
+      margin-top: 1.5rem;
     }
 
     .form-navigation .btn {
       flex: 1;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      text-align: center;
     }
-    
 
+    .footer-text {
+      text-align: center;
+      margin-top: 2rem;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .footer-text a {
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .footer-text a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    /* Mobile Responsiveness */
     @media (max-width: 900px) {
       .signup-container {
         flex-direction: column;
         max-width: 600px;
+        min-height: auto;
       }
       
       .welcome-section {
-        padding: 30px;
+        padding: 2rem;
+      }
+      
+      .form-section {
+        padding: 2rem;
+        max-height: none;
       }
       
       .role-selection {
         flex-wrap: wrap;
+        gap: 0.8rem;
+      }
+
+      .floating-card {
+        display: none;
       }
     }
 
-    @media (max-width: 500px) {
-      body {
-        padding-top: 120px; /* More space for stacked header */
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
       }
-      
-      header {
-        flex-direction: column;
-        padding: 15px;
+
+      .main-container {
+        padding: 1rem;
       }
-      
-      header nav {
-        margin-top: 15px;
-        gap: 15px;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-      
+
       .signup-container {
-        min-height: auto;
-        margin-top: 120px;
+        max-width: 100%;
       }
-      
-      .form-section {
-        padding: 25px;
+
+      .nav-container {
+        padding: 0 1rem;
       }
-      
-      .role-card {
-        width: 120px;
-        padding: 15px;
-      }
-      
+
       .form-row {
         flex-direction: column;
         gap: 0;
       }
     }
+
+    @media (max-width: 480px) {
+      .welcome-section h1 {
+        font-size: 2rem;
+      }
+
+      .form-header h2 {
+        font-size: 1.5rem;
+      }
+
+      .role-card {
+        width: 110px;
+        padding: 1rem 0.8rem;
+      }
+
+      .role-card i {
+        font-size: 2rem;
+      }
+
+      .step {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <!-- Updated Header -->
-  <header>
-    <div class="logo">
-      <i class="fas fa-heartbeat"></i> MediVault
+  <!-- Header - Matching Home Page -->
+  <header class="header">
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <i class="fas fa-heartbeat"></i>
+        MediVault
+      </a>
+      
+      <nav class="nav-menu">
+        <a href="/">Home</a>
+        <a href="/login">Login</a>
+        <a href="/signup" class="active">Sign Up</a>
+      </nav>
     </div>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/login">Login</a>
-      <a href="/register">Signup</a>
-    </nav>
   </header>
-    
-  <div class="signup-container">
-    <div class="welcome-section">
-      <div class="logo">
-        <i class="fas fa-lock-medical"></i>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+      <div class="floating-card">
+        <i class="fas fa-shield-alt"></i>
+        <span>Secure</span>
       </div>
-      <h1>Welcome to MediVault</h1>
-      <p>Secure your health records and access them anytime, anywhere. Join our trusted healthcare network today.</p>
-      <p>Already a member? <a href="/login" style="color: white; text-decoration: underline;">Log in here</a></p>
+      <div class="floating-card">
+        <i class="fas fa-user-md"></i>
+        <span>Healthcare</span>
+      </div>
+      <div class="floating-card">
+        <i class="fas fa-cloud"></i>
+        <span>Cloud Storage</span>
+      </div>
+      <div class="floating-card">
+        <i class="fas fa-mobile-alt"></i>
+        <span>Mobile Ready</span>
+      </div>
     </div>
-    
-    <div class="form-section">
-      <div class="form-header">
-        <h2>Create Your Account</h2>
-        <p>Select your role to get started</p>
-      </div>
-      
-      <div class="step-indicator">
-        <div class="step active">1</div>
-        <div class="step">2</div>
-        <div class="step">3</div>
-      </div>
-      
-      <div class="progress-bar">
-        <div class="progress" id="progress"></div>
-      </div>
-      
-      <!-- Role Selection -->
-      <div class="role-selection">
-        <div class="role-card" data-role="patient">
-          <i class="fas fa-user-injured"></i>
-          <h3>Patient</h3>
-          <p>Manage your health records</p>
+
+    <!-- Signup Container -->
+    <div class="signup-container">
+      <!-- Welcome Section -->
+      <div class="welcome-section">
+        <div class="welcome-logo">
+          <i class="fas fa-user-plus"></i>
         </div>
-        <div class="role-card" data-role="doctor">
-          <i class="fas fa-user-md"></i>
-          <h3>Doctor</h3>
-          <p>Access patient records</p>
-        </div>
-        <div class="role-card" data-role="hospital_staff">
-          <i class="fas fa-hospital"></i>
-          <h3>Hospital</h3>
-          <p>Manage institution</p>
-        </div>
+        <h1>Join MediVault</h1>
+        <p>Secure your health records and access them anytime, anywhere. Join our trusted healthcare network today.</p>
+        <p>Already a member? <a href="/login" class="login-link">Log in here</a></p>
       </div>
       
-      <!-- Common Fields -->
-      <div class="form-container" id="common-fields">
-        <form id="signup-form">
+      <!-- Form Section -->
+      <div class="form-section">
+        <div class="form-header">
+          <h2>Create Your Account</h2>
+          <p>Select your role to get started</p>
+        </div>
+        
+        <div class="step-indicator">
+          <div class="step active">1</div>
+          <div class="step">2</div>
+          <div class="step">3</div>
+        </div>
+        
+        <div class="progress-bar">
+          <div class="progress" id="progress"></div>
+        </div>
+        
+        <!-- Role Selection -->
+        <div class="role-selection">
+          <div class="role-card" data-role="patient">
+            <i class="fas fa-user-injured"></i>
+            <h3>Patient</h3>
+            <p>Manage records</p>
+          </div>
+          <div class="role-card" data-role="doctor">
+            <i class="fas fa-user-md"></i>
+            <h3>Doctor</h3>
+            <p>Access records</p>
+          </div>
+          <div class="role-card" data-role="hospital_staff">
+            <i class="fas fa-hospital"></i>
+            <h3>Hospital</h3>
+            <p>Manage institution</p>
+          </div>
+        </div>
+        
+        <!-- Common Fields -->
+        <div class="form-container" id="common-fields">
+          <form id="signup-form">
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Create a password" required>
+              </div>
+              <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" name="confirm_password" placeholder="Confirm your password" required>
+              </div>
+            </div>
+            
+            <input type="hidden" id="role" name="role">
+            
+            <button type="button" class="btn" id="next-btn">
+              <i class="fas fa-arrow-right"></i>
+              Next
+            </button>
+          </form>
+        </div>
+        
+        <!-- Patient Specific Fields -->
+        <div class="form-container" id="patient-fields">
+          <h3 class="section-title">Patient Information</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="age">Age</label>
+              <input type="number" id="age" name="age" placeholder="Enter your age" min="1" max="120" required>
+            </div>
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select id="gender" name="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          
           <div class="form-group">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+            <label for="address">Address</label>
+            <input type="text" id="address" name="address" placeholder="Enter your address">
+          </div>
+          
+          <div class="form-group">
+            <label for="contact_number">Contact Number</label>
+            <input type="tel" id="contact_number" name="contact_number" placeholder="Enter contact number">
+          </div>
+          
+          <div class="form-group">
+            <label for="medical_history">Medical History (comma separated)</label>
+            <textarea id="medical_history" name="medical_history" placeholder="e.g. Diabetes, Hypertension" rows="3"></textarea>
+          </div>
+          
+          <div class="form-navigation">
+            <button type="button" class="btn btn-secondary" id="patient-back-btn">
+              <i class="fas fa-arrow-left"></i>
+              Back
+            </button>
+            <button type="submit" class="btn" form="signup-form">
+              <i class="fas fa-user-plus"></i>
+              Create Account
+            </button>
+          </div>
+        </div>
+        
+        <!-- Doctor Specific Fields -->
+        <div class="form-container" id="doctor-fields">
+          <h3 class="section-title">Doctor Information</h3>
+          
+          <div class="form-group">
+            <label for="license_number">Medical License Number</label>
+            <input type="text" id="license_number" name="license_number" placeholder="Enter your license number" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="specialization">Specialization</label>
+            <input type="text" id="specialization" name="specialization" placeholder="Enter your specialization" required>
           </div>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="email">Email Address</label>
-              <input type="email" id="email" name="email" placeholder="Enter your email" required>
+              <label for="hospital_id">Hospital ID</label>
+              <input type="text" id="hospital_id" name="hospital_id" placeholder="Enter hospital ID" required>
             </div>
             <div class="form-group">
-              <label for="phone">Phone Number</label>
-              <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+              <label for="experience_years">Years of Experience</label>
+              <input type="number" id="experience_years" name="experience_years" placeholder="Enter years" min="0" max="60">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="doctor_contact">Contact Number</label>
+            <input type="tel" id="doctor_contact" name="contact_number" placeholder="Enter contact number">
+          </div>
+          
+          <div class="form-navigation">
+            <button type="button" class="btn btn-secondary" id="doctor-back-btn">
+              <i class="fas fa-arrow-left"></i>
+              Back
+            </button>
+            <button type="submit" class="btn" form="signup-form">
+              <i class="fas fa-user-plus"></i>
+              Create Account
+            </button>
+          </div>
+        </div>
+        
+        <!-- Hospital Specific Fields -->
+        <div class="form-container" id="hospital-fields">
+          <h3 class="section-title">Hospital Information</h3>
+          
+          <div class="form-group">
+            <label for="hospital_name">Hospital Name</label>
+            <input type="text" id="hospital_name" name="hospital_name" placeholder="Enter hospital name" required>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="address_line">Address Line</label>
+              <input type="text" id="address_line" name="address_line" placeholder="Street address" required>
+            </div>
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" id="city" name="city" placeholder="City" required>
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" id="password" name="password" placeholder="Create a password" required>
+              <label for="state">State</label>
+              <input type="text" id="state" name="state" placeholder="State" required>
             </div>
             <div class="form-group">
-              <label for="confirm-password">Confirm Password</label>
-              <input type="password" id="confirm-password" name="confirm_password" placeholder="Confirm your password" required>
+              <label for="pin_code">PIN Code</label>
+              <input type="text" id="pin_code" name="pin_code" placeholder="PIN code" required>
             </div>
           </div>
           
-          <input type="hidden" id="role" name="role">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="hospital_phone">Phone</label>
+              <input type="tel" id="hospital_phone" name="hospital_phone" placeholder="Hospital phone">
+            </div>
+            <div class="form-group">
+              <label for="hospital_email">Email</label>
+              <input type="email" id="hospital_email" name="hospital_email" placeholder="Hospital email">
+            </div>
+          </div>
           
-          <button type="button" class="btn" id="next-btn">Next</button>
-        </form>
-      </div>
-      
-      <!-- Patient Specific Fields -->
-      <div class="form-container" id="patient-fields">
-        <h3 style="margin-bottom: 20px; color: var(--primary);">Patient Information</h3>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="age">Age</label>
-            <input type="number" id="age" name="age" placeholder="Enter your age" min="1" max="120" required>
-          </div>
-          <div class="form-group">
-            <label for="gender">Gender</label>
-            <select id="gender" name="gender" required>
-              <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
+          <div class="form-navigation">
+            <button type="button" class="btn btn-secondary" id="hospital-back-btn">
+              <i class="fas fa-arrow-left"></i>
+              Back
+            </button>
+            <button type="submit" class="btn" form="signup-form">
+              <i class="fas fa-user-plus"></i>
+              Create Account
+            </button>
           </div>
         </div>
         
-        <div class="form-group">
-          <label for="address">Address</label>
-          <input type="text" id="address" name="address" placeholder="Enter your address">
+        <div class="footer-text">
+          Already have an account? <a href="/login">Log in here</a>
         </div>
-        
-        <div class="form-group">
-          <label for="contact_number">Contact Number</label>
-          <input type="tel" id="contact_number" name="contact_number" placeholder="Enter contact number">
-        </div>
-        
-        <div class="form-group">
-          <label for="medical_history">Medical History (comma separated)</label>
-          <textarea id="medical_history" name="medical_history" placeholder="e.g. Diabetes, Hypertension" rows="3"></textarea>
-        </div>
-        
-        <div class="form-navigation">
-          <button type="button" class="btn btn-secondary" id="patient-back-btn">Back</button>
-          <button type="submit" class="btn" form="signup-form">Create Account</button>
-        </div>
-      </div>
-      
-      <!-- Doctor Specific Fields -->
-      <div class="form-container" id="doctor-fields">
-        <h3 style="margin-bottom: 20px; color: var(--primary);">Doctor Information</h3>
-        
-        <div class="form-group">
-          <label for="license_number">Medical License Number</label>
-          <input type="text" id="license_number" name="license_number" placeholder="Enter your license number" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="specialization">Specialization</label>
-          <input type="text" id="specialization" name="specialization" placeholder="Enter your specialization" required>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="hospital_id">Hospital ID</label>
-            <input type="text" id="hospital_id" name="hospital_id" placeholder="Enter hospital ID" required>
-          </div>
-          <div class="form-group">
-            <label for="experience_years">Years of Experience</label>
-            <input type="number" id="experience_years" name="experience_years" placeholder="Enter years" min="0" max="60">
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="contact_number">Contact Number</label>
-          <input type="tel" id="contact_number" name="contact_number" placeholder="Enter contact number">
-        </div>
-        
-        <div class="form-navigation">
-          <button type="button" class="btn btn-secondary" id="doctor-back-btn">Back</button>
-          <button type="submit" class="btn" form="signup-form">Create Account</button>
-        </div>
-      </div>
-      
-      <!-- Hospital Specific Fields -->
-      <div class="form-container" id="hospital-fields">
-        <h3 style="margin-bottom: 20px; color: var(--primary);">Hospital Information</h3>
-        
-        <div class="form-group">
-          <label for="hospital_name">Hospital Name</label>
-          <input type="text" id="hospital_name" name="hospital_name" placeholder="Enter hospital name" required>
-        </div>
-        
-        <h4 style="margin: 20px 0 10px; color: var(--primary);">Location</h4>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="address_line">Address Line</label>
-            <input type="text" id="address_line" name="address_line" placeholder="Street address" required>
-          </div>
-          <div class="form-group">
-            <label for="city">City</label>
-            <input type="text" id="city" name="city" placeholder="City" required>
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="state">State</label>
-            <input type="text" id="state" name="state" placeholder="State" required>
-          </div>
-          <div class="form-group">
-            <label for="pin_code">PIN Code</label>
-            <input type="text" id="pin_code" name="pin_code" placeholder="PIN code" required>
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="hospital_phone">Phone</label>
-            <input type="tel" id="hospital_phone" name="hospital_phone" placeholder="Hospital phone">
-          </div>
-          <div class="form-group">
-            <label for="hospital_email">Email</label>
-            <input type="email" id="hospital_email" name="hospital_email" placeholder="Hospital email">
-          </div>
-        </div>
-        
-        <div class="form-navigation">
-          <button type="button" class="btn btn-secondary" id="hospital-back-btn">Back</button>
-          <button type="submit" class="btn" form="signup-form">Create Account</button>
-        </div>
-      </div>
-      
-      <div class="footer-text">
-        Already have an account? <a href="/login">Log in here</a>
       </div>
     </div>
   </div>
@@ -768,6 +1081,12 @@
           alert('An error occurred. Please try again.');
         }
       });
+
+      // Page load animation
+      setTimeout(() => {
+        document.querySelector('.signup-container').style.opacity = '1';
+        document.querySelector('.signup-container').style.transform = 'translateY(0)';
+      }, 100);
     });
   </script>
 </body>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -326,4 +326,156 @@
     });
   </script>
 </body>
+</html> -->
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard | MediVault</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* 🔹 Existing Styles (No Change) */
+    :root {
+      --primary: #2a3f54;
+      --secondary: #1abc9c;
+      --light: #f5f8fc;
+      --dark: #1a2a3a;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+    }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; color: #333; }
+    .sidebar { width: 260px; background: var(--primary); color: white; height: 100vh; position: fixed; box-shadow: var(--shadow); transition: all 0.3s; z-index: 1000; }
+    .sidebar-header { padding: 20px; background: var(--dark); display: flex; align-items: center; justify-content: center; }
+    .sidebar-header h2 { margin: 0; font-size: 1.5rem; color: white; display: flex; align-items: center; }
+    .sidebar-header i { margin-right: 10px; color: var(--secondary); }
+    .sidebar a { display: flex; align-items: center; color: rgba(255, 255, 255, 0.9); padding: 15px 20px; text-decoration: none; transition: all 0.3s; border-left: 4px solid transparent; }
+    .sidebar a i { margin-right: 12px; width: 20px; text-align: center; }
+    .sidebar a:hover { background: rgba(255, 255, 255, 0.1); color: white; border-left: 4px solid var(--secondary); padding-left: 25px; }
+    .sidebar a.active { background: rgba(26, 188, 156, 0.2); border-left: 4px solid var(--secondary); }
+    .main { margin-left: 260px; padding: 30px; min-height: 100vh; }
+    .welcome-card { background: white; border-radius: 10px; padding: 30px; box-shadow: var(--shadow); max-width: 800px; margin: 20px auto; text-align: center; border-top: 5px solid var(--secondary); }
+    h1 { color: var(--primary); margin-bottom: 10px; font-weight: 600; }
+    .admin-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 5px solid var(--secondary); margin-bottom: 20px; }
+    .stats-container { display: flex; justify-content: space-around; flex-wrap: wrap; margin-top: 40px; }
+    .stat-card { background: white; border-radius: 8px; padding: 20px; width: 22%; min-width: 200px; margin: 10px; box-shadow: var(--shadow); text-align: center; transition: transform 0.3s; }
+    .stat-card:hover { transform: translateY(-5px); }
+    .stat-card i { font-size: 2.5rem; color: var(--secondary); margin-bottom: 15px; }
+    .stat-card h3 { margin: 0; color: var(--primary); }
+    .stat-value { font-size: 2rem; font-weight: bold; color: var(--primary); margin: 10px 0; }
+    /* 🔹 Notification Styles (Already Present) */
+    .notification-section { background: white; border-radius: 10px; padding: 30px; box-shadow: var(--shadow); margin: 30px auto; max-width: 800px; }
+    .notification-header { display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--light); }
+    .notification-header h2 { color: var(--primary); margin: 0; font-size: 1.5rem; }
+    .notification-header i { font-size: 1.8rem; color: var(--secondary); margin-right: 15px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary); }
+    .form-group select, .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; }
+    .send-btn { background: var(--secondary); color: white; padding: 12px 30px; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; margin: 0 auto; }
+    .alert { padding: 12px 20px; border-radius: 6px; margin: 20px 0; display: none; }
+    .alert.success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+    .alert.error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-lock"></i> <span>MediVault</span></h2>
+    </div>
+    <a href="#dashboard" class="active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+    <a href="#notifications" onclick="showSection('notifications')"><i class="fas fa-bell"></i> <span>Send Notifications</span></a>
+    <a href="manage-doctors.html"><i class="fas fa-user-md"></i> <span>Manage Doctors</span></a>
+    <a href="manage-patients.html"><i class="fas fa-procedures"></i> <span>Manage Patients</span></a>
+    <a href="manage-hospitals.html"><i class="fas fa-hospital"></i> <span>Manage Hospitals</span></a>
+    <a href="manage-reports.html"><i class="fas fa-file-medical"></i> <span>Manage Reports</span></a>
+    <a href="home.html"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+  </div>
+
+  <div class="main">
+    <!-- ✅ Dashboard Section (No Change) -->
+    <div id="dashboard-section">
+      <div class="welcome-card">
+        <img src="https://ui-avatars.com/api/?name=Admin&background=1abc9c&color=fff&size=100" alt="Admin" class="admin-avatar">
+        <h1>Welcome Back, Admin!</h1>
+        <p>Manage MediVault system. Last login: <span id="current-time"></span></p>
+      </div>
+      <div class="stats-container">
+        <div class="stat-card"><i class="fas fa-user-md"></i><div class="stat-value" id="doctors-count">--</div><h3>Doctors</h3></div>
+        <div class="stat-card"><i class="fas fa-procedures"></i><div class="stat-value" id="patients-count">--</div><h3>Patients</h3></div>
+        <div class="stat-card"><i class="fas fa-hospital"></i><div class="stat-value" id="hospitals-count">--</div><h3>Hospitals</h3></div>
+        <div class="stat-card"><i class="fas fa-file-medical"></i><div class="stat-value" id="reports-count">--</div><h3>Reports</h3></div>
+      </div>
+    </div>
+
+    <!-- ✅ Notification Section -->
+    <div id="notifications-section" style="display:none;">
+      <div class="notification-section">
+        <div class="notification-header"><i class="fas fa-paper-plane"></i><h2>Send Notifications</h2></div>
+        <div class="alert success" id="success-alert"><i class="fas fa-check-circle"></i> Notification sent successfully!</div>
+        <div class="alert error" id="error-alert"><i class="fas fa-exclamation-circle"></i> Failed to send notification.</div>
+        
+        <form id="notification-form">
+          <div class="form-group">
+            <label>Target Role:</label>
+            <select id="target-role" required>
+              <option value="">--Select--</option>
+              <option value="doctor">Doctors</option>
+              <option value="patient">Patients</option>
+              <option value="hospital">Hospitals</option>
+              <option value="all">All Users</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Title:</label><input type="text" id="notification-title" required></div>
+          <div class="form-group"><label>Message:</label><textarea id="notification-message" required></textarea></div>
+          <div class="form-group">
+            <label>Priority:</label>
+            <select id="notification-priority">
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i> Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showSection(section) {
+      document.getElementById('dashboard-section').style.display = section === 'dashboard' ? 'block' : 'none';
+      document.getElementById('notifications-section').style.display = section === 'notifications' ? 'block' : 'none';
+    }
+
+    document.getElementById('notification-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const role = document.getElementById('target-role').value;
+      const title = document.getElementById('notification-title').value;
+      const message = document.getElementById('notification-message').value;
+      const priority = document.getElementById('notification-priority').value;
+
+      try {
+        const res = await fetch('/notifications/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role, title, message, priority })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('success-alert').style.display = 'block';
+          setTimeout(() => (document.getElementById('success-alert').style.display = 'none'), 3000);
+        } else throw new Error(data.message);
+      } catch {
+        document.getElementById('error-alert').style.display = 'block';
+        setTimeout(() => (document.getElementById('error-alert').style.display = 'none'), 3000);
+      }
+    });
+  </script>
+</body>
 </html>
+

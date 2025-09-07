@@ -4,526 +4,1840 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Doctor Dashboard | MediVault</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js for Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
-    :root {
-      --primary: #4a6cf7;
-      --primary-light: #6a85f9;
-      --accent: #36d1dc;
-      --bg: #f8fafd;
-      --card-bg: #fff;
-      --text-dark: #1f2937;
-      --text-medium: #4b5563;
-      --text-light: #6b7280;
-      --sidebar-width: 260px;
-    }
-
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #7209b7;
+      --accent: #f72585;
+      --success: #4cc9f0;
+      --warning: #ffc107;
+      --dark: #212529;
+      --gray: #6c757d;
+      --light-gray: #f8f9fa;
+      --white: #ffffff;
+      --gradient-primary: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+      --gradient-secondary: linear-gradient(135deg, #f72585 0%, #4361ee 100%);
+      --gradient-success: linear-gradient(135deg, #4cc9f0 0%, #36d1dc 100%);
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+      --shadow-xl: 0 16px 48px rgba(0,0,0,0.18);
+      --radius: 16px;
+      --radius-sm: 8px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-      margin: 0;
-      font-family: 'Inter', 'Segoe UI', sans-serif;
-      background-color: var(--bg);
-      display: flex;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 50%, #f0f8ff 100%);
+      color: var(--dark);
       min-height: 100vh;
-      color: var(--text-dark);
+      overflow-x: hidden;
+      line-height: 1.6;
     }
 
-    .sidebar {
-      width: var(--sidebar-width);
-      background: linear-gradient(180deg, var(--primary), var(--accent));
-      color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px;
-      transition: transform 0.3s ease;
-      height: 100vh;
+    /* Enhanced Animated Background */
+    body::before {
+      content: '';
       position: fixed;
-      left: 0;
-      top: 0;
-      z-index: 1000;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(67, 97, 238, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 30%, rgba(114, 9, 183, 0.06) 0%, transparent 50%);
+      animation: float 12s ease-in-out infinite;
+      z-index: -1;
     }
 
-    .sidebar-header {
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+
+    /* Enhanced Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(67, 97, 238, 0.08);
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
       display: flex;
       align-items: center;
-      margin-bottom: 30px;
+      justify-content: space-between;
+      height: 70px;
     }
 
-    .sidebar-header h2 {
-      font-size: 1.5rem;
-      margin-left: 10px;
-      font-weight: 700;
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-decoration: none;
+      transition: var(--transition);
     }
 
-    .logo-icon {
+    .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .logo i {
       font-size: 1.8rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .nav-menu {
-      flex-grow: 1;
-      overflow-y: auto;
-    }
-
-    .nav-link {
       display: flex;
-      align-items: center;
-      padding: 12px 15px;
-      margin-bottom: 10px;
-      border-radius: 8px;
+      list-style: none;
+      gap: 2.5rem;
+    }
+
+    .nav-menu a {
       text-decoration: none;
-      color: white;
-      transition: background 0.2s;
-    }
-
-    .nav-link:hover,
-    .nav-link.active {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .nav-link i {
-      width: 20px;
-      text-align: center;
-      font-size: 1.1rem;
-    }
-
-    .nav-link span {
-      margin-left: 12px;
+      color: var(--dark);
+      font-weight: 500;
+      position: relative;
+      transition: var(--transition);
+      padding: 0.5rem 0;
       font-size: 0.95rem;
     }
 
-    .sidebar-footer {
-      margin-top: 15px;
+    .nav-menu a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+      transition: width 0.3s ease;
+      border-radius: 2px;
     }
 
-    .user-profile {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      border-radius: 8px;
-      background-color: rgba(255, 255, 255, 0.1);
-      margin-bottom: 10px;
+    .nav-menu a:hover::after,
+    .nav-menu a.active::after {
+      width: 100%;
     }
 
-    .user-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background-color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .nav-menu a:hover,
+    .nav-menu a.active {
       color: var(--primary);
-      font-weight: bold;
-      margin-right: 10px;
     }
 
-    .logout-link {
+    /* Notification Bell Styling */
+    .notification-item {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notification-bell {
+      color: var(--dark);
+      font-weight: 500;
+      position: relative;
+      transition: var(--transition);
+      padding: 0.5rem;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .notification-bell:hover {
+      color: var(--primary);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.7rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      background-color: rgba(255, 255, 255, 0.1);
-      color: white;
-      transition: background 0.2s;
-      font-size: 0.95rem;
+      font-weight: 600;
+      animation: pulse 2s infinite;
     }
 
-    .logout-link i {
-      margin-right: 8px;
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
     }
 
-    .logout-link:hover {
-      background-color: rgba(255, 255, 255, 0.2);
+    /* Notification Dropdown */
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 350px;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-xl);
+      border: 1px solid rgba(67, 97, 238, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: var(--transition);
+      z-index: 1001;
+      max-height: 400px;
+      overflow: hidden;
     }
 
-    .main {
-      flex-grow: 1;
-      padding: 25px 30px;
-      overflow-y: auto;
-      margin-left: var(--sidebar-width);
-      width: calc(100% - var(--sidebar-width));
+    .notification-dropdown.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
     }
 
-    .main-header {
+    .notification-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--light-gray);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .main-header h1 {
-      font-size: 1.7rem;
-      font-weight: 700;
-    }
-
-    .date-display {
-      background-color: var(--card-bg);
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      color: var(--text-medium);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      background-color: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-    }
-
-    .card h3 {
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card .stat {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin: 10px 0;
-    }
-
-    .card .trend {
-      font-size: 0.85rem;
-      color: var(--text-light);
-    }
-
-    .search-card {
-      grid-column: span 2;
-      background-color: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-    }
-
-    .search-form {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .search-form input {
-      flex-grow: 1;
-      min-width: 200px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      font-size: 0.95rem;
-    }
-
-    .search-form button {
-      padding: 12px 24px;
-      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      background: var(--gradient-primary);
       color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 120px;
+      border-radius: var(--radius) var(--radius) 0 0;
     }
 
-    .search-form button:hover {
-      opacity: 0.95;
+    .notification-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .clear-all-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 0.8rem;
+      cursor: pointer;
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .clear-all-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .notification-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .notification-item-dropdown {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--light-gray);
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .notification-item-dropdown:hover {
+      background: var(--light-gray);
+    }
+
+    .notification-item-dropdown:last-child {
+      border-bottom: none;
+    }
+
+    .notification-item-dropdown.unread {
+      background: rgba(67, 97, 238, 0.05);
+      border-left: 4px solid var(--primary);
+    }
+
+    .notification-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+    }
+
+    .notification-icon {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .notification-text {
+      flex: 1;
+    }
+
+    .notification-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--dark);
+      margin-bottom: 0.3rem;
+    }
+
+    .notification-message {
+      font-size: 0.8rem;
+      color: var(--gray);
+      line-height: 1.4;
+      margin-bottom: 0.3rem;
+    }
+
+    .notification-time {
+      font-size: 0.7rem;
+      color: var(--gray);
+    }
+
+    .no-notifications {
+      padding: 2rem;
+      text-align: center;
+      color: var(--gray);
+    }
+
+    .no-notifications i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .logout-btn {
+      background: var(--gradient-primary);
+      border: none;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
 
     /* Mobile Menu Toggle */
     .mobile-menu-toggle {
       display: none;
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 1100;
-      background: var(--primary);
-      color: white;
+      background: none;
       border: none;
-      border-radius: 6px;
-      width: 40px;
-      height: 40px;
-      font-size: 1.2rem;
+      color: var(--primary);
+      font-size: 1.5rem;
       cursor: pointer;
-      justify-content: center;
-      align-items: center;
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
     }
 
-    .overlay {
+    .mobile-menu-toggle:hover {
+      background: rgba(67, 97, 238, 0.1);
+    }
+
+    /* Main Content */
+    .main-container {
+      padding-top: 70px;
+    }
+
+    .dashboard-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem;
+    }
+
+    /* Enhanced Page Header */
+    .page-header {
+      margin-bottom: 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .page-title h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .page-title p {
+      color: var(--gray);
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+
+    .date-display {
+      background: var(--white);
+      padding: 1.2rem 1.8rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: var(--gray);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .date-display:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .date-display i {
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    /* Enhanced Dashboard Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.06);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-xl);
+      border-color: rgba(67, 97, 238, 0.1);
+    }
+
+    .stat-card:nth-child(2)::before {
+      background: var(--gradient-secondary);
+    }
+
+    .stat-card:nth-child(3)::before {
+      background: var(--gradient-success);
+    }
+
+    .stat-card .icon {
+      width: 70px;
+      height: 70px;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      color: white;
+      font-size: 1.8rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-card:nth-child(2) .icon {
+      background: var(--gradient-secondary);
+    }
+
+    .stat-card:nth-child(3) .icon {
+      background: var(--gradient-success);
+    }
+
+    .stat-card .title {
+      color: var(--gray);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-card .value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 0.8rem;
+      line-height: 1;
+    }
+
+    .stat-card .trend {
+      font-size: 0.9rem;
+      color: var(--gray);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+    }
+
+    .trend .fa-arrow-up {
+      color: var(--success);
+      background: rgba(76, 201, 240, 0.1);
+      padding: 0.3rem;
+      border-radius: 50%;
+      font-size: 0.8rem;
+    }
+
+    .trend .fa-arrow-down {
+      color: var(--accent);
+      background: rgba(247, 37, 133, 0.1);
+      padding: 0.3rem;
+      border-radius: 50%;
+      font-size: 0.8rem;
+    }
+
+    .trend .fa-circle {
+      color: var(--primary);
+      font-size: 0.6rem;
+    }
+
+    /* Enhanced Search Section */
+    .search-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.06);
+      margin-bottom: 2rem;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .search-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .search-section:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-3px);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 2rem;
+    }
+
+    .section-title i {
+      padding: 0.5rem;
+      background: rgba(67, 97, 238, 0.1);
+      border-radius: var(--radius-sm);
+      font-size: 1.2rem;
+    }
+
+    .search-form {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .search-form input {
+      flex: 1;
+      min-width: 300px;
+      padding: 1rem 1.5rem;
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      transition: var(--transition);
+      background: var(--white);
+      font-family: 'Inter', sans-serif;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-form input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .search-form input::placeholder {
+      color: var(--gray);
+      font-weight: 400;
+    }
+
+    .search-btn {
+      background: var(--gradient-primary);
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 1rem;
+      min-width: 160px;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .search-btn:active {
+      transform: translateY(-1px);
+    }
+
+    /* Quick Actions Section */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .action-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.06);
+      transition: var(--transition);
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .action-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .action-card i {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: rgba(67, 97, 238, 0.1);
+      border-radius: 50%;
+    }
+
+    .action-card h3 {
+      color: var(--dark);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .action-card p {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    /* Analytics Modal */
+    .analytics-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      animation: modalFadeIn 0.3s ease;
+    }
+
+    .analytics-modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .analytics-content {
+      background: var(--white);
+      border-radius: var(--radius);
+      width: 95%;
+      max-width: 1200px;
+      height: 90vh;
+      padding: 2rem;
+      overflow-y: auto;
+      box-shadow: var(--shadow-xl);
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    .analytics-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--light-gray);
+    }
+
+    .analytics-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .close-analytics {
+      background: var(--accent);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: var(--transition);
+    }
+
+    .close-analytics:hover {
+      transform: scale(1.1);
+      background: var(--primary);
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+
+    .chart-container {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+    .chart-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .chart-canvas {
+      width: 100% !important;
+      height: 300px !important;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes modalSlideIn {
+      from { 
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      to { 
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 1200px) {
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+      }
+      
+      .dashboard-content {
+        padding: 2rem;
+      }
+
+      .notification-dropdown {
+        width: 320px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+      }
+
+      .mobile-menu-toggle {
+        display: block;
+      }
+
+      .nav-container {
+        padding: 0 1rem;
+      }
+
+      .dashboard-content {
+        padding: 1.5rem;
+      }
+
+      .page-title h1 {
+        font-size: 2.2rem;
+      }
+
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+      }
+
+      .date-display {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .search-section {
+        padding: 2rem;
+      }
+
+      .section-title {
+        font-size: 1.3rem;
+      }
+
+      .search-form {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .search-form input {
+        min-width: 100%;
+      }
+
+      .search-btn {
+        width: 100%;
+      }
+
+      .user-info {
+        display: none;
+      }
+
+      .logout-btn span {
+        display: none;
+      }
+
+      .analytics-content {
+        width: 98%;
+        height: 95vh;
+        padding: 1rem;
+      }
+
+      .analytics-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .notification-dropdown {
+        width: 300px;
+        right: -50px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dashboard-content {
+        padding: 1rem;
+      }
+
+      .page-title h1 {
+        font-size: 1.8rem;
+      }
+
+      .stat-card {
+        padding: 1.5rem;
+        text-align: center;
+      }
+
+      .stat-card .icon {
+        margin: 0 auto 1rem;
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
+
+      .stat-card .value {
+        font-size: 2rem;
+      }
+
+      .search-section {
+        padding: 1.5rem;
+      }
+
+      .section-title {
+        font-size: 1.2rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+      }
+
+      .notification-dropdown {
+        width: calc(100vw - 2rem);
+        right: -80px;
+      }
+    }
+
+    /* Mobile Sidebar (Enhanced) */
+    .mobile-sidebar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      background: var(--gradient-primary);
+      color: white;
+      z-index: 1100;
+      padding: 2rem;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .mobile-sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-overlay {
       display: none;
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(0,0,0,0.5);
-      z-index: 999;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1050;
+      backdrop-filter: blur(2px);
     }
 
-    /* Responsive Styles */
-    @media (max-width: 992px) {
-      .search-card {
-        grid-column: span 1;
-      }
+    .sidebar-overlay.active {
+      display: block;
     }
 
-    @media (max-width: 768px) {
-      :root {
-        --sidebar-width: 260px;
-      }
-      
-      .sidebar {
-        transform: translateX(-100%);
-      }
-      
-      .sidebar.open {
-        transform: translateX(0);
-      }
-      
-      .main {
-        margin-left: 0;
-        width: 100%;
-        padding: 20px 15px;
-        padding-top: 70px;
-      }
-      
-      .mobile-menu-toggle {
-        display: flex;
-      }
-      
-      .overlay.active {
-        display: block;
-      }
-      
-      .cards {
-        grid-template-columns: 1fr;
-      }
-      
-      .search-card {
-        grid-column: span 1;
-      }
-      
-      .main-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-      }
-      
-      .date-display {
-        width: 100%;
-        justify-content: center;
-      }
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    @media (max-width: 480px) {
-      .main-header h1 {
-        font-size: 1.5rem;
-      }
-      
-      .card .stat {
-        font-size: 1.5rem;
-      }
-      
-      .search-form {
-        flex-direction: column;
-      }
-      
-      .search-form button {
-        width: 100%;
-        justify-content: center;
-      }
-      
-      .nav-link {
-        padding: 14px 15px;
-      }
-      
-      .user-profile {
-        padding: 12px;
-      }
+    .sidebar-header h2 {
+      font-size: 1.6rem;
+      margin-left: 0.8rem;
+      font-weight: 800;
     }
 
-    @media (max-width: 360px) {
-      .main {
-        padding: 15px 10px;
-        padding-top: 70px;
-      }
-      
-      .card {
-        padding: 15px;
-      }
-      
-      .card h3 {
-        font-size: 1rem;
-      }
-      
-      .card .stat {
-        font-size: 1.3rem;
-      }
+    .sidebar-nav {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.8rem;
+      border-radius: var(--radius);
+      text-decoration: none;
+      color: white;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+
+    .sidebar-nav a:hover,
+    .sidebar-nav a.active {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+    }
+
+    .sidebar-nav a i {
+      width: 24px;
+      text-align: center;
+      margin-right: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      padding: 1.2rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius);
+      margin-bottom: 1.2rem;
+    }
+
+    .sidebar-user .user-avatar {
+      margin-right: 1rem;
     }
   </style>
 </head>
 <body>
+  <!-- Enhanced Header -->
+  <header class="header">
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <i class="fas fa-heartbeat"></i>
+        MediVault
+      </a>
+      
+      <nav class="nav-menu">
+        <a href="#" class="active">Dashboard</a>
+        <a href="/prescription.html">Prescriptions</a>
+        <a href="#">Reports</a>
+        
+        <!-- Notification Bell in Navbar -->
+        <div class="notification-item">
+          <div class="notification-bell" onclick="toggleNotifications()">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notificationBadge">3</span>
+          </div>
+          
+          <!-- Notification Dropdown -->
+          <div class="notification-dropdown" id="notificationDropdown">
+            <div class="notification-header">
+              <h3>Notifications</h3>
+              <button class="clear-all-btn" onclick="clearAllNotifications()">Clear All</button>
+            </div>
+            
+            <div class="notification-list" id="notificationList">
+              <!-- Notifications will be populated here -->
+            </div>
+          </div>
+        </div>
+        
+        <a href="#">Settings</a>
+      </nav>
 
-  <!-- Mobile Menu Toggle -->
-  <button class="mobile-menu-toggle" id="menuToggle">
-    <i class="fas fa-bars"></i>
-  </button>
-  
-  <!-- Overlay for mobile menu -->
-  <div class="overlay" id="overlay"></div>
+      <button class="mobile-menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </button>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <div>
-      <div class="sidebar-header">
-        <div class="logo-icon"><i class="fas fa-heartbeat"></i></div>
-        <h2>MediVault</h2>
-      </div>
-
-      <div class="nav-menu">
-        <a href="#" class="nav-link active"><i class="fas fa-home"></i><span>Dashboard</span></a>
-        <a href="/prescription.html" class="nav-link"><i class="fas fa-prescription"></i><span>Prescriptions</span></a>
-        <a href="#" class="nav-link"><i class="fas fa-user-injured"></i><span>Patients</span></a>
-        <a href="#" class="nav-link"><i class="fas fa-file-medical"></i><span>Reports</span></a>
-        <a href="#" class="nav-link"><i class="fas fa-bell"></i><span>Notifications</span></a>
-        <a href="#" class="nav-link"><i class="fas fa-cog"></i><span>Settings</span></a>
+      <div class="user-menu">
+        <div class="user-info">
+          <div class="user-avatar">DB</div>
+          <div>
+            <div style="font-weight: 600; color: var(--dark);">Dr. Basant</div>
+            <div style="font-size: 0.8rem;">Cardiologist</div>
+          </div>
+        </div>
+        <a href="/logout" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
       </div>
     </div>
+  </header>
+
+  <!-- Enhanced Mobile Sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="mobile-sidebar" id="mobileSidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-heartbeat logo-icon"></i>
+      <h2>MediVault</h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="active"><i class="fas fa-home"></i><span>Dashboard</span></a>
+      <a href="/prescription.html"><i class="fas fa-prescription"></i><span>Prescriptions</span></a>
+      <a href="#"><i class="fas fa-file-medical"></i><span>Reports</span></a>
+      <a href="#" onclick="toggleNotifications()"><i class="fas fa-bell"></i><span>Notifications</span></a>
+      <a href="#"><i class="fas fa-cog"></i><span>Settings</span></a>
+    </nav>
 
     <div class="sidebar-footer">
-      <div class="user-profile">
+      <div class="sidebar-user">
         <div class="user-avatar">DB</div>
         <div>
           <h4>Dr. Basant</h4>
           <p>Cardiologist</p>
         </div>
       </div>
-      <a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+      <a href="/logout" class="logout-btn" style="width: 100%; justify-content: center;">
+        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+      </a>
     </div>
   </div>
 
-  <!-- Main Content -->
-  <div class="main">
-    <div class="main-header">
-      <h1>Welcome Back, Dr. Basant</h1>
-      <div class="date-display" id="dateDisplay"></div>
-    </div>
-
-    <div class="cards">
-      <div class="card">
-        <h3><i class="fas fa-users"></i> Total Patients</h3>
-        <div class="stat">132</div>
-        <div class="trend"><i class="fas fa-arrow-up text-success"></i> 12% from last month</div>
+  <!-- Enhanced Main Content -->
+  <div class="main-container">
+    <div class="dashboard-content">
+      <!-- Enhanced Page Header -->
+      <div class="page-header">
+        <div class="page-title">
+          <h1>Welcome Back, Dr. Basant</h1>
+          <p>Manage your patients and medical records efficiently with advanced tools</p>
+        </div>
+        <div class="date-display" id="dateDisplay">
+          <i class="far fa-calendar-alt"></i>
+          <span>Loading...</span>
+        </div>
       </div>
 
-      <div class="card">
-        <h3><i class="fas fa-calendar-check"></i> Upcoming Appointments</h3>
-        <div class="stat">6</div>
-        <div class="trend"><i class="fas fa-arrow-down text-warning"></i> 2 less than yesterday</div>
+      <!-- Enhanced Dashboard Stats (Removed Appointments) -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="title">Total Patients</div>
+          <div class="value">132</div>
+          <div class="trend">
+            <i class="fas fa-arrow-up"></i>
+            <span>12% increase from last month</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="icon">
+            <i class="fas fa-file-upload"></i>
+          </div>
+          <div class="title">Reports Uploaded</div>
+          <div class="value">29</div>
+          <div class="trend">
+            <i class="fas fa-arrow-up"></i>
+            <span>8 more than last week</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="title">Notifications</div>
+          <div class="value">3</div>
+          <div class="trend">
+            <i class="fas fa-circle"></i>
+            <span>2 new notifications today</span>
+          </div>
+        </div>
       </div>
 
-      <div class="card">
-        <h3><i class="fas fa-file-upload"></i> Reports Uploaded</h3>
-        <div class="stat">29</div>
-        <div class="trend"><i class="fas fa-arrow-up text-success"></i> 8 more than last week</div>
+      <!-- Quick Actions (Removed Schedule Appointment) -->
+      <div class="quick-actions">
+        <div class="action-card" onclick="document.getElementById('patientId').focus()">
+          <i class="fas fa-search"></i>
+          <h3>Find Patient</h3>
+          <p>Search for patient records quickly</p>
+        </div>
+        
+        <div class="action-card" onclick="window.location.href='/prescription.html'">
+          <i class="fas fa-prescription"></i>
+          <h3>New Prescription</h3>
+          <p>Create a new prescription</p>
+        </div>
+        
+        <div class="action-card" onclick="showAnalytics()">
+          <i class="fas fa-chart-line"></i>
+          <h3>View Analytics</h3>
+          <p>Check patient statistics and trends</p>
+        </div>
       </div>
 
-      <div class="card">
-        <h3><i class="fas fa-bell"></i> Notifications</h3>
-        <div class="stat">3</div>
-        <div class="trend"><i class="fas fa-circle text-primary"></i> 2 new today</div>
-      </div>
-
-      <div class="search-card">
-        <h3><i class="fas fa-search"></i> Find Patient Records</h3>
+      <!-- Enhanced Search Section -->
+      <div class="search-section">
+        <h2 class="section-title">
+          <i class="fas fa-search"></i>
+          Patient Record Search
+        </h2>
+        
         <form class="search-form" onsubmit="redirectToPatientReports(event)">
-          <input type="text" id="patientId" placeholder="Enter Patient ID (e.g. P1001)" required />
-          <button type="submit">
-            <i class="fas fa-search"></i> Search
+          <input type="text" id="patientId" placeholder="Enter Patient ID (e.g. P1001) or Patient Name" required />
+          <button type="submit" class="search-btn">
+            <i class="fas fa-search"></i>
+            <span>Search Records</span>
           </button>
         </form>
       </div>
     </div>
   </div>
 
+  <!-- Analytics Modal -->
+  <div class="analytics-modal" id="analyticsModal">
+    <div class="analytics-content">
+      <div class="analytics-header">
+        <h2 class="analytics-title">Doctor Analytics Dashboard</h2>
+        <button class="close-analytics" onclick="hideAnalytics()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="analytics-grid">
+        <div class="chart-container">
+          <h3 class="chart-title">Patient Registration Trends</h3>
+          <canvas id="patientTrendsChart" class="chart-canvas"></canvas>
+        </div>
+        
+        <div class="chart-container">
+          <h3 class="chart-title">Report Types Distribution</h3>
+          <canvas id="reportTypesChart" class="chart-canvas"></canvas>
+        </div>
+        
+        <div class="chart-container">
+          <h3 class="chart-title">Monthly Report Uploads</h3>
+          <canvas id="monthlyReportsChart" class="chart-canvas"></canvas>
+        </div>
+        
+        <div class="chart-container">
+          <h3 class="chart-title">Patient Age Groups</h3>
+          <canvas id="ageGroupsChart" class="chart-canvas"></canvas>
+        </div>
+        
+        <div class="chart-container">
+          <h3 class="chart-title">Disease Categories</h3>
+          <canvas id="diseaseCategoriesChart" class="chart-canvas"></canvas>
+        </div>
+        
+        <div class="chart-container">
+          <h3 class="chart-title">Treatment Success Rate</h3>
+          <canvas id="successRateChart" class="chart-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Update date display
+    // Sample Admin Notifications Data
+    let adminNotifications = [];
+    let currentUserId = null;
+
+    // Sample Admin Notifications Data (fallback)
+    const fallbackNotifications = [
+      {
+        id: 1,
+        type: 'system',
+        title: 'System Maintenance',
+        message: 'Scheduled maintenance will occur tonight from 2:00 AM to 4:00 AM IST. Please save your work.',
+        time: '2 hours ago',
+        isRead: false,
+        icon: 'fas fa-tools'
+      },
+      {
+        id: 2,
+        type: 'policy',
+        title: 'New Privacy Policy',
+        message: 'Updated privacy policy has been implemented. Please review the changes in the settings section.',
+        time: '1 day ago',
+        isRead: false,
+        icon: 'fas fa-shield-alt'
+      },
+      {
+        id: 3,
+        type: 'feature',
+        title: 'New Feature Release',
+        message: 'Analytics dashboard is now available! Click on "View Analytics" to explore patient insights.',
+        time: '3 days ago',
+        isRead: true,
+        icon: 'fas fa-chart-line'
+      },
+      {
+        id: 4,
+        type: 'security',
+        title: 'Security Update',
+        message: 'Enhanced security measures have been implemented. Two-factor authentication is now available.',
+        time: '1 week ago',
+        isRead: true,
+        icon: 'fas fa-lock'
+      },
+      {
+        id: 5,
+        type: 'reminder',
+        title: 'Monthly Report Due',
+        message: 'Please submit your monthly patient report by the end of this week.',
+        time: '2 weeks ago',
+        isRead: true,
+        icon: 'fas fa-calendar-check'
+      }
+    ];
+
+    // 🔄 Updated load notifications function
+    async function loadNotifications() {
+      try {
+        const res = await fetch('/notifications/doctor');
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message);
+        
+        adminNotifications = data.notifications || [];
+        updateNotificationUI();
+      } catch (err) {
+        console.error('Error loading notifications:', err);
+        // Fallback to sample data for demo
+        adminNotifications = fallbackNotifications;
+        updateNotificationUI();
+      }
+    }
+
+    function updateNotificationUI() {
+      const notificationList = document.getElementById('notificationList');
+      const notificationBadge = document.getElementById('notificationBadge');
+     
+      const unreadCount = adminNotifications.filter(n => !n.isRead).length;
+      notificationBadge.textContent = unreadCount;
+      notificationBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+     
+      if (adminNotifications.length === 0) {
+        notificationList.innerHTML = `
+          <div class="no-notifications">
+            <i class="fas fa-bell-slash"></i>
+            <p>No notifications yet</p>
+          </div>
+        `;
+        return;
+      }
+     
+      notificationList.innerHTML = adminNotifications.map(notification => `
+        <div class="notification-item-dropdown ${!notification.isRead ? 'unread' : ''}" onclick="markAsRead('${notification._id || notification.id}')">
+          <div class="notification-content">
+            <div class="notification-icon">
+              <i class="${notification.icon || 'fas fa-bell'}"></i>
+            </div>
+            <div class="notification-text">
+              <div class="notification-title">${notification.title}</div>
+              <div class="notification-message">${notification.message}</div>
+              <div class="notification-time">${formatTimeAgo(notification.timestamp || notification.time)}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function formatTimeAgo(timestamp) {
+      if (typeof timestamp === 'string' && timestamp.includes('ago')) {
+        return timestamp; // Already formatted
+      }
+      
+      const now = new Date();
+      const notificationTime = new Date(timestamp);
+      const diffInMillis = now - notificationTime;
+      const diffInMinutes = Math.floor(diffInMillis / (1000 * 60));
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      const diffInDays = Math.floor(diffInHours / 24);
+     
+      if (diffInMinutes < 1) return 'Just now';
+      if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+      if (diffInHours < 24) return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+      return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+    }
+
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notificationDropdown');
+      dropdown.classList.toggle('show');
+     
+      if (dropdown.classList.contains('show')) {
+        setTimeout(() => {
+          document.addEventListener('click', handleOutsideClick);
+        }, 100);
+      }
+    }
+
+    function handleOutsideClick(event) {
+      const dropdown = document.getElementById('notificationDropdown');
+      const notificationBell = document.querySelector('.notification-bell');
+     
+      if (!dropdown.contains(event.target) && !notificationBell.contains(event.target)) {
+        dropdown.classList.remove('show');
+        document.removeEventListener('click', handleOutsideClick);
+      }
+    }
+
+    // 🔄 Updated mark as read function
+    async function markAsRead(notificationId) {
+      try {
+        await fetch(`/notifications/${notificationId}/read`, { method: 'PUT' });
+        const notification = adminNotifications.find(n => (n._id || n.id) === notificationId);
+        if (notification) {
+          notification.isRead = true;
+          updateNotificationUI();
+        }
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+        // Fallback for demo data
+        const notification = adminNotifications.find(n => (n._id || n.id) === notificationId);
+        if (notification) {
+          notification.isRead = true;
+          updateNotificationUI();
+        }
+      }
+    }
+
+    // 🔄 Updated clear all notifications function
+    async function clearAllNotifications() {
+      if (confirm('Are you sure you want to clear all notifications?')) {
+        try {
+          await fetch('/notifications/doctor/clear', { method: 'DELETE' });
+          loadNotifications(); // Reload to reflect changes
+        } catch (error) {
+          console.error('Error clearing notifications:', error);
+          // Fallback for demo data
+          adminNotifications.forEach(n => n.isRead = true);
+          updateNotificationUI();
+        }
+      }
+    }
+
+    // Enhanced date display
     function updateDate() {
       const now = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('dateDisplay').innerHTML = `<i class="far fa-calendar-alt"></i> ${now.toLocaleDateString(undefined, options)}`;
+      const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'Asia/Kolkata'
+      };
+      document.getElementById('dateDisplay').innerHTML = `
+        <i class="far fa-calendar-alt"></i>
+        <span>${now.toLocaleDateString('en-IN', options)}</span>
+      `;
     }
-    updateDate();
 
-    // Redirect to patient reports
+    updateDate();
+    // Update time every minute
+    setInterval(updateDate, 60000);
+
+    // Redirect to patient reports (preserving original functionality)
     function redirectToPatientReports(event) {
       event.preventDefault();
       const patientId = document.getElementById('patientId').value.trim();
       if (patientId) {
-        window.location.href = `/patientreports.html?patientId=${encodeURIComponent(patientId)}`;
+        // Show loading state
+        const button = event.target.querySelector('.search-btn');
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Searching...</span>';
+        button.disabled = true;
+       
+        // Simulate search delay
+        setTimeout(() => {
+          window.location.href = `/patientreports.html?patientId=${encodeURIComponent(patientId)}`;
+        }, 800);
       }
     }
 
-    // Mobile menu toggle
+    // Analytics Functions
+    function showAnalytics() {
+      document.getElementById('analyticsModal').classList.add('show');
+      document.body.style.overflow = 'hidden';
+     
+      // Initialize charts after modal is shown
+      setTimeout(() => {
+        initializeCharts();
+      }, 300);
+    }
+
+    function hideAnalytics() {
+      document.getElementById('analyticsModal').classList.remove('show');
+      document.body.style.overflow = 'auto';
+    }
+
+    // Initialize All Charts
+    function initializeCharts() {
+      // Patient Registration Trends Chart
+      const ctx1 = document.getElementById('patientTrendsChart').getContext('2d');
+      new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'New Patients',
+            data: [15, 22, 18, 28, 35, 42],
+            borderColor: '#4361ee',
+            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // Report Types Distribution Chart
+      const ctx2 = document.getElementById('reportTypesChart').getContext('2d');
+      new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+          labels: ['Blood Test', 'X-Ray', 'MRI', 'CT Scan', 'ECG'],
+          datasets: [{
+            data: [35, 25, 20, 15, 5],
+            backgroundColor: [
+              '#4361ee',
+              '#7209b7',
+              '#f72585',
+              '#4cc9f0',
+              '#ffc107'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+
+      // Monthly Report Uploads Chart
+      const ctx3 = document.getElementById('monthlyReportsChart').getContext('2d');
+      new Chart(ctx3, {
+        type: 'bar',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'Reports Uploaded',
+            data: [45, 38, 52, 61, 48, 72],
+            backgroundColor: 'rgba(67, 97, 238, 0.8)',
+            borderColor: '#4361ee',
+            borderWidth: 1,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      // Patient Age Groups Chart
+      const ctx4 = document.getElementById('ageGroupsChart').getContext('2d');
+      new Chart(ctx4, {
+        type: 'pie',
+        data: {
+          labels: ['0-18', '19-35', '36-50', '51-65', '65+'],
+          datasets: [{
+            data: [12, 28, 35, 18, 7],
+            backgroundColor: [
+              '#4cc9f0',
+              '#4361ee',
+              '#7209b7',
+              '#f72585',
+              '#ffc107'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+
+      // Disease Categories Chart
+      const ctx5 = document.getElementById('diseaseCategoriesChart').getContext('2d');
+      new Chart(ctx5, {
+        type: 'radar',
+        data: {
+          labels: ['Cardiovascular', 'Respiratory', 'Digestive', 'Neurological', 'Orthopedic', 'Endocrine'],
+          datasets: [{
+            label: 'Patient Cases',
+            data: [85, 65, 45, 35, 55, 40],
+            backgroundColor: 'rgba(67, 97, 238, 0.2)',
+            borderColor: '#4361ee',
+            borderWidth: 2,
+            pointBackgroundColor: '#4361ee',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#4361ee'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            r: {
+              beginAtZero: true,
+              max: 100
+            }
+          }
+        }
+      });
+
+      // Treatment Success Rate Chart
+      const ctx6 = document.getElementById('successRateChart').getContext('2d');
+      new Chart(ctx6, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'Success Rate (%)',
+            data: [88, 92, 85, 94, 91, 96],
+            borderColor: '#4cc9f0',
+            backgroundColor: 'rgba(76, 201, 240, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#4cc9f0',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 80,
+              max: 100
+            }
+          }
+        }
+      });
+    }
+
+    // Enhanced mobile menu toggle
     const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    
-    menuToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
-      document.body.classList.toggle('no-scroll');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+   
+    menuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mobileSidebar.style.display = 'block';
+      setTimeout(() => {
+        mobileSidebar.classList.toggle('open');
+        sidebarOverlay.classList.toggle('active');
+        document.body.style.overflow = mobileSidebar.classList.contains('open') ? 'hidden' : 'auto';
+      }, 10);
     });
-    
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('active');
-      document.body.classList.remove('no-scroll');
+   
+    sidebarOverlay.addEventListener('click', () => {
+      closeMobileSidebar();
     });
-    
+
+    function closeMobileSidebar() {
+      mobileSidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+      document.body.style.overflow = 'auto';
+      setTimeout(() => {
+        if (!mobileSidebar.classList.contains('open')) {
+          mobileSidebar.style.display = 'none';
+        }
+      }, 300);
+    }
+   
     // Close menu when clicking on nav links (for mobile)
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
+    const sidebarNavLinks = document.querySelectorAll('.sidebar-nav a');
+    sidebarNavLinks.forEach(link => {
       link.addEventListener('click', () => {
         if (window.innerWidth <= 768) {
-          sidebar.classList.remove('open');
-          overlay.classList.remove('active');
-          document.body.classList.remove('no-scroll');
+          closeMobileSidebar();
         }
       });
     });
-    
+   
     // Handle window resize
     window.addEventListener('resize', () => {
       if (window.innerWidth > 768) {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-        document.body.classList.remove('no-scroll');
+        closeMobileSidebar();
       }
     });
+
+    // Close analytics modal when clicking outside
+    document.getElementById('analyticsModal').addEventListener('click', (e) => {
+      if (e.target.id === 'analyticsModal') {
+        hideAnalytics();
+      }
+    });
+
+    // Close analytics modal with ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        hideAnalytics();
+      }
+    });
+
+    // Smooth scrolling for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+
+    // Enhanced input focus effects
+    const searchInput = document.getElementById('patientId');
+    searchInput.addEventListener('focus', () => {
+      searchInput.parentElement.style.transform = 'scale(1.02)';
+    });
+    searchInput.addEventListener('blur', () => {
+      searchInput.parentElement.style.transform = 'scale(1)';
+    });
+
+    // Add loading animation to page
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load notifications on page load
+      loadNotifications();
+     
+      const cards = document.querySelectorAll('.stat-card, .action-card, .search-section');
+      cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          card.style.transition = 'all 0.6s ease';
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, index * 100);
+      });
+
+      // Check for new notifications every 30 seconds
+      setInterval(loadNotifications, 30000);
+    });
+
   </script>
 </body>
 </html>

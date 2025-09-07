@@ -322,843 +322,1309 @@
   <meta charset="UTF-8" />
   <title>Patient Reports | MediVault</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
   <style>
+    /* ===== CSS Variables ===== */
     :root {
-      --primary: #4a6cf7;
-      --accent: #36d1dc;
-      --bg: #f8fafd;
-      --text-dark: #1f2937;
-      --text-medium: #4b5563;
-      --card-bg: #fff;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-      --success: #10b981;
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #7209b7;
+      --accent: #f72585;
+      --success: #4cc9f0;
+      --warning: #ffc107;
+      --danger: #ef4444;
+      --dark: #212529;
+      --gray: #6c757d;
+      --light-gray: #f8f9fa;
+      --white: #ffffff;
+      
+      /* Gradients */
+      --gradient-primary: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+      --gradient-secondary: linear-gradient(135deg, #f72585 0%, #4361ee 100%);
+      --gradient-success: linear-gradient(135deg, #4cc9f0 0%, #36d1dc 100%);
+      --gradient-bg: linear-gradient(135deg, #f8f9ff 0%, #e8edff 50%, #f0f8ff 100%);
+      
+      /* Shadows */
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+      --shadow-xl: 0 16px 48px rgba(0,0,0,0.18);
+      
+      /* Border Radius */
+      --radius: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --radius-xs: 4px;
+      
+      /* Transitions */
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-fast: all 0.2s ease;
+      
+      /* Spacing */
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2rem;
+      --spacing-xl: 3rem;
     }
 
+    /* ===== Base Styles ===== */
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      margin: 0;
       font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text-dark);
-      padding: 40px 20px;
+      background: var(--gradient-bg);
+      color: var(--dark);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ===== Animated Background ===== */
+    .page-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 30% 50%, rgba(67, 97, 238, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 70% 30%, rgba(114, 9, 183, 0.06) 0%, transparent 50%);
+      animation: float 15s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    /* ===== Layout Components ===== */
+    .app {
+      position: relative;
+      z-index: 1;
     }
 
     .container {
-      max-width: 960px;
+      max-width: 1200px;
       margin: 0 auto;
+      padding: var(--spacing-lg);
     }
 
-    /* Enhanced Back Button */
-    .header-section {
+    /* ===== Header Component ===== */
+    .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 30px;
+      margin-bottom: var(--spacing-xl);
+      gap: var(--spacing-lg);
       flex-wrap: wrap;
-      gap: 15px;
     }
 
-    .back-btn {
+    .header__navigation {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 12px 20px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      box-shadow: 0 4px 15px rgba(74, 108, 247, 0.3);
-      transition: all 0.3s ease;
+      justify-content: center;
+      gap: var(--spacing-xs);
+      padding: var(--spacing-sm) var(--spacing-md);
       border: none;
-      cursor: pointer;
-    }
-
-    .back-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(74, 108, 247, 0.4);
-      background: linear-gradient(135deg, #3d56df 0%, #2bb3c7 100%);
-    }
-
-    .back-btn:active {
-      transform: translateY(0);
-    }
-
-    .back-btn i {
-      font-size: 1rem;
-      transition: transform 0.3s ease;
-    }
-
-    .back-btn:hover i {
-      transform: translateX(-2px);
-    }
-
-    h1 {
-      font-size: 2rem;
-      color: var(--primary);
-      margin: 0;
-      font-weight: 700;
-    }
-
-    .patient-info {
-      background: var(--card-bg);
-      padding: 24px;
-      border-left: 5px solid var(--primary);
-      border-radius: 12px;
-      margin-bottom: 30px;
-      box-shadow: var(--shadow);
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 15px;
-    }
-
-    .patient-info h2 {
-      grid-column: 1 / -1;
-      margin: 0 0 10px;
-      font-size: 1.3rem;
-    }
-
-    .patient-info-item {
-      margin: 4px 0;
-    }
-
-    .patient-info-item strong {
-      display: block;
-      color: var(--text-dark);
-      margin-bottom: 3px;
-    }
-
-    .patient-info-item span {
-      color: var(--text-medium);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
       font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
     }
 
+    .btn--primary {
+      background: var(--gradient-primary);
+      color: var(--white);
+    }
+
+    .btn--primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn--back {
+      padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .btn--back:hover i {
+      transform: translateX(-3px);
+    }
+
+    .header__title {
+      flex: 1;
+    }
+
+    .title {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--spacing-xs);
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      color: var(--gray);
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    /* ===== Card Component ===== */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.06);
+      transition: var(--transition);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card--elevated {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card--bordered::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card__header {
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+    .card__body {
+      padding: var(--spacing-lg);
+    }
+
+    .card__footer {
+      padding: var(--spacing-lg);
+      border-top: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+    /* ===== Patient Info Component ===== */
+    .patient-info {
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .patient-info__header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .patient-info__icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(67, 97, 238, 0.1);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+
+    .patient-info__title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .patient-info__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-md);
+    }
+
+    .info-item {
+      background: rgba(67, 97, 238, 0.05);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+    .info-item__label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .info-item__value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .badge--success {
+      background: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+    }
+
+    .badge--warning {
+      background: rgba(255, 193, 7, 0.1);
+      color: var(--warning);
+    }
+
+    /* ===== Controls Component ===== */
     .controls {
       display: flex;
-      justify-content: flex-end;
-      margin-bottom: 20px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-lg);
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
     }
 
-    select {
-      padding: 10px 12px;
-      border-radius: 8px;
+    .controls__info {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      color: var(--gray);
+      font-weight: 600;
+    }
+
+    .controls__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .select {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--dark);
+      font-family: inherit;
       font-size: 0.95rem;
-      border: 1px solid #ccc;
+      font-weight: 500;
+      transition: var(--transition);
+      min-width: 180px;
+    }
+
+    .select:focus {
       outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    /* ===== Reports Grid Component ===== */
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: var(--spacing-md);
     }
 
     .report-card {
-      background: var(--card-bg);
-      padding: 20px;
-      border-left: 4px solid var(--accent);
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      margin-bottom: 20px;
-      transition: transform 0.2s ease, box-shadow 0.3s ease;
-    }
-
-    .report-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .report-card h3 {
-      margin: 0 0 8px;
-      color: var(--primary);
-      font-size: 1.1rem;
-    }
-
-    .report-card p {
-      margin: 6px 0;
-      color: var(--text-medium);
-    }
-
-    .report-actions {
-      margin-top: 14px;
-    }
-
-    .report-actions button,
-    .report-actions a {
-      display: inline-block;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      text-decoration: none;
-      margin-right: 12px;
-      transition: background 0.3s ease, transform 0.2s ease;
-      border: none;
-      cursor: pointer;
-    }
-
-    .view-btn {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .view-btn:hover {
-      background: #3d56df;
-      transform: translateY(-1px);
-    }
-
-    .download-btn {
-      background: var(--success);
-      color: #fff;
-    }
-
-    .download-btn:hover {
-      background: #0e9f6e;
-      transform: translateY(-1px);
-    }
-
-    .no-data {
-      text-align: center;
-      padding: 40px;
-      color: #999;
-      font-size: 1rem;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: var(--primary);
-      font-size: 1rem;
-    }
-
-    /* Modal Styles - Same as Previous Dashboard */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 2000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
-      animation: modalFadeIn 0.3s ease;
-    }
-
-    .modal-content {
-      position: absolute;
-      background: #ffffff;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 900px;
-      height: 90vh;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      animation: modalSlideIn 0.3s ease;
-      border: 2px solid #e0e0e0;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Window State Classes */
-    .modal-content.minimized {
-      width: 360px !important;
-      height: 50px !important;
-      border-radius: 8px;
-      overflow: hidden;
-      top: auto !important;
-      bottom: 20px !important;
-      left: 20px !important;
-      right: auto !important;
-      transform: none !important;
-      cursor: pointer;
-      animation: minimizeIn 0.3s ease;
-      margin: 0 !important;
-      max-width: none !important;
-    }
-
-    .modal-content.maximized {
-      width: 100vw !important;
-      height: 100vh !important;
-      max-width: none !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      transform: none !important;
-      border-radius: 0 !important;
-      margin: 0 !important;
-      animation: maximizeIn 0.3s ease;
-      z-index: 2001;
-    }
-
-    /* Document Header */
-    .modal-header {
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      border-bottom: 3px solid var(--primary);
-      padding: 1rem 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       position: relative;
-      cursor: default;
     }
 
-    .modal-header::after {
-      content: '';
-      position: absolute;
-      bottom: -3px;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, #ddd, transparent);
+    .report-card::before {
+      background: var(--gradient-secondary);
     }
 
-    .document-title {
+    .report-card__header {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
-      color: var(--text-dark);
+      justify-content: space-between;
+      margin-bottom: var(--spacing-md);
     }
 
-    .document-title .icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      border-radius: 8px;
+    .report-card__type {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .report-card__icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--gradient-secondary);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      color: var(--white);
       font-size: 1.2rem;
+      box-shadow: var(--shadow-sm);
     }
 
-    .document-title .text {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .document-title .main-title {
+    .report-card__title {
       font-size: 1.2rem;
       font-weight: 700;
       color: var(--primary);
+      margin: 0;
     }
 
-    .document-title .sub-title {
-      font-size: 0.85rem;
-      color: var(--text-medium);
+    .report-card__date {
+      background: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .report-card__details {
+      margin: var(--spacing-md) 0;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      background: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
       font-weight: 500;
     }
 
-    .window-controls {
+    .report-card__actions {
       display: flex;
-      gap: 0.3rem;
-      align-items: center;
+      gap: var(--spacing-sm);
     }
 
-    .control-btn {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid #ddd;
-      color: var(--text-dark);
-      width: 36px;
-      height: 36px;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
+    .btn--view {
+      flex: 1;
+      background: var(--primary);
+      color: var(--white);
     }
 
-    .control-btn:hover {
-      background: #f1f1f1;
-      border-color: var(--primary);
+    .btn--download {
+      flex: 1;
+      background: var(--gradient-success);
+      color: var(--white);
+    }
+
+    .btn--view:hover,
+    .btn--download:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* ===== State Components ===== */
+    .state {
+      text-align: center;
+      padding: var(--spacing-xl);
+      color: var(--gray);
+    }
+
+    .state__icon {
+      font-size: 3rem;
+      margin-bottom: var(--spacing-md);
       color: var(--primary);
-      transform: translateY(-1px);
     }
 
-    .control-btn.minimize:hover {
-      background: #ffc107;
-      border-color: #ffc107;
-      color: white;
+    .state__title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: var(--spacing-xs);
+      color: var(--dark);
     }
 
-    .control-btn.maximize:hover {
-      background: #28a745;
-      border-color: #28a745;
-      color: white;
+    .state__message {
+      font-size: 1rem;
+      line-height: 1.6;
     }
 
-    .control-btn.close {
-      background: #dc3545;
-      color: white;
-      border-color: #dc3545;
-    }
-
-    .control-btn.close:hover {
-      background: #c82333;
-      border-color: #c82333;
-      color: white;
-    }
-
-    /* Document Body */
-    .modal-body {
-      padding: 0;
-      height: calc(100% - 80px);
-      background: #fafafa;
-      position: relative;
-      border: 1px solid #e9ecef;
-      border-top: none;
-    }
-
-    .modal-body iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      border-radius: 4px;
-    }
-
-    /* Loading State */
-    .modal-loading {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      z-index: 10;
-      background: rgba(255,255,255,0.95);
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-
-    .document-spinner {
-      width: 35px;
-      height: 35px;
+    .spinner {
+      width: 40px;
+      height: 40px;
       border: 3px solid #f3f3f3;
       border-top: 3px solid var(--primary);
       border-radius: 50%;
-      animation: documentSpin 1s linear infinite;
+      animation: spin 1s linear infinite;
+      margin: 0 auto var(--spacing-md);
     }
 
-    .loading-text {
-      color: var(--text-medium);
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    /* Animations */
-    @keyframes modalFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes modalSlideIn {
-      from { 
-        transform: translate(-50%, -50%) scale(0.95);
-        opacity: 0;
-      }
-      to { 
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-      }
-    }
-
-    @keyframes minimizeIn {
-      from { 
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-      }
-      to { 
-        transform: none scale(0.8);
-        opacity: 1;
-      }
-    }
-
-    @keyframes maximizeIn {
-      from { 
-        transform: translate(-50%, -50%) scale(0.9);
-      }
-      to { 
-        transform: none scale(1);
-      }
-    }
-
-    @keyframes documentSpin {
+    @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
 
+    /* ===== Modal Component ===== */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .modal--active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal__dialog {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-xl);
+      width: 90%;
+      max-width: 1000px;
+      height: 90vh;
+      overflow: hidden;
+      transform: scale(0.9);
+      transition: var(--transition);
+    }
+
+    .modal--active .modal__dialog {
+      transform: scale(1);
+    }
+
+    .modal__dialog--minimized {
+      width: 400px !important;
+      height: 60px !important;
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      top: auto !important;
+      transform: none !important;
+    }
+
+    .modal__dialog--maximized {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      border-radius: 0 !important;
+    }
+
+    .modal__header {
+      background: var(--gradient-primary);
+      color: var(--white);
+      padding: var(--spacing-md) var(--spacing-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal__title {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .modal__title-icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .modal__title-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal__title-main {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+
+    .modal__title-sub {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .modal__controls {
+      display: flex;
+      gap: var(--spacing-xs);
+    }
+
+    .modal__control-btn {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: var(--white);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-fast);
+    }
+
+    .modal__control-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .modal__control-btn--close {
+      background: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .modal__body {
+      height: calc(100% - 90px);
+      position: relative;
+    }
+
+    .modal__content {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .modal__loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: var(--spacing-lg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+
+    .modal__loading-text {
+      margin-top: var(--spacing-sm);
+      font-weight: 600;
+      color: var(--gray);
+    }
+
+    /* ===== Responsive Design ===== */
     @media (max-width: 768px) {
-      .header-section {
+      .container {
+        padding: var(--spacing-sm);
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+      }
+
+      .title {
+        font-size: 2rem;
+      }
+
+      .patient-info__grid {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
         flex-direction: column;
         align-items: flex-start;
       }
 
-      .back-btn {
-        padding: 10px 16px;
-        font-size: 0.9rem;
-      }
-
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      .patient-info {
+      .reports-grid {
         grid-template-columns: 1fr;
       }
 
-      .modal-content { 
-        width: 95%; 
-        height: 95vh; 
-      }
-      
-      .modal-header {
-        padding: 0.8rem;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-      }
-      
-      .document-title .main-title {
-        font-size: 1rem;
-      }
-      
-      .control-btn {
-        width: 32px;
-        height: 32px;
-        font-size: 0.8rem;
+      .report-card__actions {
+        flex-direction: column;
       }
 
-      .modal-content.minimized {
+      .modal__dialog {
+        width: 95%;
+        height: 95vh;
+      }
+
+      .modal__header {
+        padding: var(--spacing-sm);
+        flex-wrap: wrap;
+      }
+
+      .modal__dialog--minimized {
         width: calc(100% - 20px) !important;
         left: 10px !important;
-        right: 10px !important;
       }
     }
 
     @media (max-width: 480px) {
-      .modal-content:not(.minimized) {
+      .title {
+        font-size: 1.8rem;
+      }
+
+      .patient-info__icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+
+      .report-card__icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+      }
+
+      .modal__dialog:not(.modal__dialog--minimized) {
         width: 100% !important;
         height: 100vh !important;
-        margin: 0;
         border-radius: 0;
+      }
+    }
+
+    /* ===== Animations ===== */
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    .slide-up {
+      animation: slideUp 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Enhanced Header Section -->
-    <div class="header-section">
-      <a href="/doctordashboard" class="back-btn">
-        <i class="fas fa-arrow-left"></i>
-        Back to Dashboard
-      </a>
-      <h1>Patient Report Details</h1>
-    </div>
-    
-    <div class="patient-info" id="patientDetails">
-      <div class="loading">Loading patient information...</div>
-    </div>
+  <!-- Animated Background -->
+  <div class="page-bg"></div>
+  
+  <!-- Main App -->
+  <div class="app">
+    <div class="container">
+      <!-- Header Component -->
+      <header class="header" role="banner">
+        <nav class="header__navigation">
+          <a href="/doctordashboard" class="btn btn--primary btn--back" aria-label="Back to Dashboard">
+            <i class="fas fa-arrow-left" aria-hidden="true"></i>
+            Back to Dashboard
+          </a>
+        </nav>
+        
+        <div class="header__title">
+          <h1 class="title">Patient Report Details</h1>
+          <p class="subtitle">View and manage patient medical reports</p>
+        </div>
+      </header>
+      
+      <!-- Patient Info Component -->
+      <section class="patient-info" aria-labelledby="patient-info-title">
+        <div class="card card--bordered">
+          <div class="card__body">
+            <div id="patientInfoContent">
+              <div class="state">
+                <div class="spinner"></div>
+                <p class="state__message">Loading patient information...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <div class="controls">
-      <select id="sortSelect" onchange="renderReports()">
-        <option value="newest">Newest First</option>
-        <option value="oldest">Oldest First</option>
-        <option value="az">Report Type A-Z</option>
-        <option value="za">Report Type Z-A</option>
-      </select>
-    </div>
+      <!-- Controls Component -->
+      <section class="controls" id="controlsSection" style="display: none;">
+        <div class="controls__info">
+          <i class="fas fa-file-medical" aria-hidden="true"></i>
+          <span id="reportsCount">Loading reports...</span>
+        </div>
+        <div class="controls__actions">
+          <label for="sortSelect" class="sr-only">Sort reports by</label>
+          <select id="sortSelect" class="select" onchange="AppController.renderReports()" aria-label="Sort reports">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="az">Report Type A-Z</option>
+            <option value="za">Report Type Z-A</option>
+          </select>
+        </div>
+      </section>
 
-    <div id="reportContainer">
-      <div class="loading">Loading reports...</div>
+      <!-- Reports Component -->
+      <section class="reports" aria-labelledby="reports-title">
+        <div id="reportContainer">
+          <div class="card">
+            <div class="card__body">
+              <div class="state">
+                <div class="spinner"></div>
+                <p class="state__message">Loading reports...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
-  <!-- Document Modal -->
-  <div id="reportModal" class="modal">
-    <div class="modal-content" id="modalBox">
-      <div class="modal-header">
-        <div class="document-title">
-          <div class="icon">
-            <i class="fas fa-file-medical"></i>
+  <!-- Modal Component -->
+  <div id="reportModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal__dialog" id="modalDialog">
+      <header class="modal__header">
+        <div class="modal__title">
+          <div class="modal__title-icon">
+            <i class="fas fa-file-medical" aria-hidden="true"></i>
           </div>
-          <div class="text">
-            <div class="main-title" id="modalTitle">Medical Report</div>
-            <div class="sub-title">Patient Document Viewer</div>
+          <div class="modal__title-text">
+            <h2 class="modal__title-main" id="modalTitle">Medical Report</h2>
+            <p class="modal__title-sub">Patient Document Viewer</p>
           </div>
         </div>
         
-        <div class="window-controls">
-          <button class="control-btn minimize" id="minBtn" title="Minimize">
-            <i class="fas fa-window-minimize"></i>
+        <div class="modal__controls">
+          <button class="modal__control-btn" id="minimizeBtn" title="Minimize" aria-label="Minimize window">
+            <i class="fas fa-window-minimize" aria-hidden="true"></i>
           </button>
-          <button class="control-btn maximize" id="maxBtn" title="Maximize">
-            <i class="fas fa-window-maximize"></i>
+          <button class="modal__control-btn" id="maximizeBtn" title="Maximize" aria-label="Maximize window">
+            <i class="fas fa-window-maximize" aria-hidden="true"></i>
           </button>
-          <button class="control-btn close" onclick="closeModal()" title="Close">
-            <i class="fas fa-times"></i>
+          <button class="modal__control-btn modal__control-btn--close" onclick="ModalController.close()" title="Close" aria-label="Close window">
+            <i class="fas fa-times" aria-hidden="true"></i>
           </button>
         </div>
-      </div>
-      <div class="modal-body">
-        <div class="modal-loading" id="modalLoading">
-          <div class="document-spinner"></div>
-          <div class="loading-text">Loading document...</div>
+      </header>
+      
+      <div class="modal__body">
+        <div class="modal__loading" id="modalLoading">
+          <div class="spinner"></div>
+          <p class="modal__loading-text">Loading document...</p>
         </div>
-        <iframe id="reportFrame" src="" onload="hideLoading()"></iframe>
+        <iframe id="reportFrame" class="modal__content" src="" onload="ModalController.hideLoading()" title="Report viewer"></iframe>
       </div>
     </div>
   </div>
 
   <script>
-    const patientId = new URLSearchParams(window.location.search).get('patientId');
-    let reportData = [];
-    let patientData = {};
+    // ===== Application State =====
+    const AppState = {
+      patientId: new URLSearchParams(window.location.search).get('patientId'),
+      patientData: {},
+      reportData: [],
+      modal: {
+        isOpen: false,
+        isMinimized: false,
+        isMaximized: false
+      }
+    };
 
-    // Modal window controls
-    const modal = document.getElementById('reportModal');
-    const modalBox = document.getElementById('modalBox');
-    const minBtn = document.getElementById('minBtn');
-    const maxBtn = document.getElementById('maxBtn');
-    let isMin = false;
-    let isMax = false;
+    // ===== Utility Functions =====
+    const Utils = {
+      formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      },
 
-    async function fetchPatientDetails() {
-      try {
-        const res = await fetch(`/api/patient/details?patientId=${patientId}`);
-        if (!res.ok) {
-          throw new Error('Patient not found');
+      getReportIcon(reportType) {
+        const iconMap = {
+          'lab': 'fas fa-flask',
+          'lab test': 'fas fa-flask',
+          'imaging': 'fas fa-x-ray',
+          'prescription': 'fas fa-pills',
+          'discharge': 'fas fa-file-export',
+          'discharge summary': 'fas fa-file-export',
+          'default': 'fas fa-file-medical'
+        };
+        return iconMap[reportType.toLowerCase()] || iconMap.default;
+      },
+
+      showToast(message, type = 'info') {
+        // Simple toast implementation
+        console.log(`${type.toUpperCase()}: ${message}`);
+      },
+
+      debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
+    };
+
+    // ===== API Service =====
+    const ApiService = {
+      async fetchPatientDetails(patientId) {
+        try {
+          const response = await fetch(`/api/patient/details?patientId=${patientId}`);
+          if (!response.ok) throw new Error('Patient not found');
+          return await response.json();
+        } catch (error) {
+          console.error('Error fetching patient details:', error);
+          throw error;
         }
-        patientData = await res.json();
-        renderPatientDetails();
-      } catch (err) {
-        console.error('Error loading patient details:', err);
-        document.getElementById('patientDetails').innerHTML = `
-          <div class="no-data">Error loading patient details: ${err.message}</div>
+      },
+
+      async fetchReports(patientId) {
+        try {
+          const response = await fetch(`/api/reports/${patientId}`);
+          if (!response.ok) throw new Error('Reports not found');
+          return await response.json();
+        } catch (error) {
+          console.error('Error fetching reports:', error);
+          throw error;
+        }
+      }
+    };
+
+    // ===== Patient Info Controller =====
+    const PatientController = {
+      async load() {
+        const container = document.getElementById('patientInfoContent');
+        
+        try {
+          AppState.patientData = await ApiService.fetchPatientDetails(AppState.patientId);
+          this.render(container, AppState.patientData);
+        } catch (error) {
+          this.renderError(container, error.message);
+        }
+      },
+
+      render(container, data) {
+        const verificationBadge = data.verified 
+          ? '<span class="badge badge--success"><i class="fas fa-shield-check"></i> Verified</span>'
+          : '<span class="badge badge--warning"><i class="fas fa-shield-exclamation"></i> Not Verified</span>';
+
+        container.innerHTML = `
+          <div class="patient-info__header">
+            <div class="patient-info__icon">
+              <i class="fas fa-user-injured"></i>
+            </div>
+            <h2 class="patient-info__title" id="patient-info-title">Patient Information</h2>
+          </div>
+          <div class="patient-info__grid">
+            <div class="info-item">
+              <label class="info-item__label">Patient ID</label>
+              <div class="info-item__value">${AppState.patientId}</div>
+            </div>
+            <div class="info-item">
+              <label class="info-item__label">Full Name</label>
+              <div class="info-item__value">${data.name || 'Not available'}</div>
+            </div>
+            <div class="info-item">
+              <label class="info-item__label">Email Address</label>
+              <div class="info-item__value">${data.email || 'Not available'}</div>
+            </div>
+            <div class="info-item">
+              <label class="info-item__label">Phone Number</label>
+              <div class="info-item__value">${data.phone || 'Not available'}</div>
+            </div>
+            <div class="info-item">
+              <label class="info-item__label">Verification Status</label>
+              <div class="info-item__value">${verificationBadge}</div>
+            </div>
+            <div class="info-item">
+              <label class="info-item__label">Registration Date</label>
+              <div class="info-item__value">${data.createdAt ? Utils.formatDate(data.createdAt) : 'Not available'}</div>
+            </div>
+          </div>
+        `;
+        
+        container.classList.add('fade-in');
+      },
+
+      renderError(container, message) {
+        container.innerHTML = `
+          <div class="state">
+            <i class="fas fa-exclamation-triangle state__icon"></i>
+            <h3 class="state__title">Error Loading Patient</h3>
+            <p class="state__message">Unable to load patient details: ${message}</p>
+          </div>
         `;
       }
-    }
+    };
 
-    function renderPatientDetails() {
-      const details = `
-        <h2>Patient Information</h2>
-        <div class="patient-info-item">
-          <strong>Patient ID</strong>
-          <span>${patientId}</span>
-        </div>
-        <div class="patient-info-item">
-          <strong>Name</strong>
-          <span>${patientData.name || 'Not available'}</span>
-        </div>
-        <div class="patient-info-item">
-          <strong>Email</strong>
-          <span>${patientData.email || 'Not available'}</span>
-        </div>
-        <div class="patient-info-item">
-          <strong>Phone</strong>
-          <span>${patientData.phone || 'Not available'}</span>
-        </div>
-        <div class="patient-info-item">
-          <strong>Status</strong>
-          <span>${patientData.verified ? 'Verified' : 'Not Verified'}</span>
-        </div>
-      `;
-      document.getElementById('patientDetails').innerHTML = details;
-    }
+    // ===== Reports Controller =====
+    const ReportsController = {
+      async load() {
+        try {
+          AppState.reportData = await ApiService.fetchReports(AppState.patientId);
+          this.showControls();
+          this.updateCount();
+          this.render();
+        } catch (error) {
+          this.renderError(error.message);
+        }
+      },
 
-    async function fetchReports() {
-      try {
-        const res = await fetch(`/api/reports/${patientId}`);
-        const data = await res.json();
-        reportData = data;
+      showControls() {
+        document.getElementById('controlsSection').style.display = 'flex';
+        document.getElementById('controlsSection').classList.add('slide-up');
+      },
 
-        if (!data.length) {
-          document.getElementById('reportContainer').innerHTML = `
-            <div class="no-data">No reports found for patient ID: <strong>${patientId}</strong></div>
-          `;
+      updateCount() {
+        const count = AppState.reportData.length;
+        document.getElementById('reportsCount').innerHTML = `
+          <i class="fas fa-file-medical"></i>
+          ${count} report${count !== 1 ? 's' : ''} found
+        `;
+      },
+
+      render() {
+        const container = document.getElementById('reportContainer');
+        
+        if (AppState.reportData.length === 0) {
+          this.renderEmpty(container);
           return;
         }
 
-        renderReports();
-      } catch (err) {
-        console.error('Error loading reports:', err);
+        const sorted = this.getSortedReports();
+        container.innerHTML = `
+          <div class="reports-grid">
+            ${sorted.map(report => this.renderReportCard(report)).join('')}
+          </div>
+        `;
+        
+        container.classList.add('fade-in');
+      },
+
+      getSortedReports() {
+        const sortValue = document.getElementById('sortSelect').value;
+        const sorted = [...AppState.reportData];
+        
+        switch (sortValue) {
+          case 'newest':
+            return sorted.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+          case 'oldest':
+            return sorted.sort((a, b) => new Date(a.uploadedAt) - new Date(b.uploadedAt));
+          case 'az':
+            return sorted.sort((a, b) => a.reportType.localeCompare(b.reportType));
+          case 'za':
+            return sorted.sort((a, b) => b.reportType.localeCompare(a.reportType));
+          default:
+            return sorted;
+        }
+      },
+
+      renderReportCard(report) {
+        return `
+          <div class="card card--elevated report-card" data-report-id="${report._id || report.id}">
+            <div class="card__body">
+              <div class="report-card__header">
+                <div class="report-card__type">
+                  <div class="report-card__icon">
+                    <i class="${Utils.getReportIcon(report.reportType)}"></i>
+                  </div>
+                  <h3 class="report-card__title">${report.reportType}</h3>
+                </div>
+                <div class="report-card__date">${Utils.formatDate(report.uploadedAt)}</div>
+              </div>
+              
+              <div class="report-card__details">
+                <div class="file-info">
+                  <i class="fas fa-file"></i>
+                  <span>${report.filename}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card__footer">
+              <div class="report-card__actions">
+                <button class="btn btn--view" onclick="ModalController.open('${report.filePath}', '${report.reportType}')" aria-label="View ${report.reportType} report">
+                  <i class="fas fa-eye"></i>
+                  View Report
+                </button>
+                <a href="/${report.filePath}" class="btn btn--download" download aria-label="Download ${report.reportType} report">
+                  <i class="fas fa-download"></i>
+                  Download
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      renderEmpty(container) {
+        container.innerHTML = `
+          <div class="card">
+            <div class="card__body">
+              <div class="state">
+                <i class="fas fa-file-medical state__icon"></i>
+                <h3 class="state__title">No Reports Found</h3>
+                <p class="state__message">No medical reports found for patient ID: <strong>${AppState.patientId}</strong></p>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      renderError(message) {
         document.getElementById('reportContainer').innerHTML = `
-          <div class="no-data">An error occurred while fetching reports.</div>
+          <div class="card">
+            <div class="card__body">
+              <div class="state">
+                <i class="fas fa-exclamation-triangle state__icon"></i>
+                <h3 class="state__title">Error Loading Reports</h3>
+                <p class="state__message">An error occurred while fetching reports: ${message}</p>
+              </div>
+            </div>
+          </div>
         `;
       }
-    }
+    };
 
-    function renderReports() {
-      const container = document.getElementById('reportContainer');
-      const sortValue = document.getElementById('sortSelect').value;
+    // ===== Modal Controller =====
+    const ModalController = {
+      elements: {
+        modal: document.getElementById('reportModal'),
+        dialog: document.getElementById('modalDialog'),
+        title: document.getElementById('modalTitle'),
+        frame: document.getElementById('reportFrame'),
+        loading: document.getElementById('modalLoading'),
+        minimizeBtn: document.getElementById('minimizeBtn'),
+        maximizeBtn: document.getElementById('maximizeBtn')
+      },
 
-      let sorted = [...reportData];
-      if (sortValue === 'newest') {
-        sorted.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
-      } else if (sortValue === 'oldest') {
-        sorted.sort((a, b) => new Date(a.uploadedAt) - new Date(b.uploadedAt));
-      } else if (sortValue === 'az') {
-        sorted.sort((a, b) => a.reportType.localeCompare(b.reportType));
-      } else if (sortValue === 'za') {
-        sorted.sort((a, b) => b.reportType.localeCompare(a.reportType));
+      init() {
+        this.bindEvents();
+      },
+
+      bindEvents() {
+        // Window controls
+        this.elements.minimizeBtn.addEventListener('click', () => this.toggleMinimize());
+        this.elements.maximizeBtn.addEventListener('click', () => this.toggleMaximize());
+        
+        // Double click to maximize
+        document.querySelector('.modal__header').addEventListener('dblclick', () => this.toggleMaximize());
+        
+        // Restore from minimized
+        this.elements.dialog.addEventListener('click', () => {
+          if (AppState.modal.isMinimized) this.restore();
+        });
+        
+        // Close on outside click
+        this.elements.modal.addEventListener('click', (e) => {
+          if (e.target === this.elements.modal && !AppState.modal.isMinimized) {
+            this.close();
+          }
+        });
+        
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && AppState.modal.isOpen) this.close();
+        });
+      },
+
+      open(filePath, reportType) {
+        this.elements.title.textContent = reportType;
+        this.elements.loading.style.display = 'block';
+        this.elements.frame.style.display = 'none';
+        this.elements.frame.src = '/' + filePath;
+        
+        this.elements.modal.classList.add('modal--active');
+        this.elements.modal.setAttribute('aria-hidden', 'false');
+        
+        AppState.modal.isOpen = true;
+        this.resetWindowState();
+        document.body.style.overflow = 'hidden';
+        
+        // Focus management
+        this.elements.minimizeBtn.focus();
+      },
+
+      close() {
+        this.elements.modal.classList.remove('modal--active');
+        this.elements.modal.setAttribute('aria-hidden', 'true');
+        this.elements.frame.src = '';
+        
+        AppState.modal.isOpen = false;
+        this.resetWindowState();
+        document.body.style.overflow = 'auto';
+      },
+
+      toggleMinimize() {
+        if (AppState.modal.isMinimized) {
+          this.restore();
+        } else {
+          this.minimize();
+        }
+      },
+
+      minimize() {
+        this.elements.dialog.classList.add('modal__dialog--minimized');
+        this.elements.dialog.classList.remove('modal__dialog--maximized');
+        
+        this.elements.minimizeBtn.innerHTML = '<i class="fas fa-window-restore"></i>';
+        this.elements.minimizeBtn.title = 'Restore';
+        this.elements.maximizeBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
+        this.elements.maximizeBtn.title = 'Maximize';
+        
+        AppState.modal.isMinimized = true;
+        AppState.modal.isMaximized = false;
+      },
+
+      toggleMaximize() {
+        if (AppState.modal.isMaximized) {
+          this.restore();
+        } else {
+          this.maximize();
+        }
+      },
+
+      maximize() {
+        this.elements.dialog.classList.add('modal__dialog--maximized');
+        this.elements.dialog.classList.remove('modal__dialog--minimized');
+        
+        this.elements.maximizeBtn.innerHTML = '<i class="fas fa-compress"></i>';
+        this.elements.maximizeBtn.title = 'Restore';
+        this.elements.minimizeBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
+        this.elements.minimizeBtn.title = 'Minimize';
+        
+        AppState.modal.isMaximized = true;
+        AppState.modal.isMinimized = false;
+      },
+
+      restore() {
+        this.elements.dialog.classList.remove('modal__dialog--minimized', 'modal__dialog--maximized');
+        
+        this.elements.minimizeBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
+        this.elements.minimizeBtn.title = 'Minimize';
+        this.elements.maximizeBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
+        this.elements.maximizeBtn.title = 'Maximize';
+        
+        AppState.modal.isMinimized = false;
+        AppState.modal.isMaximized = false;
+      },
+
+      resetWindowState() {
+        this.restore();
+      },
+
+      hideLoading() {
+        setTimeout(() => {
+          this.elements.loading.style.display = 'none';
+          this.elements.frame.style.display = 'block';
+        }, 800);
       }
+    };
 
-      container.innerHTML = sorted.map(r => `
-        <div class="report-card">
-          <h3>${r.reportType}</h3>
-          <p><strong>File:</strong> ${r.filename}</p>
-          <p><strong>Uploaded:</strong> ${new Date(r.uploadedAt).toLocaleString()}</p>
-          <div class="report-actions">
-            <button class="view-btn" onclick="openReportModal('${r.filePath}', '${r.reportType}')">
-              🔍 View
-            </button>
-            <a href="/${r.filePath}" class="download-btn" download>⬇ Download</a>
-          </div>
-        </div>
-      `).join('');
-    }
+    // ===== App Controller (Main) =====
+    const AppController = {
+      async init() {
+        console.log('🚀 Patient Reports App initializing...');
+        
+        if (!AppState.patientId) {
+          Utils.showToast('No patient ID provided', 'error');
+          return;
+        }
 
-    // Modal Functions
-    function openReportModal(filePath, reportType) {
-      const iframe = document.getElementById('reportFrame');
-      const title = document.getElementById('modalTitle');
-      const loading = document.getElementById('modalLoading');
-      
-      title.textContent = reportType;
-      loading.style.display = 'flex';
-      iframe.style.display = 'none';
-      iframe.src = '/' + filePath;
-      modal.style.display = 'block';
-      
-      // Reset window state
-      modalBox.classList.remove('minimized', 'maximized');
-      isMin = false;
-      isMax = false;
-      minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
-      maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
-      minBtn.title = 'Minimize';
-      maxBtn.title = 'Maximize';
-      
-      document.body.style.overflow = 'hidden';
-    }
+        // Initialize components
+        ModalController.init();
+        
+        // Load data
+        await this.loadData();
+        
+        console.log('✅ Patient Reports App initialized successfully');
+      },
 
-    function hideLoading() {
-      const loading = document.getElementById('modalLoading');
-      const iframe = document.getElementById('reportFrame');
-      setTimeout(() => {
-        loading.style.display = 'none';
-        iframe.style.display = 'block';
-      }, 500);
-    }
+      async loadData() {
+        // Load patient info and reports in parallel
+        await Promise.all([
+          PatientController.load(),
+          ReportsController.load()
+        ]);
+      },
 
-    function closeModal() {
-      const iframe = document.getElementById('reportFrame');
-      
-      modal.style.display = 'none';
-      iframe.src = '';
-      
-      // Reset window state
-      modalBox.classList.remove('minimized', 'maximized');
-      isMin = false;
-      isMax = false;
-      minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
-      maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
-      
-      document.body.style.overflow = 'auto';
-    }
-
-    // Window Controls
-    minBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (!isMin) {
-        modalBox.classList.add('minimized');
-        modalBox.classList.remove('maximized');
-        isMin = true;
-        isMax = false;
-        minBtn.innerHTML = '<i class="fas fa-window-restore"></i>';
-        minBtn.title = 'Restore';
-        maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
-        maxBtn.title = 'Maximize';
-      } else {
-        modalBox.classList.remove('minimized');
-        isMin = false;
-        minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
-        minBtn.title = 'Minimize';
+      renderReports() {
+        ReportsController.render();
       }
+    };
+
+    // ===== Screen Reader Support =====
+    const sr = document.createElement('div');
+    sr.setAttribute('aria-live', 'polite');
+    sr.setAttribute('aria-atomic', 'true');
+    sr.className = 'sr-only';
+    sr.style.cssText = 'position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;';
+    document.body.appendChild(sr);
+
+    // ===== Initialize App =====
+    document.addEventListener('DOMContentLoaded', () => {
+      AppController.init();
     });
 
-    maxBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (!isMax) {
-        modalBox.classList.add('maximized');
-        modalBox.classList.remove('minimized');
-        isMax = true;
-        isMin = false;
-        maxBtn.innerHTML = '<i class="fas fa-compress"></i>';
-        maxBtn.title = 'Restore';
-        minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
-        minBtn.title = 'Minimize';
-      } else {
-        modalBox.classList.remove('maximized');
-        isMax = false;
-        maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
-        maxBtn.title = 'Maximize';
-      }
-    });
-
-    // Double click on header to toggle maximize
-    document.querySelector('.modal-header').addEventListener('dblclick', function() {
-      if (!isMax) {
-        modalBox.classList.add('maximized');
-        modalBox.classList.remove('minimized');
-        isMax = true;
-        isMin = false;
-        maxBtn.innerHTML = '<i class="fas fa-compress"></i>';
-        maxBtn.title = 'Restore';
-      } else {
-        modalBox.classList.remove('maximized');
-        isMax = false;
-        maxBtn.innerHTML = '<i class="fas fa-window-maximize"></i>';
-        maxBtn.title = 'Maximize';
-      }
-    });
-
-    // Restore from minimized state when clicking on the bar
-    modalBox.addEventListener('click', function() {
-      if (isMin) {
-        modalBox.classList.remove('minimized');
-        isMin = false;
-        minBtn.innerHTML = '<i class="fas fa-window-minimize"></i>';
-        minBtn.title = 'Minimize';
-      }
-    });
-
-    // Event Listeners
-    window.onclick = function(event) {
-      if (event.target === modal && !isMin) {
-        closeModal();
-      }
+    // ===== Performance Monitoring =====
+    if ('performance' in window) {
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const perfData = performance.getEntriesByType('navigation')[0];
+          console.log(`⚡ Page loaded in ${Math.round(perfData.loadEventEnd - perfData.fetchStart)}ms`);
+        }, 0);
+      });
     }
-
-    document.addEventListener('keydown', function(event) {
-      if (event.key === 'Escape') {
-        closeModal();
-      }
-    });
-
-    // Load both patient details and reports
-    fetchPatientDetails();
-    fetchReports();
   </script>
 </body>
 </html>
+
+
 

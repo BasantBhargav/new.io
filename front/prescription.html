@@ -4,187 +4,1019 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Write Prescription | MediVault</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
   <style>
-    :root {
-      --primary: #4a6cf7;
-      --primary-light: #6a85f9;
-      --success: #28a745;
-      --danger: #dc3545;
-      --bg: #f8fafd;
-      --card-bg: #fff;
-      --text-dark: #1f2937;
-      --text-medium: #4b5563;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-dark); }
-    .container { max-width: 800px; margin: 30px auto; background: var(--card-bg); border-radius: 10px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-    h1 { color: var(--primary); margin-bottom: 15px; text-align: center; }
-    .btn { padding: 10px 20px; background: linear-gradient(to right, var(--primary), var(--primary-light)); color: white; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
-    .btn:hover { opacity: 0.9; }
-    .btn-back { background: var(--text-medium); margin-bottom: 20px; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
-    .form-control { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
-    .alert { padding: 12px; border-radius: 5px; margin-bottom: 15px; }
-    .alert-success { background: rgba(40, 167, 69, 0.1); border-left: 4px solid var(--success); color: var(--success); }
-    .alert-danger { background: rgba(220, 53, 69, 0.1); border-left: 4px solid var(--danger); color: var(--danger); }
-    .hidden { display: none; }
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #7209b7;
+      --accent: #f72585;
+      --success: #4cc9f0;
+      --warning: #ffc107;
+      --danger: #ef4444;
+      --dark: #212529;
+      --gray: #6c757d;
+      --light-gray: #f8f9fa;
+      --white: #ffffff;
+      --gradient-primary: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+      --gradient-secondary: linear-gradient(135deg, #f72585 0%, #4361ee 100%);
+      --gradient-success: linear-gradient(135deg, #4cc9f0 0%, #36d1dc 100%);
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+      --shadow-xl: 0 16px 48px rgba(0,0,0,0.18);
+      --radius: 16px;
+      --radius-sm: 8px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 50%, #f0f8ff 100%);
+      color: var(--dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Enhanced Animated Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(67, 97, 238, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 30%, rgba(114, 9, 183, 0.06) 0%, transparent 50%);
+      animation: float 12s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Enhanced Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem 2rem;
+      background: var(--gradient-primary);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      border: none;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .back-btn i {
+      font-size: 1.1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .back-btn:hover i {
+      transform: translateX(-3px);
+    }
+
+    .page-title h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .page-title p {
+      color: var(--gray);
+      font-size: 1.1rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Enhanced Card Components */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.06);
+      transition: var(--transition);
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .card-header-icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(67, 97, 238, 0.1);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+
+    .card-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    /* Enhanced Form Components */
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: var(--transition);
+      background: var(--white);
+      color: var(--dark);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .form-control::placeholder {
+      color: var(--gray);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* Enhanced Button Components */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      min-height: 45px;
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      background: var(--gradient-secondary);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-success {
+      background: var(--gradient-success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: var(--shadow-sm) !important;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      min-height: 35px;
+    }
+
+    /* Enhanced Alert Components */
+    .alert {
+      padding: 1.2rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-weight: 500;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { 
+        opacity: 0; 
+        transform: translateY(-10px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+
+    .alert-success {
+      background: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(76, 201, 240, 0.2);
+      border-left: 4px solid var(--success);
+    }
+
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-left: 4px solid var(--danger);
+    }
+
+    .alert i {
+      font-size: 1.2rem;
+    }
+
+    /* Patient Info Display */
+    .patient-info {
+      background: rgba(67, 97, 238, 0.05);
+      border: 1px solid rgba(67, 97, 238, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .patient-info h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .patient-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .patient-detail-item {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 0.8rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .patient-detail-item strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray);
+      margin-bottom: 0.3rem;
+    }
+
+    .patient-detail-item span {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    /* Medication List */
+    .medications-container {
+      border: 1px dashed #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: rgba(67, 97, 238, 0.02);
+    }
+
+    .medication-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+    .medication-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .medication-input {
+      flex: 1;
+    }
+
+    .medication-remove {
+      background: var(--danger);
+      color: white;
+      border: none;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .medication-remove:hover {
+      background: #c82333;
+      transform: scale(1.1);
+    }
+
+    .add-medication-btn {
+      width: 100%;
+      border: 2px dashed var(--primary);
+      background: rgba(67, 97, 238, 0.05);
+      color: var(--primary);
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+
+    .add-medication-btn:hover {
+      background: rgba(67, 97, 238, 0.1);
+      border-color: var(--primary-dark);
+    }
+
+    .empty-medications {
+      text-align: center;
+      color: var(--gray);
+      font-style: italic;
+      padding: 2rem;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ffffff40;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Hidden state */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Fade in animation */
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .page-title h1 {
+        font-size: 2rem;
+      }
+
+      .card-body {
+        padding: 1.2rem;
+      }
+
+      .patient-details-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .medication-item {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .medication-remove {
+        align-self: flex-end;
+        margin-top: 0.5rem;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-title h1 {
+        font-size: 1.8rem;
+      }
+
+      .card-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .card-header-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+    }
+
+    /* Focus management for accessibility */
+    .form-control:focus,
+    .btn:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    /* Screen reader only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <button class="btn btn-back" onclick="window.location.href='doctordashboard.html'">
-      <i class="fas fa-arrow-left"></i> Back to Dashboard
-    </button>
+    <!-- Enhanced Header -->
+    <div class="header">
+      <button class="back-btn" onclick="window.location.href='doctordashboard.html'" aria-label="Back to Dashboard">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+        Back to Dashboard
+      </button>
 
-    <h1>Write Prescription</h1>
-
-    <div id="alertPlaceholder"></div>
-
-    <!-- Patient Search -->
-    <div id="patientSearchSection">
-      <form id="patientSearchForm">
-        <div class="form-group">
-          <label for="searchPatientId">Enter Patient ID</label>
-          <input type="text" id="searchPatientId" class="form-control" placeholder="e.g. P1001" required />
-        </div>
-        <button type="submit" class="btn">
-          <i class="fas fa-search"></i> Search
-        </button>
-      </form>
+      <div class="page-title">
+        <h1>Write Prescription</h1>
+        <p>Create digital prescriptions for your patients</p>
+      </div>
     </div>
 
-    <!-- Patient Info & Prescription Form -->
+    <!-- Alert Placeholder -->
+    <div id="alertPlaceholder" role="alert" aria-live="polite"></div>
+
+    <!-- Patient Search Section -->
+    <div id="patientSearchSection">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">
+            <i class="fas fa-search"></i>
+          </div>
+          <h2>Find Patient</h2>
+        </div>
+        <div class="card-body">
+          <form id="patientSearchForm">
+            <div class="form-group">
+              <label for="searchPatientId">Patient ID</label>
+              <input 
+                type="text" 
+                id="searchPatientId" 
+                class="form-control" 
+                placeholder="Enter Patient ID (e.g. P1001)" 
+                required 
+                autocomplete="off"
+                aria-describedby="patient-id-help"
+              />
+              
+            </div>
+            <button type="submit" class="btn btn-primary" id="searchBtn">
+              <i class="fas fa-search" aria-hidden="true"></i>
+              <span>Search Patient</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient Info & Prescription Form Section -->
     <div id="patientInfoSection" class="hidden">
-      <div class="form-group">
-        <h3>Patient Details</h3>
-        <p><strong>Name:</strong> <span id="patientName">-</span></p>
-        <p><strong>ID:</strong> <span id="patientIdDisplay">-</span></p>
-        <p><strong>Email:</strong> <span id="patientEmail">-</span></p>
-        <p><strong>Phone:</strong> <span id="patientPhone">-</span></p>
+      <!-- Patient Information Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">
+            <i class="fas fa-user-injured"></i>
+          </div>
+          <h2>Patient Information</h2>
+        </div>
+        <div class="card-body">
+          <div class="patient-info">
+            <h3>
+              <i class="fas fa-id-badge" aria-hidden="true"></i>
+              Patient Details
+            </h3>
+            <div class="patient-details-grid">
+              <div class="patient-detail-item">
+                <strong>Full Name</strong>
+                <span id="patientName">-</span>
+              </div>
+              <div class="patient-detail-item">
+                <strong>Patient ID</strong>
+                <span id="patientIdDisplay">-</span>
+              </div>
+              <div class="patient-detail-item">
+                <strong>Email Address</strong>
+                <span id="patientEmail">-</span>
+              </div>
+              <div class="patient-detail-item">
+                <strong>Phone Number</strong>
+                <span id="patientPhone">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <form id="prescriptionForm">
-        <input type="hidden" id="prescriptionPatientId">
-
-        <div class="form-group">
-          <label for="diagnosis">Diagnosis</label>
-          <input type="text" id="diagnosis" class="form-control" required />
+      <!-- Prescription Form Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">
+            <i class="fas fa-prescription-bottle-medical"></i>
+          </div>
+          <h2>Create Prescription</h2>
         </div>
+        <div class="card-body">
+          <form id="prescriptionForm">
+            <input type="hidden" id="prescriptionPatientId">
 
-        <div class="form-group">
-          <label>Medications</label>
-          <div id="medicationsContainer"></div>
-          <button type="button" id="addMedication" class="btn">
-            <i class="fas fa-plus"></i> Add Medication
-          </button>
+            <div class="form-group">
+              <label for="diagnosis">
+                <i class="fas fa-stethoscope" aria-hidden="true"></i>
+                Diagnosis
+              </label>
+              <input 
+                type="text" 
+                id="diagnosis" 
+                class="form-control" 
+                placeholder="Enter primary diagnosis"
+                required 
+                aria-describedby="diagnosis-help"
+              />
+              <small id="diagnosis-help" class="form-text">Provide the primary medical diagnosis for this prescription</small>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <i class="fas fa-pills" aria-hidden="true"></i>
+                Medications
+              </label>
+              <div id="medicationsContainer" class="medications-container">
+                <div class="empty-medications">
+                  <i class="fas fa-plus-circle" aria-hidden="true"></i>
+                  <p>Click "Add Medication" to start adding medications to this prescription</p>
+                </div>
+              </div>
+              <button type="button" id="addMedication" class="btn btn-secondary add-medication-btn">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                Add Medication
+              </button>
+            </div>
+
+            <div class="form-group">
+              <label for="notes">
+                <i class="fas fa-sticky-note" aria-hidden="true"></i>
+                Additional Notes
+              </label>
+              <textarea 
+                id="notes" 
+                class="form-control" 
+                rows="4" 
+                placeholder="Enter any additional instructions, warnings, or notes for the patient"
+                aria-describedby="notes-help"
+              ></textarea>
+              <small id="notes-help" class="form-text">Optional: Provide any additional instructions or important notes</small>
+            </div>
+
+            <div class="form-group">
+              <label for="followUpDate">
+                <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                Follow-up Date
+              </label>
+              <input 
+                type="date" 
+                id="followUpDate" 
+                class="form-control" 
+                aria-describedby="followup-help"
+              />
+              <small id="followup-help" class="form-text">Optional: Schedule a follow-up appointment date</small>
+            </div>
+
+            <button type="submit" class="btn btn-success" id="savePrescriptionBtn">
+              <i class="fas fa-save" aria-hidden="true"></i>
+              <span>Save Prescription</span>
+            </button>
+          </form>
         </div>
-
-        <div class="form-group">
-          <label for="notes">Additional Notes</label>
-          <textarea id="notes" class="form-control" rows="4"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="followUpDate">Follow-up Date</label>
-          <input type="date" id="followUpDate" class="form-control" />
-        </div>
-
-        <button type="submit" class="btn">
-          <i class="fas fa-save"></i> Save Prescription
-        </button>
-      </form>
+      </div>
     </div>
   </div>
 
   <script>
+    // DOM Elements
     const patientSearchForm = document.getElementById('patientSearchForm');
     const patientSearchSection = document.getElementById('patientSearchSection');
     const patientInfoSection = document.getElementById('patientInfoSection');
     const alertPlaceholder = document.getElementById('alertPlaceholder');
     const medicationsContainer = document.getElementById('medicationsContainer');
     const prescriptionForm = document.getElementById('prescriptionForm');
+    const searchBtn = document.getElementById('searchBtn');
+    const savePrescriptionBtn = document.getElementById('savePrescriptionBtn');
 
+    // State
+    let medicationCount = 0;
+    let isLoading = false;
+
+    // Utility Functions
     function showAlert(message, type = 'success') {
+      const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
       alertPlaceholder.innerHTML = `
-        <div class="alert alert-${type}">${message}</div>
+        <div class="alert alert-${type}">
+          <i class="${iconClass}" aria-hidden="true"></i>
+          <span>${message}</span>
+        </div>
       `;
-      setTimeout(() => alertPlaceholder.innerHTML = '', 4000);
+      setTimeout(() => {
+        alertPlaceholder.innerHTML = '';
+      }, 5000);
     }
 
-    // Patient search
+    function setButtonLoading(button, loading) {
+      if (loading) {
+        button.disabled = true;
+        const icon = button.querySelector('i');
+        const text = button.querySelector('span');
+        icon.className = '';
+        icon.appendChild(document.createElement('div')).className = 'spinner';
+        if (text) text.textContent = 'Loading...';
+      } else {
+        button.disabled = false;
+        const spinner = button.querySelector('.spinner');
+        if (spinner) {
+          const icon = button.querySelector('i');
+          icon.innerHTML = '';
+          if (button.id === 'searchBtn') {
+            icon.className = 'fas fa-search';
+            button.querySelector('span').textContent = 'Search Patient';
+          } else if (button.id === 'savePrescriptionBtn') {
+            icon.className = 'fas fa-save';
+            button.querySelector('span').textContent = 'Save Prescription';
+          }
+        }
+      }
+    }
+
+    function addMedicationField() {
+      medicationCount++;
+      const medicationId = `medication-${medicationCount}`;
+      
+      // Remove empty state if present
+      const emptyState = medicationsContainer.querySelector('.empty-medications');
+      if (emptyState) {
+        emptyState.remove();
+      }
+
+      const medicationDiv = document.createElement('div');
+      medicationDiv.className = 'medication-item';
+      medicationDiv.innerHTML = `
+        <div class="medication-input">
+          <label for="${medicationId}" class="sr-only">Medication ${medicationCount}</label>
+          <input 
+            type="text" 
+            id="${medicationId}"
+            class="form-control" 
+            placeholder="Enter medication name, dosage, and frequency"
+            required 
+            autocomplete="off"
+          />
+        </div>
+        <button 
+          type="button" 
+          class="medication-remove" 
+          onclick="removeMedication(this)"
+          aria-label="Remove medication ${medicationCount}"
+          title="Remove this medication"
+        >
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+      `;
+      
+      medicationsContainer.appendChild(medicationDiv);
+      
+      // Focus on the new input
+      const newInput = medicationDiv.querySelector('input');
+      newInput.focus();
+      
+      // Add fade-in animation
+      medicationDiv.classList.add('fade-in');
+    }
+
+    function removeMedication(button) {
+      const medicationItem = button.closest('.medication-item');
+      medicationItem.remove();
+      
+      // Show empty state if no medications left
+      if (medicationsContainer.children.length === 0) {
+        medicationsContainer.innerHTML = `
+          <div class="empty-medications">
+            <i class="fas fa-plus-circle" aria-hidden="true"></i>
+            <p>Click "Add Medication" to start adding medications to this prescription</p>
+          </div>
+        `;
+      }
+    }
+
+    // Event Listeners
     patientSearchForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const patientId = document.getElementById('searchPatientId').value.trim();
 
+      if (!patientId) {
+        showAlert('Please enter a Patient ID', 'danger');
+        return;
+      }
+
+      setButtonLoading(searchBtn, true);
+      isLoading = true;
+
       try {
-        const res = await fetch(`/api/prescriptions/patients/${patientId}`);
-        if (res.ok) {
-          const patient = await res.json();
-          document.getElementById('patientName').textContent = patient.name;
-          document.getElementById('patientIdDisplay').textContent = patient._id;
-          document.getElementById('patientEmail').textContent = patient.email;
-          document.getElementById('patientPhone').textContent = patient.phone;
-          document.getElementById('prescriptionPatientId').value = patient._id;
+        const response = await fetch(`/api/prescriptions/patients/${patientId}`);
+        
+        if (response.ok) {
+          const patient = await response.json();
+          
+          // Populate patient information
+          document.getElementById('patientName').textContent = patient.name || 'N/A';
+          document.getElementById('patientIdDisplay').textContent = patient._id || patientId;
+          document.getElementById('patientEmail').textContent = patient.email || 'N/A';
+          document.getElementById('patientPhone').textContent = patient.phone || 'N/A';
+          document.getElementById('prescriptionPatientId').value = patient._id || patientId;
+          
+          // Show patient info section with animation
           patientSearchSection.classList.add('hidden');
           patientInfoSection.classList.remove('hidden');
-        } else if (res.status === 404) {
-          showAlert('Patient not found', 'danger');
+          patientInfoSection.classList.add('fade-in');
+          
+          showAlert(`Patient found: ${patient.name}`, 'success');
+          
+          // Focus on diagnosis field
+          document.getElementById('diagnosis').focus();
+          
+        } else if (response.status === 404) {
+          showAlert('Patient not found. Please check the Patient ID and try again.', 'danger');
         } else {
-          showAlert('Error fetching patient data', 'danger');
+          showAlert('Error fetching patient data. Please try again.', 'danger');
         }
-      } catch (err) {
-        console.error(err);
-        showAlert('Network error. Try again.', 'danger');
+      } catch (error) {
+        console.error('Patient search error:', error);
+        showAlert('Network error. Please check your connection and try again.', 'danger');
+      } finally {
+        setButtonLoading(searchBtn, false);
+        isLoading = false;
       }
     });
 
-    // Add medication
-    document.getElementById('addMedication').addEventListener('click', () => {
-      const row = document.createElement('div');
-      row.classList.add('form-group');
-      row.innerHTML = `
-        <input type="text" class="form-control" placeholder="Medicine Name" required />
-      `;
-      medicationsContainer.appendChild(row);
-    });
+    // Add medication button
+    document.getElementById('addMedication').addEventListener('click', addMedicationField);
 
-    // Save prescription
+    // Prescription form submission
     prescriptionForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      // Collect medication data
+      const medicationInputs = medicationsContainer.querySelectorAll('input[type="text"]');
+      const medications = Array.from(medicationInputs)
+        .map(input => ({ name: input.value.trim() }))
+        .filter(med => med.name.length > 0);
+
+      if (medications.length === 0) {
+        showAlert('Please add at least one medication to the prescription.', 'danger');
+        return;
+      }
 
       const prescriptionData = {
         patientId: document.getElementById('prescriptionPatientId').value,
         diagnosis: document.getElementById('diagnosis').value.trim(),
-        medications: Array.from(medicationsContainer.querySelectorAll('input')).map(input => ({
-          name: input.value.trim(),
-        })),
+        medications: medications,
         notes: document.getElementById('notes').value.trim(),
         followUpDate: document.getElementById('followUpDate').value
       };
 
+      setButtonLoading(savePrescriptionBtn, true);
+      isLoading = true;
+
       try {
-        const res = await fetch('/api/prescriptions', {
+        const response = await fetch('/api/prescriptions', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
           body: JSON.stringify(prescriptionData)
         });
 
-        if (res.ok) {
-          showAlert('Prescription saved successfully!', 'success');
+        if (response.ok) {
+          showAlert('✅ Prescription saved successfully!', 'success');
+          
           setTimeout(() => {
             window.location.href = 'doctordashboard.html';
           }, 2000);
+          
         } else {
-          const data = await res.json();
-          showAlert(data.message || 'Failed to save prescription.', 'danger');
+          const errorData = await response.json().catch(() => ({}));
+          showAlert(errorData.message || 'Failed to save prescription. Please try again.', 'danger');
         }
-      } catch (err) {
-        console.error(err);
-        showAlert('Network error. Try again.', 'danger');
+      } catch (error) {
+        console.error('Prescription save error:', error);
+        showAlert('Network error. Please check your connection and try again.', 'danger');
+      } finally {
+        setButtonLoading(savePrescriptionBtn, false);
+        isLoading = false;
       }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 's') {
+          e.preventDefault();
+          if (!patientInfoSection.classList.contains('hidden') && !isLoading) {
+            prescriptionForm.dispatchEvent(new Event('submit'));
+          }
+        } else if (e.key === 'm') {
+          e.preventDefault();
+          if (!patientInfoSection.classList.contains('hidden')) {
+            addMedicationField();
+          }
+        }
+      }
+      
+      if (e.key === 'Escape') {
+        const focusedElement = document.activeElement;
+        if (focusedElement && focusedElement.blur) {
+          focusedElement.blur();
+        }
+      }
+    });
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 Prescription Writing page initialized');
+      document.getElementById('searchPatientId').focus();
+      
+      // Set minimum date for follow-up to today
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('followUpDate').setAttribute('min', today);
+    });
+
+    // Prevent form submission on Enter in medication inputs
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.closest('.medication-item')) {
+        e.preventDefault();
+        addMedicationField();
+      }
+    });
+
+    // Auto-resize textarea
+    const notesTextarea = document.getElementById('notes');
+    notesTextarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    // Form validation feedback
+    const requiredInputs = document.querySelectorAll('input[required], textarea[required]');
+    requiredInputs.forEach(input => {
+      input.addEventListener('invalid', function() {
+        this.classList.add('is-invalid');
+      });
+      
+      input.addEventListener('input', function() {
+        if (this.validity.valid) {
+          this.classList.remove('is-invalid');
+        }
+      });
     });
   </script>
 </body>

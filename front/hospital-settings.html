@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hospital Settings | MediVault</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #7209b7;
+      --accent: #f72585;
+      --success: #4cc9f0;
+      --warning: #ffc107;
+      --danger: #ef4444;
+      --dark: #212529;
+      --gray: #6c757d;
+      --light-gray: #f8f9fa;
+      --white: #ffffff;
+      --gradient-primary: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+      --gradient-secondary: linear-gradient(135deg, #f72585 0%, #4361ee 100%);
+      --gradient-success: linear-gradient(135deg, #4cc9f0 0%, #36d1dc 100%);
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+      --shadow-xl: 0 16px 48px rgba(0,0,0,0.18);
+      --radius: 16px;
+      --radius-sm: 8px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 50%, #f0f8ff 100%);
+      color: var(--dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Enhanced Animated Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(67, 97, 238, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 30%, rgba(114, 9, 183, 0.06) 0%, transparent 50%);
+      animation: float 12s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+
+    /* ===== Hospital Dashboard Header (Same as Hospital Dashboard) ===== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(67, 97, 238, 0.08);
+      z-index: 1000;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+    }
+
+    .logo i {
+      font-size: 1.8rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-menu {
+      display: flex;
+      list-style: none;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .nav-menu a {
+      text-decoration: none;
+      color: var(--dark);
+      font-weight: 500;
+      position: relative;
+      transition: var(--transition);
+      padding: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .nav-menu a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+      transition: width 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .nav-menu a:hover::after,
+    .nav-menu a.active::after {
+      width: 100%;
+    }
+
+    .nav-menu a:hover,
+    .nav-menu a.active {
+      color: var(--primary);
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .logout-btn {
+      background: var(--gradient-primary);
+      border: none;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .mobile-menu-toggle:hover {
+      background: rgba(67, 97, 238, 0.1);
+    }
+
+    /* Main Container */
+    .main-container {
+      padding-top: 70px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1rem 2rem;
+      background: var(--gradient-primary);
+      color: white;
+      text-decoration: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      border: none;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .back-btn i {
+      font-size: 1.1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .back-btn:hover i {
+      transform: translateX(-3px);
+    }
+
+    .page-title h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .page-title p {
+      color: var(--gray);
+      font-size: 1.1rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Enhanced Card Components */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(67, 97, 238, 0.06);
+      transition: var(--transition);
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .card-header-icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(67, 97, 238, 0.1);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+
+    .card-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    /* Form Components */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      transition: var(--transition);
+      background: var(--white);
+      color: var(--dark);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .form-control:disabled {
+      background: var(--light-gray);
+      color: var(--gray);
+      cursor: not-allowed;
+    }
+
+    .form-control::placeholder {
+      color: var(--gray);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* Read-only fields */
+    .readonly-field {
+      background: rgba(67, 97, 238, 0.05);
+      border: 1px solid rgba(67, 97, 238, 0.2);
+      color: var(--gray);
+      cursor: not-allowed;
+    }
+
+    /* Button Components */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+      min-height: 45px;
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-success {
+      background: var(--gradient-success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: var(--shadow-sm) !important;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(67, 97, 238, 0.1);
+    }
+
+    /* Alert Components */
+    .alert {
+      padding: 1.2rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-weight: 500;
+      animation: slideDown 0.3s ease;
+    }
+
+    .alert-success {
+      background: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(76, 201, 240, 0.2);
+      border-left: 4px solid var(--success);
+    }
+
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-left: 4px solid var(--danger);
+    }
+
+    .alert i {
+      font-size: 1.2rem;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ffffff40;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes slideDown {
+      from { 
+        opacity: 0; 
+        transform: translateY(-10px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+
+    /* Hidden state */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--gray);
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        padding: 1.5rem;
+        gap: 1rem;
+        z-index: 999;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+        max-height: calc(100vh - 70px);
+        overflow-y: auto;
+      }
+
+      .nav-menu.active {
+        display: flex !important;
+      }
+
+      .nav-menu a {
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+        text-align: center;
+        font-size: 1.1rem;
+      }
+
+      .nav-menu a:last-child {
+        border-bottom: none;
+      }
+
+      .mobile-menu-toggle {
+        display: block;
+      }
+
+      .nav-container {
+        padding: 0 1rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .page-title h1 {
+        font-size: 2rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .user-info {
+        display: none;
+      }
+
+      .logout-btn span {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page-title h1 {
+        font-size: 1.8rem;
+      }
+
+      .card-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .card-header-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hospital Dashboard Header (Exact same as Hospital Dashboard) -->
+  <header class="header" role="banner">
+    <div class="nav-container">
+      <a href="/" class="logo">
+        <i class="fas fa-heartbeat"></i>
+        MediVault
+      </a>
+      
+      <nav class="nav-menu" id="navMenu">
+        <a href="/hospitaldashboard">Dashboard</a>
+        <a href="/patients">Patients</a>
+        <a href="/reports">Reports</a>
+        <a href="/staff">Staff</a>
+        <a href="/hospital-settings" class="active">Settings</a>
+      </nav>
+
+      <button class="mobile-menu-toggle" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <div class="user-menu">
+        <div class="user-info">
+          <div class="user-avatar" id="headerUserAvatar">H</div>
+          <div>
+            <div style="font-weight: 600; color: var(--dark);" id="headerUserName">Loading...</div>
+            <div style="font-size: 0.8rem;" id="headerUserRole">Hospital Admin</div>
+          </div>
+        </div>
+        <a href="/logout" class="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <div class="container">
+      <!-- Page Header -->
+      <div class="page-header">
+        <button class="back-btn" onclick="window.location.href='/hospitaldashboard'" aria-label="Back to Dashboard">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
+          Back to Dashboard
+        </button>
+
+        <div class="page-title">
+          <h1>Hospital Settings</h1>
+          <p>Manage your hospital information and preferences</p>
+        </div>
+      </div>
+
+      <!-- Alert Placeholder -->
+      <div id="alertPlaceholder" role="alert" aria-live="polite"></div>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="loading">
+        <div class="spinner" style="margin: 0 auto 1rem;"></div>
+        <p>Loading hospital settings...</p>
+      </div>
+
+      <!-- Settings Content -->
+      <div id="settingsContent" class="hidden">
+        
+        <!-- Hospital Information Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <i class="fas fa-hospital"></i>
+            </div>
+            <h2>Hospital Information</h2>
+          </div>
+          <div class="card-body">
+            <form id="hospitalInfoForm">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="hospitalName">Hospital Name *</label>
+                  <input type="text" id="hospitalName" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="hospitalId">Hospital ID</label>
+                  <input type="text" id="hospitalId" class="form-control readonly-field" readonly>
+                </div>
+                
+                <div class="form-group">
+                  <label for="establishedYear">Established Year</label>
+                  <input type="number" id="establishedYear" class="form-control" min="1800" max="2025">
+                </div>
+                
+                <div class="form-group">
+                  <label for="bedCapacity">Bed Capacity</label>
+                  <input type="number" id="bedCapacity" class="form-control" min="0">
+                </div>
+                
+                <div class="form-group">
+                  <label for="totalDoctors">Total Doctors</label>
+                  <input type="number" id="totalDoctors" class="form-control" min="0">
+                </div>
+                
+                <div class="form-group">
+                  <label for="totalStaff">Total Staff</label>
+                  <input type="number" id="totalStaff" class="form-control" min="0">
+                </div>
+                
+                <div class="form-group">
+                  <label for="licenseNumber">License Number</label>
+                  <input type="text" id="licenseNumber" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                  <label for="emergencyContact">Emergency Contact</label>
+                  <input type="tel" id="emergencyContact" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                  <label for="createdAt">Registration Date</label>
+                  <input type="text" id="createdAt" class="form-control readonly-field" readonly>
+                </div>
+              </div>
+              
+              <div class="btn-group">
+                <button type="submit" class="btn btn-success" id="saveHospitalInfoBtn">
+                  <i class="fas fa-save"></i>
+                  <span>Save Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Location Settings Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h2>Location Settings</h2>
+          </div>
+          <div class="card-body">
+            <form id="locationForm">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="addressLine">Address Line *</label>
+                  <input type="text" id="addressLine" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="city">City *</label>
+                  <input type="text" id="city" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="state">State *</label>
+                  <input type="text" id="state" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="pinCode">Pin Code *</label>
+                  <input type="text" id="pinCode" class="form-control" required pattern="[0-9]{6}">
+                </div>
+                
+                <div class="form-group">
+                  <label for="country">Country</label>
+                  <input type="text" id="country" class="form-control" value="India">
+                </div>
+              </div>
+              
+              <div class="btn-group">
+                <button type="submit" class="btn btn-success" id="saveLocationBtn">
+                  <i class="fas fa-save"></i>
+                  <span>Save Location</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Contact Information Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <h2>Contact Information</h2>
+          </div>
+          <div class="card-body">
+            <form id="contactForm">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="hospitalPhone">Hospital Phone</label>
+                  <input type="tel" id="hospitalPhone" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                  <label for="hospitalEmail">Hospital Email</label>
+                  <input type="email" id="hospitalEmail" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                  <label for="hospitalWebsite">Website</label>
+                  <input type="url" id="hospitalWebsite" class="form-control" placeholder="https://example.com">
+                </div>
+              </div>
+              
+              <div class="btn-group">
+                <button type="submit" class="btn btn-success" id="saveContactBtn">
+                  <i class="fas fa-save"></i>
+                  <span>Save Contact Info</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Admin Account Settings Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <i class="fas fa-user-cog"></i>
+            </div>
+            <h2>Admin Account Settings</h2>
+          </div>
+          <div class="card-body">
+            <form id="adminForm">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="adminName">Admin Name *</label>
+                  <input type="text" id="adminName" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="adminEmail">Admin Email *</label>
+                  <input type="email" id="adminEmail" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="adminPhone">Admin Phone *</label>
+                  <input type="tel" id="adminPhone" class="form-control" required>
+                </div>
+              </div>
+              
+              <div class="btn-group">
+                <button type="submit" class="btn btn-success" id="saveAdminBtn">
+                  <i class="fas fa-save"></i>
+                  <span>Save Admin Info</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <h2>Change Password</h2>
+          </div>
+          <div class="card-body">
+            <form id="passwordForm">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="currentPassword">Current Password *</label>
+                  <input type="password" id="currentPassword" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="newPassword">New Password *</label>
+                  <input type="password" id="newPassword" class="form-control" required minlength="6">
+                </div>
+                
+                <div class="form-group">
+                  <label for="confirmPassword">Confirm New Password *</label>
+                  <input type="password" id="confirmPassword" class="form-control" required minlength="6">
+                </div>
+              </div>
+              
+              <div class="btn-group">
+                <button type="submit" class="btn btn-danger" id="changePasswordBtn">
+                  <i class="fas fa-key"></i>
+                  <span>Change Password</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global variables
+    let hospitalData = null;
+    let adminData = null;
+
+    // Mobile menu toggle (Same as Hospital Dashboard)
+    function toggleMenu() {
+      const navMenu = document.getElementById('navMenu');
+      const mobileToggle = document.querySelector('.mobile-menu-toggle');
+      
+      navMenu.classList.toggle('active');
+      mobileToggle.classList.toggle('active');
+      
+      // Prevent body scroll when menu is open
+      if (navMenu.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Close menu when clicking outside (Same as Hospital Dashboard)
+    document.addEventListener('click', function(e) {
+      const navMenu = document.getElementById('navMenu');
+      const mobileToggle = document.querySelector('.mobile-menu-toggle');
+      
+      if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target) && navMenu.classList.contains('active')) {
+        navMenu.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    // Utility Functions
+    function showAlert(message, type = 'success') {
+      const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
+      document.getElementById('alertPlaceholder').innerHTML = `
+        <div class="alert alert-${type}">
+          <i class="${iconClass}" aria-hidden="true"></i>
+          <span>${message}</span>
+        </div>
+      `;
+      setTimeout(() => {
+        document.getElementById('alertPlaceholder').innerHTML = '';
+      }, 5000);
+    }
+
+    function setButtonLoading(button, loading) {
+      if (loading) {
+        button.disabled = true;
+        const icon = button.querySelector('i');
+        const text = button.querySelector('span');
+        icon.className = '';
+        icon.appendChild(document.createElement('div')).className = 'spinner';
+        if (text) text.textContent = 'Loading...';
+      } else {
+        button.disabled = false;
+        const spinner = button.querySelector('.spinner');
+        if (spinner) {
+          button.innerHTML = button.getAttribute('data-original-html');
+        }
+      }
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString('en-IN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    // Store original button HTML
+    document.addEventListener('DOMContentLoaded', () => {
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(btn => {
+        btn.setAttribute('data-original-html', btn.innerHTML);
+      });
+    });
+
+    // Load hospital settings
+    async function loadHospitalSettings() {
+      try {
+        const response = await fetch('/api/hospital/settings', {
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success) {
+            hospitalData = result.data.hospital;
+            adminData = result.data.admin;
+            populateSettings();
+            showSettingsContent();
+          } else {
+            throw new Error(result.error || 'Failed to load settings');
+          }
+        } else {
+          throw new Error('Failed to fetch settings');
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+        showAlert('Failed to load hospital settings. Please try again.', 'danger');
+      }
+    }
+
+    function populateSettings() {
+      // Hospital Information
+      document.getElementById('hospitalName').value = hospitalData.name || '';
+      document.getElementById('hospitalId').value = hospitalData.hospital_id || '';
+      document.getElementById('establishedYear').value = hospitalData.established_year || '';
+      document.getElementById('bedCapacity').value = hospitalData.bed_capacity || '';
+      document.getElementById('totalDoctors').value = hospitalData.total_doctors || '';
+      document.getElementById('totalStaff').value = hospitalData.total_staff || '';
+      document.getElementById('licenseNumber').value = hospitalData.license_number || '';
+      document.getElementById('emergencyContact').value = hospitalData.emergency_contact || '';
+      document.getElementById('createdAt').value = hospitalData.created_at ? formatDate(hospitalData.created_at) : '';
+
+      // Location
+      if (hospitalData.location) {
+        document.getElementById('addressLine').value = hospitalData.location.address_line || '';
+        document.getElementById('city').value = hospitalData.location.city || '';
+        document.getElementById('state').value = hospitalData.location.state || '';
+        document.getElementById('pinCode').value = hospitalData.location.pin_code || '';
+        document.getElementById('country').value = hospitalData.location.country || 'India';
+      }
+
+      // Contact
+      if (hospitalData.contact) {
+        document.getElementById('hospitalPhone').value = hospitalData.contact.phone || '';
+        document.getElementById('hospitalEmail').value = hospitalData.contact.email || '';
+        document.getElementById('hospitalWebsite').value = hospitalData.contact.website || '';
+      }
+
+      // Admin Account
+      document.getElementById('adminName').value = adminData.name || '';
+      document.getElementById('adminEmail').value = adminData.email || '';
+      document.getElementById('adminPhone').value = adminData.phone || '';
+
+      // Update header (Same as Hospital Dashboard)
+      document.getElementById('headerUserName').textContent = adminData.name || 'Hospital Admin';
+      const initials = adminData.name ? adminData.name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase() : 'H';
+      document.getElementById('headerUserAvatar').textContent = initials;
+    }
+
+    function showSettingsContent() {
+      document.getElementById('loadingState').classList.add('hidden');
+      document.getElementById('settingsContent').classList.remove('hidden');
+    }
+
+    // Form Handlers
+    document.getElementById('hospitalInfoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = document.getElementById('saveHospitalInfoBtn');
+      setButtonLoading(button, true);
+
+      const formData = {
+        name: document.getElementById('hospitalName').value.trim(),
+        established_year: document.getElementById('establishedYear').value,
+        bed_capacity: document.getElementById('bedCapacity').value,
+        total_doctors: document.getElementById('totalDoctors').value,
+        total_staff: document.getElementById('totalStaff').value,
+        license_number: document.getElementById('licenseNumber').value.trim(),
+        emergency_contact: document.getElementById('emergencyContact').value.trim()
+      };
+
+      try {
+        const response = await fetch('/api/hospital/settings/info', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+          showAlert('Hospital information updated successfully!', 'success');
+          hospitalData = { ...hospitalData, ...result.data };
+        } else {
+          throw new Error(result.error || 'Failed to update hospital information');
+        }
+      } catch (error) {
+        console.error('Error updating hospital info:', error);
+        showAlert(error.message, 'danger');
+      } finally {
+        setButtonLoading(button, false);
+      }
+    });
+
+    document.getElementById('locationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = document.getElementById('saveLocationBtn');
+      setButtonLoading(button, true);
+
+      const formData = {
+        address_line: document.getElementById('addressLine').value.trim(),
+        city: document.getElementById('city').value.trim(),
+        state: document.getElementById('state').value.trim(),
+        pin_code: document.getElementById('pinCode').value.trim(),
+        country: document.getElementById('country').value.trim()
+      };
+
+      try {
+        const response = await fetch('/api/hospital/settings/location', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+          showAlert('Location updated successfully!', 'success');
+          hospitalData.location = result.data;
+        } else {
+          throw new Error(result.error || 'Failed to update location');
+        }
+      } catch (error) {
+        console.error('Error updating location:', error);
+        showAlert(error.message, 'danger');
+      } finally {
+        setButtonLoading(button, false);
+      }
+    });
+
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = document.getElementById('saveContactBtn');
+      setButtonLoading(button, true);
+
+      const formData = {
+        phone: document.getElementById('hospitalPhone').value.trim(),
+        email: document.getElementById('hospitalEmail').value.trim(),
+        website: document.getElementById('hospitalWebsite').value.trim()
+      };
+
+      try {
+        const response = await fetch('/api/hospital/settings/contact', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+          showAlert('Contact information updated successfully!', 'success');
+          hospitalData.contact = result.data;
+        } else {
+          throw new Error(result.error || 'Failed to update contact information');
+        }
+      } catch (error) {
+        console.error('Error updating contact:', error);
+        showAlert(error.message, 'danger');
+      } finally {
+        setButtonLoading(button, false);
+      }
+    });
+
+    document.getElementById('adminForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = document.getElementById('saveAdminBtn');
+      setButtonLoading(button, true);
+
+      const formData = {
+        name: document.getElementById('adminName').value.trim(),
+        email: document.getElementById('adminEmail').value.trim(),
+        phone: document.getElementById('adminPhone').value.trim()
+      };
+
+      try {
+        const response = await fetch('/api/hospital/settings/admin', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+          showAlert('Admin account updated successfully!', 'success');
+          adminData = result.data;
+          
+          // Update header (Same as Hospital Dashboard)
+          document.getElementById('headerUserName').textContent = adminData.name;
+          const initials = adminData.name.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase();
+          document.getElementById('headerUserAvatar').textContent = initials;
+        } else {
+          throw new Error(result.error || 'Failed to update admin account');
+        }
+      } catch (error) {
+        console.error('Error updating admin:', error);
+        showAlert(error.message, 'danger');
+      } finally {
+        setButtonLoading(button, false);
+      }
+    });
+
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = document.getElementById('changePasswordBtn');
+      
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        showAlert('New password and confirm password do not match', 'danger');
+        return;
+      }
+
+      setButtonLoading(button, true);
+
+      const formData = {
+        currentPassword: document.getElementById('currentPassword').value,
+        newPassword: newPassword,
+        confirmPassword: confirmPassword
+      };
+
+      try {
+        const response = await fetch('/api/hospital/settings/password', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+          showAlert('Password changed successfully!', 'success');
+          // Clear password fields
+          document.getElementById('currentPassword').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('confirmPassword').value = '';
+        } else {
+          throw new Error(result.error || 'Failed to change password');
+        }
+      } catch (error) {
+        console.error('Error changing password:', error);
+        showAlert(error.message, 'danger');
+      } finally {
+        setButtonLoading(button, false);
+      }
+    });
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 Hospital Settings page initialized');
+      loadHospitalSettings();
+    });
+  </script>
+</body>
+</html>
