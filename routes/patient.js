@@ -57,6 +57,9 @@ const router = express.Router();
 const User = require('../schema/user');
 const Report = require('../schema/report');
 const Prescription = require('../schema/Prescription');
+const Hospital = require('../schema/hospital');
+const Doctor = require('../schema/doctor');
+const Patient = require('../schema/patient');
 const fs = require('fs');
 const path = require('path');
 
@@ -67,8 +70,13 @@ router.get('/api/patient-dashboard', async (req, res) => {
     const user = await User.findById(userId).lean();
     const reports = await Report.find({ patientId: userId }).sort({ uploadedAt: -1 }).lean();
 
-    if (!user || user.role !== 'patient') {
-      return res.status(403).json({ message: 'Unauthorized' });
+    if (!user) {
+      console.log(`[routes/patient.js] ❌ User not found for session ID: ${userId}`);
+      return res.status(403).json({ message: 'Unauthorized: User not found' });
+    }
+    if (user.role !== 'patient') {
+      console.log(`[routes/patient.js] ❌ User found but role is not patient. Role is: ${user.role} for session ID: ${userId}`);
+      return res.status(403).json({ message: 'Unauthorized: Not a patient' });
     }
 
     res.json({ user, reports });
@@ -211,6 +219,61 @@ router.delete('/delete-report/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting report:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// 🏥 SEARCH NEARBY HOSPITALS (5KM) AND LIST DOCTORS
+router.get('/api/nearby-hospitals', async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    if (!userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+    // 1. Get Patient's Location
+    const patientDetail = await Patient.findOne({ user_id: userId });
+    if (!patientDetail || !patientDetail.location || !patientDetail.location.geo) {
+      return res.status(400).json({ success: false, message: 'Patient location not set' });
+    }
+
+    const patientCoords = patientDetail.location.geo.coordinates; // [lng, lat]
+
+    // 2. Find Hospitals within 5km (5000 meters)
+    const hospitals = await Hospital.find({
+      "location.geo": {
+        $near: {
+          $geometry: { type: "Point", coordinates: patientCoords },
+          $maxDistance: 5000 
+        }
+      }
+    }).lean();
+
+    // 3. For each Hospital, fetch associated Doctors
+    const hospitalsWithDoctors = [];
+    for (const h of hospitals) {
+      // Find doctors where hospital_id matches the hospital's numeric ID
+      const doctors = await Doctor.find({ hospital_id: h.hospital_id.toString() }).lean();
+      
+      // Get doctor names from User collection
+      const doctorsWithNames = [];
+      for (const d of doctors) {
+        const user = await User.findById(d.user_id).select('name email').lean();
+        doctorsWithNames.push({
+          ...d,
+          name: user ? user.name : 'Unknown Doctor',
+          email: user ? user.email : 'N/A'
+        });
+      }
+
+      hospitalsWithDoctors.push({
+        ...h,
+        doctors: doctorsWithNames
+      });
+    }
+
+    res.json({ success: true, hospitals: hospitalsWithDoctors });
+
+  } catch (error) {
+    console.error('❌ Error finding nearby hospitals:', error);
+    res.status(500).json({ success: false, message: error.message || 'Internal server error' });
   }
 });
 

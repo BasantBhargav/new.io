@@ -27,10 +27,14 @@ router.get('/:role', async (req, res) => {
     const userId = req.session?.userId; // Get user ID from session
     
     const notifications = await Notification.find({
-      $or: [{ role }, { role: 'all' }],
+      $and: [
+        { $or: [{ role }, { role: 'all' }] },
+        { $or: [{ targetUserId: null }, { targetUserId: userId }] }
+      ],
       // 🆕 Exclude notifications hidden by current user
       'hiddenBy.userId': { $ne: userId }
     }).sort({ timestamp: -1 });
+
 
     // 🆕 Mark isRead based on per-user tracking
     const processedNotifications = notifications.map(notification => {

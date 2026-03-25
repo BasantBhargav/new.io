@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const pendingUserSchema = new mongoose.Schema({
   _id: { type: String, required: true, unique: true },
-  role: { type: String, enum: ['doctor', 'hospital_staff'], required: true },
+  role: { type: String, enum: ['doctor', 'hospital_staff', 'laboratory'], required: true },
+
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   phone: { type: String, required: true, unique: true },

@@ -9,7 +9,11 @@ const hospitalSchema = new mongoose.Schema({
     city: String,
     state: String,
     pin_code: String,
-    country: { type: String, default: 'India' }
+    country: { type: String, default: 'India' },
+    geo: {
+      type: { type: String, enum: ['Point'], default: 'Point' },
+      coordinates: { type: [Number], default: [0, 0] } // [longitude, latitude]
+    }
   },
   contact: {
     phone: String,
@@ -17,5 +21,7 @@ const hospitalSchema = new mongoose.Schema({
   },
   created_at: { type: Date, default: Date.now }
 });
+
+hospitalSchema.index({ "location.geo": "2dsphere" });
 
 module.exports = mongoose.model('Hospital', hospitalSchema);

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const notificationSchema = new mongoose.Schema({
   role: { type: String, required: true }, // doctor, patient, hospital, all
+  targetUserId: { type: String, default: null }, // 🆕 Optional: Send to specific user
   title: { type: String, required: true },
   message: { type: String, required: true },
   priority: { type: String, default: 'normal' },
@@ -19,5 +20,6 @@ const notificationSchema = new mongoose.Schema({
     hiddenAt: { type: Date, default: Date.now } 
   }]
 });
+
 
 module.exports = mongoose.model('Notification', notificationSchema);

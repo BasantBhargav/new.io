@@ -10,7 +10,8 @@
   
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+  <script src="/socket.io/socket.io.js"></script> <!-- 🌍 Socket client -->
+
   <!-- Chart.js for Analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
@@ -156,6 +157,99 @@
       color: var(--primary);
     }
 
+    /* 🎨 MODERN BUTTONS STYLES */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-view {
+      background: var(--gradient-success);
+      color: white;
+    }
+
+    .btn-download {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    .btn-delete {
+      background: #fee2e2;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .btn-delete:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    /* Reports List Styling */
+    .reports-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .report-item {
+      background: var(--white);
+      padding: 1.5rem;
+      border-radius: var(--radius-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      border: 1px solid rgba(67, 97, 238, 0.05);
+    }
+
+    .report-item:hover {
+      transform: translateX(5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .report-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .report-type {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+
+    .report-date {
+      color: var(--gray);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .report-actions {
+      display: flex;
+      gap: 0.8rem;
+    }
+
     /* Notification Bell Styling */
     .notification-item {
       position: relative;
@@ -237,9 +331,24 @@
       border-radius: var(--radius) var(--radius) 0 0;
     }
 
-    .notification-header h3 {
-      font-size: 1rem;
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .form-group {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
       font-weight: 600;
+      color: var(--gray);
     }
 
     .clear-all-btn {
@@ -255,6 +364,27 @@
 
     .clear-all-btn:hover {
       background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* 📝 INPUT & SELECT STYLES */
+    input[type="text"],
+    input[type="time"],
+    select {
+      padding: 0.8rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      background: var(--white);
+      width: 100%;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
     }
 
     .notification-list {
@@ -729,8 +859,7 @@
     }
 
     /* Analytics Modal */
-    .analytics-modal {
-      display: none;
+    .analytics-modal { display: none; 
       position: fixed;
       top: 0;
       left: 0;
@@ -1078,7 +1207,13 @@
     .sidebar-user .user-avatar {
       margin-right: 1rem;
     }
-  </style>
+  
+    
+    
+    
+    
+    
+    </style>
 </head>
 <body>
   <!-- Enhanced Header -->
@@ -1208,16 +1343,19 @@
           </div>
         </div>
 
-        <div class="stat-card">
-          <div class="icon">
-            <i class="fas fa-bell"></i>
+        <div class="stat-card" style="border-top: 4px solid var(--accent);">
+          <div class="icon" style="background: var(--gradient-secondary);">
+             <i class="fas fa-bullhorn"></i>
           </div>
-          <div class="title">Notifications</div>
-          <div class="value">3</div>
-          <div class="trend">
-            <i class="fas fa-circle"></i>
-            <span>2 new notifications today</span>
+          <div class="title">Current Token</div>
+          <div class="value" id="currentTokenDisplay">0</div>
+          <div class="trend" style="margin-bottom: 1rem;">
+             <i class="fas fa-circle"></i>
+             <span>Live Queue Progress</span>
           </div>
+          <button class="btn btn-download" onclick="callNextPatient()" style="width: 100%; justify-content: center; background: var(--gradient-secondary);">
+             <i class="fas fa-volume-up"></i> Call Next Patient
+          </button>
         </div>
       </div>
 
@@ -1242,15 +1380,75 @@
         </div>
       </div>
 
-      <!-- Enhanced Search Section -->
-      <div class="search-section">
+      <!-- 📅 APPOINTMENT MANAGEMENT SECTION -->
+      <div class="search-section" id="appointmentsSection" style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 class="section-title" style="margin-bottom: 0;">
+            <i class="fas fa-calendar-check"></i>
+            Upcoming Appointments
+          </h2>
+          <button class="btn btn-view" onclick="loadDoctorAppointments()">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
+        </div>
+        
+        <div id="doctorAppointmentsList" class="reports-list">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading appointments...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🕒 SET AVAILABILITY SECTION -->
+      <div class="search-section" id="availabilitySection" style="margin-bottom: 2rem;">
         <h2 class="section-title">
-          <i class="fas fa-search"></i>
-          Patient Record Search
+          <i class="fas fa-clock"></i>
+          Set Weekly Availability
         </h2>
         
+        <div id="slotsContainer" class="form-row" style="flex-wrap: wrap; gap: 1rem;">
+          <!-- Existing slots will be loaded here -->
+        </div>
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+          <button class="btn btn-view" id="addSlotBtn" onclick="addNewSlotRow()">
+            <i class="fas fa-plus"></i> Add Slot
+          </button>
+          <button class="btn btn-download" onclick="saveAvailability()">
+            <i class="fas fa-save"></i> Save Availability
+          </button>
+        </div>
+      </div>
+
+      <!-- 🧪 NEW: LAB REQUESTS TRACKING SECTION -->
+      <div class="search-section" id="labRequestsSection" style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 class="section-title" style="margin-bottom: 0;">
+            <i class="fas fa-flask"></i>
+            Recent Lab Requests
+          </h2>
+          <button class="btn btn-view" onclick="loadDoctorLabRequests()">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
+        </div>
+        
+        <div id="doctorLabRequestsList" class="reports-list">
+          <p style="text-align: center; color: var(--gray);">Click refresh to see latest requests.</p>
+        </div>
+      </div>
+
+      <!-- Enhanced Search Section -->
+      <div class="search-section" style="margin-bottom: 2rem;">
+        <h2 class="section-title">
+          <i class="fas fa-search"></i>
+          Search Patient Records
+        </h2>
         <form class="search-form" onsubmit="redirectToPatientReports(event)">
-          <input type="text" id="patientId" placeholder="Enter Patient ID (e.g. P1001) or Patient Name" required />
+          <div class="search-group">
+            <i class="fas fa-user-tag"></i>
+            <input type="text" id="patientId" placeholder="Enter Patient User ID (e.g. 1, 2, 3)" required>
+          </div>
           <button type="submit" class="search-btn">
             <i class="fas fa-search"></i>
             <span>Search Records</span>
@@ -1305,6 +1503,137 @@
   </div>
 
   <script>
+    window.openLabTestModal = async function(patientId, appointmentId, patientName) {
+       console.log("Opening lab modal for:", patientId, appointmentId, patientName);
+       const modal = document.getElementById('labTestModal');
+       if (!modal) {
+          alert('❌ Modal template missing. Please check HTML.');
+          return;
+       }
+       document.getElementById('labPatientId').value = patientId;
+       document.getElementById('labAppointmentId').value = appointmentId;
+       document.getElementById('labPatientName').textContent = patientName || 'N/A';
+       
+       // 🧪 Fetch and populate laboratories
+       const labSelect = document.getElementById('labId');
+       if (labSelect) {
+           labSelect.innerHTML = '<option value="">Loading labs...</option>';
+           try {
+              const res = await fetch('/api/laboratories');
+              const data = await res.json();
+              if (data.success && data.laboratories.length > 0) {
+                 labSelect.innerHTML = '<option value="">-- Choose a Laboratory --</option>' + 
+                    data.laboratories.map(lab => `<option value="${lab._id}">${lab.name} (${lab.location.city})</option>`).join('');
+              } else {
+                 labSelect.innerHTML = '<option value="">No labs available</option>';
+              }
+           } catch (e) {
+              labSelect.innerHTML = '<option value="">Error loading labs</option>';
+           }
+       }
+       
+       modal.style.display = 'flex';
+       modal.classList.add('show');
+       document.body.style.overflow = 'hidden';
+    }
+    
+
+    window.submitLabRequest = async function(e) {
+        if (e) e.preventDefault();
+        try {
+           const patientId = document.getElementById('labPatientId').value;
+           const labId = document.getElementById('labId').value;
+           const appointmentId = document.getElementById('labAppointmentId').value;
+           
+           if (!labId) {
+              alert('Please select a laboratory');
+              return;
+           }
+           let testType = document.getElementById('labTestType').value;
+           if (testType === 'Other') testType = document.getElementById('otherTestName').value;
+           const notes = document.getElementById('labNotes').value;
+           const priority = document.querySelector('input[name="labPriority"]:checked').value;
+
+           const res = await fetch('/api/lab-requests', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ patientId, labId, appointmentId, testType, notes, priority })
+           });
+           const data = await res.json();
+           if (data.success) {
+              alert('✅ Lab request sent successfully!');
+              closeLabTestModal();
+              
+    // Toggle Other Test input
+    document.addEventListener('change', function(e) {
+       if (e.target && e.target.id === 'labTestType') {
+          const div = document.getElementById('otherTestDiv');
+          if (div) div.style.display = e.target.value === 'Other' ? 'block' : 'none';
+       }
+    });
+
+    loadDoctorLabRequests();
+           } else {
+              alert('❌ Error: ' + data.message);
+           }
+        } catch (error) {
+           alert('❌ Connection failed');
+        }
+    }
+
+    window.closeLabTestModal = function() {
+       const modal = document.getElementById('labTestModal');
+       if (modal) {
+          modal.style.display = 'none';
+          modal.classList.remove('show');
+       }
+       document.body.style.overflow = 'auto';
+    }
+    const daysArr = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    function addNewSlotRow(data = null) {
+      console.log('🏥 Adding new availability slot row...');
+      const container = document.getElementById('slotsContainer');
+      if (!container) {
+        console.error('❌ Error: slotsContainer not found');
+        return;
+      }
+
+      const row = document.createElement('div');
+      row.className = 'slot-item';
+      row.style.background = '#f8f9ff';
+      row.style.padding = '1rem';
+      row.style.borderRadius = '12px';
+      row.style.marginBottom = '1rem';
+      row.style.width = '100%';
+      row.style.display = 'flex';
+      row.style.gap = '1rem';
+      row.style.alignItems = 'end';
+      row.style.border = '1px solid #e2e8f0';
+      row.style.boxShadow = 'var(--shadow-sm)';
+
+      row.innerHTML = `
+        <div class="form-group" style="flex: 1; min-width: 150px;">
+          <label>Day</label>
+          <select class="slot-day">
+            ${daysArr.map(d => `<option value="${d}" ${data?.day === d ? 'selected' : ''}>${d}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group" style="flex: 1; min-width: 120px;">
+          <label>Start Time</label>
+          <input type="time" class="slot-start" value="${data?.startTime || '09:00'}">
+        </div>
+        <div class="form-group" style="flex: 1; min-width: 120px;">
+          <label>End Time</label>
+          <input type="time" class="slot-end" value="${data?.endTime || '17:00'}">
+        </div>
+        <button class="btn btn-delete" onclick="this.parentElement.remove()" style="margin-bottom: 0px; height: 42px;">
+          <i class="fas fa-trash"></i>
+        </button>
+      `;
+      container.appendChild(row);
+    }
+
     // Sample Admin Notifications Data
     let adminNotifications = [];
     let currentUserId = null;
@@ -1383,30 +1712,33 @@
       notificationBadge.textContent = unreadCount;
       notificationBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
      
+      let notificationsHtml = '';
+
       if (adminNotifications.length === 0) {
-        notificationList.innerHTML = `
+        notificationsHtml = `
           <div class="no-notifications">
             <i class="fas fa-bell-slash"></i>
             <p>No notifications yet</p>
           </div>
         `;
-        return;
-      }
-     
-      notificationList.innerHTML = adminNotifications.map(notification => `
-        <div class="notification-item-dropdown ${!notification.isRead ? 'unread' : ''}" onclick="markAsRead('${notification._id || notification.id}')">
-          <div class="notification-content">
-            <div class="notification-icon">
-              <i class="${notification.icon || 'fas fa-bell'}"></i>
-            </div>
-            <div class="notification-text">
-              <div class="notification-title">${notification.title}</div>
-              <div class="notification-message">${notification.message}</div>
-              <div class="notification-time">${formatTimeAgo(notification.timestamp || notification.time)}</div>
+      } else {
+        notificationsHtml = adminNotifications.map(notification => `
+          <div class="notification-item-dropdown ${!notification.isRead ? 'unread' : ''}" onclick="markAsRead('${notification._id || notification.id}')">
+            <div class="notification-content">
+              <div class="notification-icon">
+                <i class="${notification.icon || 'fas fa-bell'}"></i>
+              </div>
+              <div class="notification-text">
+                <div class="notification-title">${notification.title}</div>
+                <div class="notification-message">${notification.message}</div>
+                <div class="notification-time">${formatTimeAgo(notification.timestamp || notification.time)}</div>
+              </div>
             </div>
           </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
+
+      notificationList.innerHTML = notificationsHtml;
     }
 
     function formatTimeAgo(timestamp) {
@@ -1836,8 +2168,257 @@
 
       // Check for new notifications every 30 seconds
       setInterval(loadNotifications, 30000);
+      
+      // 📅 DOCTOR APPOINTMENTS & SLOTS JS
+      loadDoctorAppointments();
+      loadAvailability();
+      loadDoctorStats(); // Load doctor stats including current token
     });
 
+    let doctorId = '';
+    const socket = io(); // 🌍 Init Socket
+
+    async function loadDoctorStats() {
+      try {
+        const res = await fetch('/api/doctor/stats');
+        const data = await res.json();
+        if (data.success) {
+          // Assuming these elements exist elsewhere if needed, not directly used in the provided snippet
+          // document.getElementById('totalPatients').textContent = data.totalPatients || 0;
+          // document.getElementById('pendingAppts').textContent = data.pendingAppointments || 0;
+          // document.getElementById('completedAppts').textContent = data.completedAppointments || 0;
+          
+          const currentTokenDisplay = document.getElementById('currentTokenDisplay');
+          if (currentTokenDisplay) {
+            currentTokenDisplay.textContent = data.currentToken || 0;
+          }
+          
+          doctorId = data.doctorId;
+          if (doctorId) {
+            socket.emit('joinDoctorQueue', doctorId); // 🌍 Join socket room
+          }
+        }
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
+    }
+
+    socket.on('queueUpdated', (data) => {
+       if (data.currentToken !== undefined) {
+          const currentTokenDisplay = document.getElementById('currentTokenDisplay');
+          if (currentTokenDisplay) {
+            currentTokenDisplay.textContent = data.currentToken;
+          }
+       }
+    });
+
+    async function callNextPatient() {
+       try {
+          const res = await fetch('/api/doctor/call-next', { method: 'PATCH' });
+          const data = await res.json();
+          if (data.success) {
+             alert(`Calling Token: ${data.currentToken}`);
+             loadDoctorStats(); // Refresh stats to show new token
+          } else {
+             alert(data.message);
+          }
+       } catch (error) {
+          alert('Failed to call next patient');
+       }
+    }
+
+    async function saveAvailability() {
+      const rows = document.querySelectorAll('#slotsContainer .slot-item');
+      const slots = Array.from(rows).map(row => ({
+        day: row.querySelector('.slot-day').value,
+        startTime: row.querySelector('.slot-start').value,
+        endTime: row.querySelector('.slot-end').value
+      }));
+
+      try {
+        const res = await fetch('/api/doctor/set-slots', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slots })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Availability saved!');
+        } else {
+          alert('Failed to save: ' + data.message);
+        }
+      } catch (error) {
+        alert('An error occurred');
+      }
+    }
+
+    async function loadDoctorAppointments() {
+       const list = document.getElementById('doctorAppointmentsList');
+       try {
+         const res = await fetch('/api/appointments');
+         const data = await res.json();
+         if (data.appointments && data.appointments.length > 0) {
+           list.innerHTML = data.appointments.map(app => {
+             const patientUserId = (app.patient_id && app.patient_id.user_id) 
+                ? (typeof app.patient_id.user_id === 'object' ? (app.patient_id.user_id._id || app.patient_id.user_id) : app.patient_id.user_id)
+                : '';
+              const patientName = (app.patient_id && app.patient_id.user_id && typeof app.patient_id.user_id === 'object') 
+                ? (app.patient_id.user_id.name || 'N/A') 
+                : 'N/A';
+             const borderColor = app.status === 'Completed' ? 'var(--success)' : 'var(--primary)';
+             
+             return `
+               <div class="report-item" style="border-left: 4px solid ${borderColor};">
+                 <div class="report-details">
+                   <div class="report-type">Patient: ${patientName}</div>
+                   <div class="report-date">${new Date(app.scheduled_time).toLocaleString()}</div>
+                   <div style="font-size: 0.8rem; color: var(--gray);">Reason: ${app.notes || 'No notes'}</div>
+                   <div style="font-size: 0.8rem; font-weight: 600; color: var(--accent);">Status: ${app.status}</div>
+                 </div>
+                 <div class="report-actions">
+                   ${app.status === 'Scheduled' ? `
+                     <button class="btn btn-view" onclick="updateStatus('${app._id}', 'Completed')">Mark Done</button>
+                     <button class="btn btn-delete" onclick="updateStatus('${app._id}', 'Cancelled')">Cancel</button>
+                   ` : ''}
+                   <button class="btn lab-test-btn" style="background:#4cc9f0;color:white;" onclick="if(!'${patientUserId}') { alert('Patient ID missing'); return; } openLabTestModal('${patientUserId}', '${app._id}', '${patientName}')">
+                     <i class="fas fa-flask"></i> Lab Test
+                   </button>
+                 </div>
+               </div>
+             `;
+           }).join('');
+         } else {
+           list.innerHTML = '<div class="no-reports"><h3>No upcoming appointments</h3></div>';
+         }
+       } catch (error) {
+         console.error('Error loading doctor appointments');
+       }
+    }
+
+    // 🧪 Delegated click handler for Lab Test button (safe from nested template literal issues)
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('.lab-test-btn');
+      if (!btn) return;
+      const patientId = btn.dataset.patientId;
+      const appointmentId = btn.dataset.appointmentId;
+      const patientName = btn.dataset.patientName;
+      
+      if (!patientId) {
+        alert('⚠️ Patient ID not found. Please refresh and try again.');
+        return;
+      }
+      openLabTestModal(patientId, appointmentId, patientName);
+    });
+
+
+    async function loadAvailability() {
+      const container = document.getElementById('slotsContainer');
+      try {
+        const res = await fetch('/api/doctor/availability');
+        const data = await res.json();
+        if (data.success && data.slots && data.slots.length > 0) {
+          container.innerHTML = ''; // Start fresh
+          data.slots.forEach(slot => addNewSlotRow(slot));
+        } else {
+          // Add one empty slot if no availability yet
+          addNewSlotRow();
+        }
+      } catch (err) {
+        console.error('Error loading availability:', err);
+        // Fallback: at least one row if error or no profile
+        addNewSlotRow();
+      }
+    }
+
+    async function updateStatus(id, status) {
+       let reason = '';
+       if (status === 'Cancelled') {
+         reason = prompt('Enter reason for cancellation (optional):') || 'Scheduling conflict';
+       }
+
+       if (!confirm(`Are you sure you want to mark this appointment as ${status}?`)) return;
+
+       try {
+         const res = await fetch(`/api/appointments/${id}/status`, {
+           method: 'PATCH',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ status, reason }) // 🆕 Send reason if Cancelled
+         });
+         if (res.ok) {
+           loadDoctorAppointments();
+         }
+       } catch (error) {
+         alert('Update failed');
+       }
+    }
+
+    loadDoctorLabRequests();
   </script>
+
+  <!-- 🧪 LAB TEST REQUEST MODAL -->
+  <div class="analytics-modal" id="labTestModal">
+    <div class="analytics-content" style="max-width: 500px; height: auto;">
+      <div class="analytics-header">
+        <h2 class="analytics-title" style="font-size: 1.5rem;">Request Lab Test</h2>
+        <button class="close-analytics" onclick="closeLabTestModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div style="padding: 1rem;">
+        <p style="margin-bottom: 1.5rem; color: var(--gray);">Ordering test for: <strong id="labPatientName" style="color: var(--primary);"></strong></p>
+        
+        <form id="labRequestForm" onsubmit="submitLabRequest(event)">
+          <input type="hidden" id="labPatientId">
+          <input type="hidden" id="labAppointmentId">
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;"><i class="fas fa-hospital"></i> Select Laboratory</label>
+            <select id="labId" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; background: white;">
+               <option value="">Loading labs...</option>
+            </select>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Test Type</label>
+            <select id="labTestType" required style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;">
+               <option value="">Select a test...</option>
+               <option value="Blood Test">Blood Test</option>
+               <option value="X-Ray">X-Ray</option>
+               <option value="MRI Scan">MRI Scan</option>
+               <option value="CT Scan">CT Scan</option>
+               <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div id="otherTestDiv" class="form-group" style="margin-bottom: 1.5rem; display: none;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Specify Test Name</label>
+            <input type="text" id="otherTestName" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;">
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Clinical Notes / Instructions</label>
+            <textarea id="labNotes" rows="3" placeholder="Symptoms, urgency details, etc." style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd;"></textarea>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Priority</label>
+            <div style="display: flex; gap: 1rem;">
+               <label style="display: flex; align-items: center; gap: 0.5rem;">
+                  <input type="radio" name="labPriority" value="Normal" checked> Normal
+               </label>
+               <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--accent); font-weight: 600;">
+                  <input type="radio" name="labPriority" value="Urgent"> Urgent
+               </label>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-download" style="width: 100%; justify-content: center; height: 50px; font-size: 1rem;">
+            <i class="fas fa-paper-plane"></i> Send Request to Lab
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
+

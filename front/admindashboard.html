@@ -443,13 +443,97 @@
           <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i> Send</button>
         </form>
       </div>
+
+      <!-- 🆕 Recent Notifications History -->
+      <div class="notification-section" style="margin-top: 20px;">
+        <div class="notification-header"><i class="fas fa-history"></i><h2>Recent History</h2></div>
+        <div id="recent-notifications-list">
+           <div style="text-align: center; color: var(--gray); padding: 1rem;">Loading history...</div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
+    async function fetchLiveData() {
+      try {
+        const res = await fetch('/api/admin/stats');
+        const data = await res.json();
+        document.getElementById('doctors-count').textContent = data.totalDoctors || 0;
+        document.getElementById('patients-count').textContent = data.totalPatients || 0;
+        document.getElementById('hospitals-count').textContent = data.totalHospitals || 0;
+        document.getElementById('reports-count').textContent = data.totalReports || 0;
+      } catch (error) {
+        console.error('Error fetching admin stats:', error);
+      }
+    }
+
+    async function loadRecentNotifications() {
+        const list = document.getElementById('recent-notifications-list');
+        try {
+            // Fetch notifications for 'all' to see what was sent to everyone
+            const res = await fetch('/notifications/all');
+            const data = await res.json();
+            const notes = data.notifications || [];
+            
+            if (notes.length > 0) {
+                list.innerHTML = `
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                            <thead>
+                                <tr style="background: var(--light); text-align: left;">
+                                    <th style="padding: 10px;">Title</th>
+                                    <th style="padding: 10px;">To</th>
+                                    <th style="padding: 10px;">Priority</th>
+                                    <th style="padding: 10px;">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${notes.slice(0, 5).map(n => `
+                                    <tr style="border-bottom: 1px solid #eee;">
+                                        <td style="padding: 10px;"><strong>${n.title}</strong></td>
+                                        <td style="padding: 10px;"><span class="badge" style="background: #e9ecef; padding: 2px 6px; border-radius: 4px;">${n.role}</span></td>
+                                        <td style="padding: 10px;"><span style="color: ${n.priority === 'urgent' ? 'var(--danger)' : n.priority === 'high' ? 'orange' : 'inherit'}">${n.priority}</span></td>
+                                        <td style="padding: 10px; color: #888;">${new Date(n.timestamp).toLocaleDateString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p style="text-align: center; margin-top: 15px;"><a href="#" style="color: var(--secondary); text-decoration: none; font-size: 0.8rem;">View All History</a></p>
+                `;
+            } else {
+                list.innerHTML = '<div style="text-align: center; color: var(--gray); padding: 1rem;">No notification history found.</div>';
+            }
+        } catch (error) {
+            console.error('Error loading history:', error);
+            list.innerHTML = '<div style="text-align: center; color: red;">Failed to load history.</div>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchLiveData();
+      loadRecentNotifications();
+      setInterval(() => {
+         const now = new Date();
+         document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      }, 60000);
+      document.getElementById('current-time').textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    });
+
     function showSection(section) {
       document.getElementById('dashboard-section').style.display = section === 'dashboard' ? 'block' : 'none';
       document.getElementById('notifications-section').style.display = section === 'notifications' ? 'block' : 'none';
+      
+      // Update sidebar links active status
+      const links = document.querySelectorAll('.sidebar a');
+      links.forEach(l => l.classList.remove('active'));
+      const activeLink = Array.from(links).find(l => l.getAttribute('onclick')?.includes(section));
+      if (activeLink) activeLink.classList.add('active');
+
+      if (section === 'notifications') {
+         loadRecentNotifications();
+      }
     }
 
     document.getElementById('notification-form').addEventListener('submit', async (e) => {
@@ -458,6 +542,10 @@
       const title = document.getElementById('notification-title').value;
       const message = document.getElementById('notification-message').value;
       const priority = document.getElementById('notification-priority').value;
+      const btn = e.target.querySelector('button');
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
       try {
         const res = await fetch('/notifications/send', {
@@ -468,11 +556,16 @@
         const data = await res.json();
         if (data.success) {
           document.getElementById('success-alert').style.display = 'block';
+          e.target.reset();
+          loadRecentNotifications();
           setTimeout(() => (document.getElementById('success-alert').style.display = 'none'), 3000);
         } else throw new Error(data.message);
-      } catch {
+      } catch (err) {
         document.getElementById('error-alert').style.display = 'block';
         setTimeout(() => (document.getElementById('error-alert').style.display = 'none'), 3000);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
       }
     });
   </script>

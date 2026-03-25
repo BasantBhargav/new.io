@@ -16,6 +16,11 @@ const appointmentSchema = new mongoose.Schema({
     ref: 'Patient',
     required: true
   },
+  token_number: { // 🔢 Queue system token
+    type: Number,
+    required: true
+  },
+
   scheduled_time: {
     type: Date,
     required: true
@@ -25,9 +30,19 @@ const appointmentSchema = new mongoose.Schema({
     enum: ['Scheduled', 'Completed', 'Cancelled'],
     default: 'Scheduled'
   },
+  paymentStatus: { // 🆕 Added for payment tracking
+    type: String,
+    enum: ['Pending', 'Paid', 'Refunded'],
+    default: 'Pending'
+  },
+  amountPaid: { // 🆕 Optional: amount for tracking
+    type: Number,
+    default: 0
+  },
   notes: {
     type: String
   }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

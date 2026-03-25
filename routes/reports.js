@@ -103,7 +103,7 @@ router.post('/upload-report', upload.single('report'), async (req, res) => {
 /**
  * ✅ Fetch patient details endpoint
  */
-router.get('/patient/details', async (req, res) => {
+router.get('/api/patient/details', async (req, res) => {
   try {
     const patientId = req.query.patientId;
     if (!patientId) {

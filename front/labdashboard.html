@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratory Dashboard | MediVault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --accent: #f72585;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light: #f8f9fa;
+            --white: #ffffff;
+            --gradient-primary: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+            --gradient-success: linear-gradient(135deg, #2ecc71 0%, #1abc9c 100%);
+            --gradient-accent: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
+            --gradient-warning: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            --shadow: 0 4px 16px rgba(0,0,0,0.08);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.12);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.15);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f2ff 0%, #e8f4ff 50%, #f5f0ff 100%);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(67,97,238,0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, rgba(114,9,183,0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* ─── SIDEBAR ─────────────────────────────── */
+        .sidebar {
+            width: 260px;
+            background: var(--white);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            border-right: 1px solid rgba(67,97,238,0.1);
+            padding: 2rem 1.2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 2.5rem;
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 1.6rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            padding: 0.85rem 1rem;
+            color: var(--gray);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-link i { width: 20px; text-align: center; font-size: 1rem; }
+
+        .nav-link:hover { background: rgba(67,97,238,0.08); color: var(--primary); }
+        .nav-link.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(67,97,238,0.3);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(67,97,238,0.1);
+        }
+
+        .lab-badge {
+            background: rgba(67,97,238,0.08);
+            border-radius: var(--radius-sm);
+            padding: 0.8rem 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .lab-badge p { font-size: 0.75rem; color: var(--gray); }
+        .lab-badge strong { font-size: 0.95rem; color: var(--primary); }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.85rem 1rem;
+            color: var(--accent);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            border: 1.5px solid rgba(247,37,133,0.2);
+        }
+        .logout-link:hover { background: rgba(247,37,133,0.08); }
+
+        /* ─── MAIN CONTENT ────────────────────────── */
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem 2.5rem;
+            min-height: 100vh;
+        }
+
+        /* ─── TOP HEADER ──────────────────────────── */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .top-header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .top-header p { color: var(--gray); font-size: 0.9rem; margin-top: 0.2rem; }
+
+        .date-badge {
+            background: var(--white);
+            border: 1px solid rgba(67,97,238,0.1);
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ─── STATS GRID ──────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(67,97,238,0.06);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+
+        .stat-card.pending::before { background: var(--gradient-warning); }
+        .stat-card.completed::before { background: var(--gradient-success); }
+        .stat-card.total::before { background: var(--gradient-primary); }
+        .stat-card.revenue::before { background: var(--gradient-accent); }
+
+        .stat-icon {
+            width: 46px; height: 46px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card.pending .stat-icon { background: rgba(243,156,18,0.12); color: var(--warning); }
+        .stat-card.completed .stat-icon { background: rgba(46,204,113,0.12); color: var(--success); }
+        .stat-card.total .stat-icon { background: rgba(67,97,238,0.12); color: var(--primary); }
+        .stat-card.revenue .stat-icon { background: rgba(247,37,133,0.12); color: var(--accent); }
+
+        .stat-label { font-size: 0.78rem; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
+        .stat-val { font-size: 2rem; font-weight: 800; color: var(--dark); }
+
+        /* ─── SECTION CARD ────────────────────────── */
+        .section-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(67,97,238,0.06);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .section-card:hover { box-shadow: var(--shadow-md); }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .section-title i {
+            padding: 0.4rem;
+            background: rgba(67,97,238,0.1);
+            border-radius: 8px;
+        }
+
+        /* ─── REQUEST CARDS ───────────────────────── */
+        .requests-list { display: flex; flex-direction: column; gap: 1rem; }
+
+        .request-card {
+            background: var(--light);
+            border-radius: var(--radius-sm);
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition);
+            border: 1px solid rgba(67,97,238,0.06);
+            flex-wrap: wrap;
+        }
+        .request-card:hover { transform: translateX(4px); box-shadow: var(--shadow); background: #fff; }
+        .request-card.urgent-card { border-left: 4px solid var(--accent); }
+        .request-card.normal-card { border-left: 4px solid var(--primary); }
+        .request-card.completed-card { border-left: 4px solid var(--success); opacity: 0.85; }
+
+        .req-info { flex: 1; min-width: 180px; }
+        .req-patient { font-weight: 700; font-size: 1rem; color: var(--dark); margin-bottom: 0.3rem; }
+        .req-test { font-size: 0.9rem; color: var(--primary); font-weight: 600; margin-bottom: 0.3rem; }
+        .req-meta { font-size: 0.78rem; color: var(--gray); }
+
+        .req-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+        .badge {
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-collected { background: #cce5ff; color: #004085; }
+        .badge-processing { background: #e2d9f3; color: #6f42c1; }
+        .badge-completed { background: #d4edda; color: #155724; }
+        .badge-urgent { background: #f8d7da; color: #721c24; }
+
+        .req-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+        /* ─── BUTTONS ─────────────────────────────── */
+        .btn {
+            padding: 0.55rem 1.1rem;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-primary { background: var(--gradient-primary); color: white; }
+        .btn-success { background: var(--gradient-success); color: white; }
+        .btn-warning { background: var(--gradient-warning); color: white; }
+        .btn-outline {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.78rem; }
+        .btn-refresh { background: rgba(67,97,238,0.1); color: var(--primary); }
+        .btn-refresh:hover { background: var(--primary); color: white; }
+
+        /* ─── TODAY'S REPORT TABLE ────────────────── */
+        .table-wrap { overflow-x: auto; margin-top: 1rem; border-radius: var(--radius-sm); }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th {
+            background: rgba(67,97,238,0.06);
+            padding: 0.85rem 1rem;
+            text-align: left;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(67,97,238,0.1);
+        }
+        .table td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid rgba(67,97,238,0.06);
+            font-size: 0.88rem;
+            color: var(--dark);
+            vertical-align: middle;
+        }
+        .table tr:last-child td { border-bottom: none; }
+        .table tr:hover td { background: rgba(67,97,238,0.02); }
+
+        /* ─── MODAL ───────────────────────────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.25s ease;
+        }
+        .modal-overlay.show { display: flex; }
+
+        .modal-box {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            width: 95%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-close {
+            background: rgba(247,37,133,0.1);
+            border: none;
+            color: var(--accent);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .modal-close:hover { background: var(--accent); color: white; }
+
+        .modal-patient-info {
+            background: rgba(67,97,238,0.06);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .modal-patient-info .info-row { display: flex; flex-direction: column; }
+        .modal-patient-info .info-label { font-size: 0.7rem; color: var(--gray); font-weight: 600; text-transform: uppercase; }
+        .modal-patient-info .info-val { font-size: 0.95rem; font-weight: 700; color: var(--dark); }
+
+        .form-group { margin-bottom: 1.3rem; }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--dark);
+        }
+        .form-group input[type="file"],
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67,97,238,0.1);
+        }
+
+        .modal-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .modal-actions .btn { flex: 1; justify-content: center; height: 46px; font-size: 0.9rem; }
+
+        /* ─── EMPTY STATE ─────────────────────────── */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--gray);
+        }
+        .empty-state i { font-size: 3rem; opacity: 0.3; margin-bottom: 1rem; display: block; }
+        .empty-state p { font-size: 0.95rem; }
+
+        /* ─── LOADING ─────────────────────────────── */
+        .loading-dots {
+            display: inline-flex; gap: 4px; align-items: center;
+        }
+        .loading-dots span {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: bounce 1.2s infinite;
+        }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ─── TOAST ───────────────────────────────── */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--dark);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+            max-width: 400px;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--accent); }
+
+        /* ─── RESPONSIVE ──────────────────────────── */
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 1.5rem; }
+        }
+    
+    
+    
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="#" class="logo"><i class="fas fa-flask"></i> MediVault Lab</a>
+
+        <span class="nav-label">Navigation</span>
+        <a href="#pending-section" class="nav-link active"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="#pending-section" class="nav-link"><i class="fas fa-vial"></i> Test Requests</a>
+        <a href="#today-section" class="nav-link"><i class="fas fa-history"></i> Today's Reports</a>
+
+        <div class="sidebar-footer">
+            <div class="lab-badge">
+                <p>Logged in as</p>
+                <strong id="labNameSidebar">Laboratory</strong>
+            </div>
+            <a href="/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <!-- Top Header -->
+        <div class="top-header">
+            <div>
+                <h1 id="labNameHeader">Laboratory Dashboard</h1>
+                <p id="labLocationText">Loading details...</p>
+            </div>
+            <div class="date-badge">
+                <i class="fas fa-calendar-alt" style="color:var(--primary)"></i>
+                <span id="todayDate">—</span>
+            </div>
+        </div>
+
+        
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card pending">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-label">Pending Requests</div>
+                <div class="stat-val" id="statPending">—</div>
+            </div>
+            <div class="stat-card completed">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-label">Completed Today</div>
+                <div class="stat-val" id="statCompleted">—</div>
+            </div>
+            <div class="stat-card total">
+                <div class="stat-icon"><i class="fas fa-vial"></i></div>
+                <div class="stat-label">Total Active</div>
+                <div class="stat-val" id="statTotal">—</div>
+            </div>
+        </div>
+
+        <!-- ── Pending / Active Requests ── -->
+        <div class="section-card" id="pending-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-vial"></i> Doctor-Requested Lab Tests
+                </h2>
+                <button class="btn btn-refresh" onclick="loadRequests()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            <div class="requests-list" id="requestsList">
+                <div class="empty-state">
+                    <div class="loading-dots"><span></span><span></span><span></span></div>
+                    <p style="margin-top:1rem">Loading requests...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Today's Completed Reports ── -->
+        <div class="section-card" id="today-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-file-medical-alt"></i> Today's Completed Reports
+                </h2>
+                <button class="btn btn-refresh" onclick="loadTodayReports()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Patient</th>
+                            <th>Test</th>
+                            <th>Referred by</th>
+                            <th>Completed At</th>
+                            <th>Report</th>
+                        </tr>
+                    </thead>
+                    <tbody id="todayReportsList">
+                        <tr><td colspan="6" style="text-align:center; color:var(--gray); padding:2rem;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div><!-- /main-content -->
+
+    <!-- ── Upload Report Modal ── -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-file-upload"></i> Upload Lab Report</h2>
+                <button class="modal-close" onclick="closeUploadModal()"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="modal-patient-info" id="modalPatientInfo">
+                <div class="info-row">
+                    <span class="info-label">Patient</span>
+                    <span class="info-val" id="modalPatientName">—</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Test Type</span>
+                    <span class="info-val" id="modalTestType">—</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Referred by</span>
+                    <span class="info-val" id="modalDoctorName">—</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Priority</span>
+                    <span class="info-val" id="modalPriority">—</span>
+                </div>
+            </div>
+
+            <form id="uploadForm" onsubmit="submitReport(event)">
+                <input type="hidden" id="uploadRequestId">
+
+                <div class="form-group">
+                    <label><i class="fas fa-paperclip" style="color:var(--primary)"></i> Select Report File (PDF / Image)</label>
+                    <input type="file" id="reportFile" accept=".pdf,.jpg,.jpeg,.png" required>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeUploadModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success" id="uploadBtn">
+                        <i class="fas fa-paper-plane"></i> Upload & Notify
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ── Date display ──
+        const now = new Date();
+        document.getElementById('todayDate').textContent = now.toLocaleDateString('en-IN', {
+            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+        });
+
+        // ── Toast helper ──
+        function showToast(message, type = 'success') {
+            const t = document.getElementById('toast');
+            t.className = `toast ${type} show`;
+            t.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            setTimeout(() => { t.className = 'toast'; }, 4000);
+        }
+
+        // ── Status badge helper ──
+        function statusBadge(status, priority) {
+            const map = {
+                'Pending': ['badge-pending', 'fas fa-hourglass-start', 'Pending'],
+                'Requested': ['badge-pending', 'fas fa-hourglass-start', 'Requested'],
+                'Sample Collected': ['badge-collected', 'fas fa-tint', 'Sample Collected'],
+                'Processing': ['badge-processing', 'fas fa-spinner fa-spin', 'Processing'],
+                'Completed': ['badge-completed', 'fas fa-check-circle', 'Completed'],
+                'Cancelled': ['badge-pending', 'fas fa-ban', 'Cancelled'],
+            };
+            const [cls, icon, label] = map[status] || ['badge-pending', 'fas fa-question', status];
+            let html = `<span class="badge ${cls}"><i class="${icon}"></i> ${label}</span>`;
+            if (priority === 'Urgent') {
+                html += `<span class="badge badge-urgent"><i class="fas fa-bolt"></i> Urgent</span>`;
+            }
+            return html;
+        }
+
+        // ── Load Active Requests ──
+        async function loadRequests() {
+            const list = document.getElementById('requestsList');
+            list.innerHTML = `<div class="empty-state"><div class="loading-dots"><span></span><span></span><span></span></div><p style="margin-top:1rem">Loading...</p></div>`;
+            try {
+                const res = await fetch('/api/lab/lab-requests');
+                const data = await res.json();
+
+                if (!data.success) throw new Error(data.message);
+
+                const reqs = data.requests || [];
+
+                // Update stats
+                const pending = reqs.filter(r => r.status !== 'Completed' && r.status !== 'Cancelled').length;
+                document.getElementById('statPending').textContent = reqs.filter(r => r.status === 'Requested').length;
+                document.getElementById('statTotal').textContent = reqs.length;
+
+                if (reqs.length === 0) {
+                    list.innerHTML = `<div class="empty-state"><i class="fas fa-vial"></i><p>No active lab requests at the moment. Doctor requests will appear here.</p></div>`;
+                    return;
+                }
+
+                list.innerHTML = reqs.map(req => {
+                    const patient = req.patientId?.name || 'Unknown Patient';
+                    const phone = req.patientId?.phone || 'N/A';
+                    const doctor = req.doctorId?.name || 'Unknown Doctor';
+                    const date = new Date(req.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+                    const cardClass = req.priority === 'Urgent' ? 'urgent-card' : (req.status === 'Completed' ? 'completed-card' : 'normal-card');
+
+                    let actions = '';
+                    if (req.status === 'Requested' || req.status === 'Pending') {
+                        actions = `<button class="btn btn-warning btn-sm" onclick="updateStatus('${req._id}', 'Sample Collected')">
+                                        <i class="fas fa-tint"></i> Collect Sample
+                                   </button>`;
+                    } else if (req.status === 'Sample Collected') {
+                        actions = `<button class="btn btn-outline btn-sm" onclick="updateStatus('${req._id}', 'Processing')">
+                                        <i class="fas fa-flask"></i> Start Processing
+                                   </button>
+                                   <button class="btn btn-success btn-sm" onclick="openUploadModal('${req._id}', '${patient}', '${req.testType}', '${doctor}', '${req.priority}')">
+                                        <i class="fas fa-file-upload"></i> Upload
+                                   </button>`;
+                    } else if (req.status === 'Processing') {
+                        actions = `<button class="btn btn-success btn-sm" onclick="openUploadModal('${req._id}', '${patient}', '${req.testType}', '${doctor}', '${req.priority}')">
+                                        <i class="fas fa-file-upload"></i> Upload Report
+                                   </button>`;
+                    } else if (req.status === 'Completed') {
+                        actions = req.reportFile
+                            ? `<a class="btn btn-primary btn-sm" href="/${req.reportFile}" target="_blank"><i class="fas fa-file-pdf"></i> View Report</a>`
+                            : `<button class="btn btn-success btn-sm" onclick="openUploadModal('${req._id}', '${patient}', '${req.testType}', '${doctor}', '${req.priority}')">
+                                    <i class="fas fa-file-upload"></i> Upload Report
+                               </button>`;
+                    }
+
+                    return `
+                    <div class="request-card ${cardClass}">
+                        <div class="req-info">
+                            <div class="req-patient">
+                                <i class="fas fa-user-circle" style="color:var(--primary);margin-right:6px"></i>${patient}
+                                <span style="font-size:0.85rem;color:var(--gray);margin-left:10px;font-weight:400">
+                                    <i class="fas fa-phone-alt" style="font-size:0.75rem"></i> ${phone}
+                                </span>
+                            </div>
+                            <div class="req-test"><i class="fas fa-microscope" style="margin-right:5px"></i>${req.testType}</div>
+                            <div class="req-meta">Dr. ${doctor} &nbsp;•&nbsp; Requested: ${date}</div>
+                            ${req.notes ? `<div class="req-meta" style="margin-top:4px;font-style:italic">📝 ${req.notes}</div>` : ''}
+                        </div>
+                        <div class="req-badges">
+                            ${statusBadge(req.status, req.priority)}
+                        </div>
+                        <div class="req-actions">
+                            ${actions}
+                        </div>
+                    </div>`;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                list.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load requests. Please try again.</p></div>`;
+            }
+        }
+
+        // ── Update Status ──
+        async function updateStatus(id, status) {
+            try {
+                const res = await fetch(`/api/lab-requests/${id}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`Status updated to: ${status}`, 'success');
+                    loadRequests();
+                } else {
+                    showToast('Failed to update status', 'error');
+                }
+            } catch (err) {
+                showToast('Connection error', 'error');
+            }
+        }
+
+        // ── Open Upload Modal ──
+        function openUploadModal(id, patient, testType, doctor, priority) {
+            document.getElementById('uploadRequestId').value = id;
+            document.getElementById('modalPatientName').textContent = patient;
+            document.getElementById('modalTestType').textContent = testType;
+            document.getElementById('modalDoctorName').textContent = 'Dr. ' + doctor;
+            document.getElementById('modalPriority').textContent = priority || 'Normal';
+            document.getElementById('reportFile').value = '';
+            document.getElementById('uploadModal').classList.add('show');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('show');
+        }
+
+        // ── Submit Report ──
+        async function submitReport(e) {
+            e.preventDefault();
+            const id = document.getElementById('uploadRequestId').value;
+            const fileInput = document.getElementById('reportFile');
+            if (!fileInput.files[0]) {
+                showToast('Please select a report file', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+            const formData = new FormData();
+            formData.append('report', fileInput.files[0]);
+
+            try {
+                const res = await fetch(`/api/lab-request/${id}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('✅ Report uploaded! Patient & Doctor notified.', 'success');
+                    closeUploadModal();
+                    loadRequests();
+                    loadTodayReports();
+                    // Update completed stat
+                    const cur = parseInt(document.getElementById('statCompleted').textContent) || 0;
+                    document.getElementById('statCompleted').textContent = cur + 1;
+                } else {
+                    showToast('❌ Upload failed: ' + data.message, 'error');
+                }
+            } catch (err) {
+                showToast('❌ Connection error during upload', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Upload & Notify';
+            }
+        }
+
+        // ── Load Today's Completed Reports ──
+        async function loadTodayReports() {
+            const tbody = document.getElementById('todayReportsList');
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray)">Loading...</td></tr>`;
+            try {
+                const res = await fetch('/api/lab/today-reports');
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message);
+
+                const reports = data.reports || [];
+
+                // Update stat
+                document.getElementById('statCompleted').textContent = reports.length;
+
+                if (reports.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--gray)"><i class="fas fa-moon" style="margin-right:6px"></i>No reports completed today yet.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = reports.map((r, i) => {
+                    const patient = r.patientId?.name || 'N/A';
+                    const doctor = r.doctorId?.name || 'N/A';
+                    const time = new Date(r.updatedAt).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12: true });
+                    const reportLink = r.reportFile
+                        ? `<a href="/${r.reportFile}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-file-pdf"></i> View</a>`
+                        : `<span style="color:var(--gray);font-size:0.8rem">N/A</span>`;
+
+                    return `
+                    <tr>
+                        <td><strong>${i + 1}</strong></td>
+                        <td><strong>${patient}</strong><br><span style="font-size:0.75rem;color:var(--gray)">${r.patientId?.email || ''}</span></td>
+                        <td><span style="color:var(--primary);font-weight:600">${r.testType}</span></td>
+                        <td>Dr. ${doctor}</td>
+                        <td><span class="badge badge-completed"><i class="fas fa-check"></i> ${time}</span></td>
+                        <td>${reportLink}</td>
+                    </tr>`;
+                }).join('');
+
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent);padding:2rem">Failed to load today's reports.</td></tr>`;
+            }
+        }
+
+        // ── Load Lab Info ──
+        async function loadLabInfo() {
+            try {
+                const res = await fetch('/api/lab/info');
+                const data = await res.json();
+                if (data.success && data.lab) {
+                    document.getElementById('labNameHeader').textContent = data.lab.name || 'Laboratory Dashboard';
+                    document.getElementById('labNameSidebar').textContent = data.lab.name || 'Lab';
+                    if (data.lab.location) {
+                        document.getElementById('labLocationText').textContent =
+                            `${data.lab.location.city || ''}, ${data.lab.location.state || ''}`;
+                    }
+                }
+            } catch (e) {
+                // Lab info not critical, continue
+            }
+        }
+
+        // ── Close modal on outside click ──
+        document.getElementById('uploadModal').addEventListener('click', function(e) {
+            if (e.target === this) closeUploadModal();
+        });
+
+        // ── Init ──
+        window.onload = () => {
+            loadLabInfo();
+            loadRequests();
+            loadTodayReports();
+        };
+    </script>
+</body>
+</html>

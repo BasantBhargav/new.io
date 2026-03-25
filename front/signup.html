@@ -761,11 +761,17 @@
             <h3>Hospital</h3>
             <p>Manage institution</p>
           </div>
+          <div class="role-card" data-role="laboratory">
+            <i class="fas fa-microscope"></i>
+            <h3>Laboratory</h3>
+            <p>Test & Reports</p>
+          </div>
         </div>
+
         
-        <!-- Common Fields -->
-        <div class="form-container" id="common-fields">
-          <form id="signup-form">
+        <form id="signup-form" novalidate>
+          <!-- Common Fields -->
+          <div class="form-container" id="common-fields">
             <div class="form-group">
               <label for="name">Full Name</label>
               <input type="text" id="name" name="name" placeholder="Enter your full name" required>
@@ -799,7 +805,6 @@
               <i class="fas fa-arrow-right"></i>
               Next
             </button>
-          </form>
         </div>
         
         <!-- Patient Specific Fields -->
@@ -809,11 +814,11 @@
           <div class="form-row">
             <div class="form-group">
               <label for="age">Age</label>
-              <input type="number" id="age" name="age" placeholder="Enter your age" min="1" max="120" required>
+              <input type="number" id="age" name="age" placeholder="Enter your age" min="1" max="120">
             </div>
             <div class="form-group">
               <label for="gender">Gender</label>
-              <select id="gender" name="gender" required>
+              <select id="gender" name="gender">
                 <option value="">Select Gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -836,6 +841,21 @@
             <label for="medical_history">Medical History (comma separated)</label>
             <textarea id="medical_history" name="medical_history" placeholder="e.g. Diabetes, Hypertension" rows="3"></textarea>
           </div>
+
+          <!-- NEW: Location Coordinates for 5km Radius feature -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="p_lat">Latitude</label>
+              <input type="text" id="p_lat" name="lat" placeholder="e.g. 28.6139">
+            </div>
+            <div class="form-group">
+              <label for="p_lng">Longitude</label>
+              <input type="text" id="p_lng" name="lng" placeholder="e.g. 77.2090">
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary" style="margin-bottom: 1rem; width: 100%;" onclick="getLocation('p_lat', 'p_lng')">
+            <i class="fas fa-location-arrow"></i> Get Current Location
+          </button>
           
           <div class="form-navigation">
             <button type="button" class="btn btn-secondary" id="patient-back-btn">
@@ -855,18 +875,18 @@
           
           <div class="form-group">
             <label for="license_number">Medical License Number</label>
-            <input type="text" id="license_number" name="license_number" placeholder="Enter your license number" required>
+            <input type="text" id="license_number" name="license_number" placeholder="Enter your license number">
           </div>
           
           <div class="form-group">
             <label for="specialization">Specialization</label>
-            <input type="text" id="specialization" name="specialization" placeholder="Enter your specialization" required>
+            <input type="text" id="specialization" name="specialization" placeholder="Enter your specialization">
           </div>
           
           <div class="form-row">
             <div class="form-group">
               <label for="hospital_id">Hospital ID</label>
-              <input type="text" id="hospital_id" name="hospital_id" placeholder="Enter hospital ID" required>
+              <input type="text" id="hospital_id" name="hospital_id" placeholder="Enter hospital ID">
             </div>
             <div class="form-group">
               <label for="experience_years">Years of Experience</label>
@@ -877,6 +897,11 @@
           <div class="form-group">
             <label for="doctor_contact">Contact Number</label>
             <input type="tel" id="doctor_contact" name="contact_number" placeholder="Enter contact number">
+          </div>
+
+          <div class="form-group">
+            <label for="workingHours">Working Hours</label>
+            <input type="text" id="workingHours" name="workingHours" placeholder="e.g. 10:00 AM - 4:00 PM">
           </div>
           
           <div class="form-navigation">
@@ -897,28 +922,28 @@
           
           <div class="form-group">
             <label for="hospital_name">Hospital Name</label>
-            <input type="text" id="hospital_name" name="hospital_name" placeholder="Enter hospital name" required>
+            <input type="text" id="hospital_name" name="hospital_name" placeholder="Enter hospital name">
           </div>
           
           <div class="form-row">
             <div class="form-group">
               <label for="address_line">Address Line</label>
-              <input type="text" id="address_line" name="address_line" placeholder="Street address" required>
+              <input type="text" id="address_line" name="address_line" placeholder="Street address">
             </div>
             <div class="form-group">
               <label for="city">City</label>
-              <input type="text" id="city" name="city" placeholder="City" required>
+              <input type="text" id="city" name="city" placeholder="City">
             </div>
           </div>
           
           <div class="form-row">
             <div class="form-group">
               <label for="state">State</label>
-              <input type="text" id="state" name="state" placeholder="State" required>
+              <input type="text" id="state" name="state" placeholder="State">
             </div>
             <div class="form-group">
               <label for="pin_code">PIN Code</label>
-              <input type="text" id="pin_code" name="pin_code" placeholder="PIN code" required>
+              <input type="text" id="pin_code" name="pin_code" placeholder="PIN code">
             </div>
           </div>
           
@@ -932,6 +957,21 @@
               <input type="email" id="hospital_email" name="hospital_email" placeholder="Hospital email">
             </div>
           </div>
+
+          <!-- NEW: Hospital Coordinates -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="h_lat">Latitude</label>
+              <input type="text" id="h_lat" name="lat" placeholder="e.g. 28.6139">
+            </div>
+            <div class="form-group">
+              <label for="h_lng">Longitude</label>
+              <input type="text" id="h_lng" name="lng" placeholder="e.g. 77.2090">
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary" style="margin-bottom: 1rem; width: 100%;" onclick="getLocation('h_lat', 'h_lng')">
+            <i class="fas fa-location-arrow"></i> Get Current Location
+          </button>
           
           <div class="form-navigation">
             <button type="button" class="btn btn-secondary" id="hospital-back-btn">
@@ -945,6 +985,64 @@
           </div>
         </div>
         
+          <!-- Laboratory Specific Fields -->
+          <div class="form-container" id="laboratory-fields">
+            <h3 class="section-title">Laboratory Information</h3>
+            
+            <div class="form-group">
+              <label for="lab_name">Laboratory Name</label>
+              <input type="text" id="lab_name" name="lab_name" placeholder="Enter laboratory name">
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="l_address_line">Address Line</label>
+                <input type="text" id="l_address_line" name="address_line" placeholder="Street address">
+              </div>
+              <div class="form-group">
+                <label for="l_city">City</label>
+                <input type="text" id="l_city" name="city" placeholder="City">
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="l_state">State</label>
+                <input type="text" id="l_state" name="state" placeholder="State">
+              </div>
+              <div class="form-group">
+                <label for="l_pin_code">PIN Code</label>
+                <input type="text" id="l_pin_code" name="pin_code" placeholder="PIN code">
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="l_lat">Latitude</label>
+                <input type="text" id="l_lat" name="lat" placeholder="e.g. 28.6139">
+              </div>
+              <div class="form-group">
+                <label for="l_lng">Longitude</label>
+                <input type="text" id="l_lng" name="lng" placeholder="e.g. 77.2090">
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" style="margin-bottom: 1rem; width: 100%;" onclick="getLocation('l_lat', 'l_lng')">
+              <i class="fas fa-location-arrow"></i> Get Current Location
+            </button>
+            
+            <div class="form-navigation">
+              <button type="button" class="btn btn-secondary" id="laboratory-back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back
+              </button>
+              <button type="submit" class="btn" form="signup-form">
+                <i class="fas fa-user-plus"></i>
+                Create Account
+              </button>
+            </div>
+          </div>
+        </form>
+        
         <div class="footer-text">
           Already have an account? <a href="/login">Log in here</a>
         </div>
@@ -953,6 +1051,21 @@
   </div>
 
   <script>
+    // NEW: Function to get geolocation
+    function getLocation(latId, lngId) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          document.getElementById(latId).value = position.coords.latitude;
+          document.getElementById(lngId).value = position.coords.longitude;
+          alert("✅ Location captured successfully!");
+        }, (error) => {
+          alert("❌ Error: " + error.message);
+        });
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       // Elements
       const roleCards = document.querySelectorAll('.role-card');
@@ -1014,6 +1127,8 @@
           doctorFields.classList.add('active');
         } else if (selectedRole === 'hospital_staff') {
           hospitalFields.classList.add('active');
+        } else if (selectedRole === 'laboratory') {
+          document.getElementById('laboratory-fields').classList.add('active');
         }
         
         steps[1].classList.add('completed');
@@ -1048,13 +1163,32 @@
         steps[2].classList.remove('active');
         progressBar.style.width = '66%';
       });
+
+      document.getElementById('laboratory-back-btn').addEventListener('click', () => {
+        document.getElementById('laboratory-fields').classList.remove('active');
+        commonFields.classList.add('active');
+        steps[1].classList.add('active');
+        steps[1].classList.remove('completed');
+        steps[2].classList.remove('active');
+        progressBar.style.width = '66%';
+      });
       
       // Form submission
       signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        console.log('📝 Signup attempt initiated...');
+
+        const submitBtns = signupForm.querySelectorAll('button[type="submit"]');
+        submitBtns.forEach(btn => {
+           btn.disabled = true;
+           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        });
 
         const formData = new FormData(signupForm);
         const data = Object.fromEntries(formData.entries());
+        // 🛡️ Ensure role is explicitly included even if hidden field is missed
+        if (!data.role && selectedRole) data.role = selectedRole;
+        console.log('📦 Form data captured:', data);
 
         try {
           const response = await fetch('/signup', {

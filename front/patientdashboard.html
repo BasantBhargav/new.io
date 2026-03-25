@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>MediVault | Patient Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- 
+
   <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
- 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <script src="/socket.io/socket.io.js"></script>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
- 
+
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+
     :root {
       --primary: #4361ee;
       --primary-dark: #3a56d4;
@@ -29,13 +33,15 @@
       --white: #ffffff;
       --gradient-primary: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
       --gradient-secondary: linear-gradient(135deg, #f72585 0%, #4361ee 100%);
-      --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
-      --shadow-lg: 0 8px 24px rgba(0,0,0,0.2);
-      --shadow-xl: 0 16px 48px rgba(0,0,0,0.18);
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+      --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.18);
       --radius: 12px;
+      --primary-soft: rgba(67, 97, 238, 0.1);
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
     body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 50%, #f0f8ff 100%);
@@ -43,6 +49,7 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
+
     /* Animated Background */
     body::before {
       content: '';
@@ -55,10 +62,19 @@
       animation: float 8s ease-in-out infinite;
       z-index: -1;
     }
+
     @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-30px) rotate(180deg); }
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-30px) rotate(180deg);
+      }
     }
+
     /* Header - Matching Home Page */
     .header {
       position: fixed;
@@ -71,6 +87,7 @@
       z-index: 1000;
       box-shadow: var(--shadow-sm);
     }
+
     .nav-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -80,6 +97,7 @@
       justify-content: space-between;
       height: 70px;
     }
+
     .logo {
       display: flex;
       align-items: center;
@@ -90,9 +108,11 @@
       text-decoration: none;
       transition: var(--transition);
     }
+
     .logo:hover {
       transform: scale(1.05);
     }
+
     .logo i {
       font-size: 1.8rem;
       background: var(--gradient-primary);
@@ -100,12 +120,14 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
+
     .nav-menu {
       display: flex;
       list-style: none;
       gap: 2rem;
       align-items: center;
     }
+
     .nav-menu a {
       text-decoration: none;
       color: var(--dark);
@@ -114,6 +136,7 @@
       transition: var(--transition);
       padding: 0.5rem 0;
     }
+
     .nav-menu a::after {
       content: '';
       position: absolute;
@@ -124,14 +147,17 @@
       background: var(--gradient-primary);
       transition: width 0.3s ease;
     }
+
     .nav-menu a:hover::after,
     .nav-menu a.active::after {
       width: 100%;
     }
+
     .nav-menu a:hover,
     .nav-menu a.active {
       color: var(--primary);
     }
+
     /* 🚀 Enhanced Notification Bell Styling */
     .notification-item {
       position: relative;
@@ -146,10 +172,12 @@
       min-width: 60px;
       min-height: 50px;
     }
+
     .notification-item:hover {
       background: rgba(67, 97, 238, 0.1);
       transform: scale(1.05);
     }
+
     .notification-bell {
       color: var(--primary);
       font-weight: 500;
@@ -162,9 +190,11 @@
       width: 100%;
       height: 100%;
     }
+
     .notification-bell:hover {
       color: var(--primary-dark);
     }
+
     .notification-badge {
       position: absolute;
       top: -8px;
@@ -182,11 +212,21 @@
       animation: pulse 2s infinite;
       box-shadow: 0 2px 8px rgba(247, 37, 133, 0.3);
     }
+
     @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
+
     /* 🎯 Enhanced Notification Dropdown */
     .notification-dropdown {
       position: absolute;
@@ -206,11 +246,13 @@
       overflow: hidden;
       margin-top: 0.5rem;
     }
+
     .notification-dropdown.show {
       opacity: 1;
       visibility: visible;
       transform: translateY(0);
     }
+
     .notification-header {
       padding: 1.5rem 2rem;
       border-bottom: 1px solid var(--light-gray);
@@ -221,11 +263,13 @@
       color: white;
       border-radius: var(--radius) var(--radius) 0 0;
     }
+
     .notification-header h3 {
       font-size: 1.2rem;
       font-weight: 600;
       margin: 0;
     }
+
     .clear-all-btn {
       background: none;
       border: none;
@@ -237,14 +281,17 @@
       transition: var(--transition);
       font-weight: 500;
     }
+
     .clear-all-btn:hover {
       background: rgba(255, 255, 255, 0.2);
       transform: scale(1.05);
     }
+
     .notification-list {
       max-height: 380px;
       overflow-y: auto;
     }
+
     .notification-item-dropdown {
       padding: 1.5rem 2rem;
       border-bottom: 1px solid var(--light-gray);
@@ -252,22 +299,27 @@
       cursor: pointer;
       position: relative;
     }
+
     .notification-item-dropdown:hover {
       background: var(--light-gray);
       transform: translateX(5px);
     }
+
     .notification-item-dropdown:last-child {
       border-bottom: none;
     }
+
     .notification-item-dropdown.unread {
       background: rgba(67, 97, 238, 0.05);
       border-left: 4px solid var(--primary);
     }
+
     .notification-content {
       display: flex;
       align-items: flex-start;
       gap: 1.2rem;
     }
+
     .notification-icon {
       width: 45px;
       height: 45px;
@@ -281,9 +333,11 @@
       flex-shrink: 0;
       box-shadow: var(--shadow-sm);
     }
+
     .notification-text {
       flex: 1;
     }
+
     .notification-title {
       font-weight: 600;
       font-size: 1rem;
@@ -291,12 +345,14 @@
       margin-bottom: 0.5rem;
       line-height: 1.3;
     }
+
     .notification-message {
       font-size: 0.9rem;
       color: var(--gray);
       line-height: 1.5;
       margin-bottom: 0.5rem;
     }
+
     .notification-time {
       font-size: 0.8rem;
       color: var(--gray);
@@ -304,6 +360,7 @@
       align-items: center;
       gap: 0.3rem;
     }
+
     .priority-badge {
       font-size: 0.7rem;
       padding: 0.1rem 0.4rem;
@@ -312,33 +369,40 @@
       text-transform: uppercase;
       margin-left: 0.5rem;
     }
+
     .priority-normal {
       background: rgba(76, 201, 240, 0.2);
       color: var(--success);
     }
+
     .priority-high {
       background: rgba(255, 193, 7, 0.2);
       color: #ffc107;
     }
+
     .priority-urgent {
       background: rgba(247, 37, 133, 0.2);
       color: var(--accent);
     }
+
     .no-notifications {
       padding: 3rem 2rem;
       text-align: center;
       color: var(--gray);
     }
+
     .no-notifications i {
       font-size: 3rem;
       margin-bottom: 1rem;
       opacity: 0.5;
     }
+
     .user-menu {
       display: flex;
       align-items: center;
       gap: 1rem;
     }
+
     .user-info {
       display: flex;
       align-items: center;
@@ -346,6 +410,7 @@
       color: var(--gray);
       font-size: 0.9rem;
     }
+
     .logout-btn {
       background: var(--gradient-primary);
       border: none;
@@ -360,10 +425,12 @@
       align-items: center;
       gap: 0.5rem;
     }
+
     .logout-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
     }
+
     /* Mobile Menu Toggle */
     .mobile-menu-toggle {
       display: none;
@@ -375,21 +442,26 @@
       padding: 0.5rem;
       z-index: 1001;
     }
+
     .mobile-menu-toggle.active {
       color: var(--accent);
     }
+
     /* Main Content */
     .main-container {
       padding-top: 70px;
     }
+
     .dashboard-content {
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem;
     }
+
     .page-title {
       margin-bottom: 2rem;
     }
+
     .page-title h1 {
       font-size: 2.5rem;
       font-weight: 800;
@@ -399,10 +471,12 @@
       background-clip: text;
       margin-bottom: 0.5rem;
     }
+
     .page-title p {
       color: var(--gray);
       font-size: 1.1rem;
     }
+
     /* Dashboard Cards Grid */
     .stats-grid {
       display: grid;
@@ -410,6 +484,7 @@
       gap: 1.5rem;
       margin-bottom: 2rem;
     }
+
     .stat-card {
       background: var(--white);
       border-radius: var(--radius);
@@ -420,6 +495,7 @@
       position: relative;
       overflow: hidden;
     }
+
     .stat-card::before {
       content: '';
       position: absolute;
@@ -430,11 +506,13 @@
       background: var(--gradient-primary);
       border-radius: var(--radius) var(--radius) 0 0;
     }
+
     .stat-card:hover {
       transform: translateY(-5px);
       box-shadow: var(--shadow-lg);
       border-color: var(--primary);
     }
+
     .stat-card .icon {
       width: 60px;
       height: 60px;
@@ -447,6 +525,7 @@
       color: white;
       font-size: 1.5rem;
     }
+
     .stat-card .title {
       color: var(--gray);
       font-size: 0.9rem;
@@ -455,12 +534,14 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
+
     .stat-card .value {
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--dark);
       word-break: break-word;
     }
+
     /* Upload Section */
     .upload-section {
       background: var(--white);
@@ -471,9 +552,11 @@
       margin-bottom: 2rem;
       transition: var(--transition);
     }
+
     .upload-section:hover {
       box-shadow: var(--shadow-md);
     }
+
     .section-title {
       display: flex;
       align-items: center;
@@ -483,22 +566,26 @@
       color: var(--primary);
       margin-bottom: 1.5rem;
     }
+
     .upload-form {
       display: flex;
       flex-direction: column;
       gap: 1rem;
       position: relative;
     }
+
     .form-group {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
     }
+
     .form-group label {
       font-weight: 600;
       color: var(--dark);
       font-size: 0.9rem;
     }
+
     .form-group input {
       padding: 0.8rem;
       border: 2px solid #e2e8f0;
@@ -508,16 +595,19 @@
       background: var(--white);
       font-family: 'Inter', sans-serif;
     }
+
     .form-group input:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
     }
+
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
     }
+
     .suggestions {
       position: absolute;
       background: var(--white);
@@ -531,16 +621,19 @@
       box-shadow: var(--shadow-md);
       display: none;
     }
+
     .suggestions div {
       padding: 0.8rem;
       cursor: pointer;
       transition: var(--transition);
       border-bottom: 1px solid #f1f1f1;
     }
+
     .suggestions div:hover {
       background: var(--light-gray);
       color: var(--primary);
     }
+
     /* Upload Button */
     .upload-btn {
       background: var(--gradient-primary);
@@ -560,16 +653,19 @@
       width: auto;
       align-self: flex-start;
     }
+
     .upload-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
     }
+
     .upload-btn:disabled {
       background: var(--gray);
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
     }
+
     /* Reports Section */
     .reports-section {
       background: var(--white);
@@ -579,12 +675,14 @@
       border: 1px solid rgba(67, 97, 238, 0.1);
       margin-bottom: 2rem;
     }
+
     .reports-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5rem;
     }
+
     .filter-select {
       padding: 0.6rem 1rem;
       border: 2px solid #e2e8f0;
@@ -595,16 +693,19 @@
       transition: var(--transition);
       min-width: 150px;
     }
+
     .filter-select:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
     }
+
     .reports-list {
       display: flex;
       flex-direction: column;
       gap: 1rem;
     }
+
     .report-item {
       background: var(--white);
       border: 1px solid #e2e8f0;
@@ -615,28 +716,34 @@
       align-items: center;
       transition: var(--transition);
     }
+
     .report-item:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
       border-color: var(--primary);
     }
+
     .report-details {
       flex: 1;
     }
+
     .report-details .report-type {
       font-size: 1.1rem;
       font-weight: 600;
       color: var(--dark);
       margin-bottom: 0.3rem;
     }
+
     .report-details .report-date {
       color: var(--gray);
       font-size: 0.9rem;
     }
+
     .report-actions {
       display: flex;
       gap: 0.5rem;
     }
+
     .btn {
       padding: 0.5rem 1rem;
       border: none;
@@ -650,40 +757,50 @@
       font-size: 0.85rem;
       text-decoration: none;
     }
+
     .btn:hover {
       transform: translateY(-1px);
     }
+
     .btn-view {
       background: var(--success);
       color: white;
     }
+
     .btn-view:hover {
       box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
     }
+
     .btn-download {
       background: var(--primary);
       color: white;
     }
+
     .btn-download:hover {
       box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
     }
+
     .btn-delete {
       background: var(--accent);
       color: white;
     }
+
     .btn-delete:hover {
       box-shadow: 0 4px 12px rgba(247, 37, 133, 0.3);
     }
+
     .no-reports {
       text-align: center;
       padding: 3rem 2rem;
       color: var(--gray);
     }
+
     .no-reports i {
       font-size: 4rem;
       margin-bottom: 1rem;
       opacity: 0.5;
     }
+
     /* Modal Styles */
     .modal {
       display: none;
@@ -697,6 +814,7 @@
       backdrop-filter: blur(5px);
       animation: modalFadeIn 0.3s ease;
     }
+
     .modal-content {
       position: absolute;
       background: var(--white);
@@ -711,6 +829,7 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       animation: modalSlideIn 0.3s ease;
     }
+
     .modal-header {
       background: var(--gradient-primary);
       color: white;
@@ -719,6 +838,7 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .modal-title {
       display: flex;
       align-items: center;
@@ -726,10 +846,12 @@
       font-weight: 600;
       font-size: 1.1rem;
     }
+
     .window-controls {
       display: flex;
       gap: 0.3rem;
     }
+
     .control-btn {
       background: rgba(255, 255, 255, 0.2);
       border: none;
@@ -743,26 +865,32 @@
       justify-content: center;
       transition: var(--transition);
     }
+
     .control-btn:hover {
       background: rgba(255, 255, 255, 0.3);
     }
+
     .control-btn.close {
       background: rgba(247, 37, 133, 0.8);
     }
+
     .control-btn.close:hover {
       background: var(--accent);
     }
+
     .modal-body {
       height: calc(100% - 70px);
       background: var(--light-gray);
       position: relative;
     }
+
     .modal-body iframe {
       width: 100%;
       height: 100%;
       border: none;
       background: white;
     }
+
     .modal-loading {
       position: absolute;
       top: 50%;
@@ -778,6 +906,7 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow-md);
     }
+
     .spinner {
       width: 40px;
       height: 40px;
@@ -786,24 +915,39 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
+
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
+
     @keyframes modalFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
+
     @keyframes modalSlideIn {
       from {
         transform: translate(-50%, -50%) scale(0.95);
         opacity: 0;
       }
+
       to {
         transform: translate(-50%, -50%) scale(1);
         opacity: 1;
       }
     }
+
     /* 🔄 Updated Prescription Section */
     .prescription-section {
       background: var(--white);
@@ -813,6 +957,7 @@
       border: 1px solid rgba(67, 97, 238, 0.1);
       margin-bottom: 2rem;
     }
+
     /* Prescription Styles */
     .prescriptions-list {
       display: flex;
@@ -820,6 +965,7 @@
       gap: 1rem;
       margin-top: 1rem;
     }
+
     .prescription-item {
       background: var(--white);
       border: 1px solid #e2e8f0;
@@ -829,23 +975,27 @@
       border-left: 4px solid var(--primary);
       box-shadow: var(--shadow-sm);
     }
+
     .prescription-item:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-md);
       border-color: var(--primary);
     }
+
     .prescription-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 1rem;
     }
+
     .prescription-info h3 {
       color: var(--primary);
       font-size: 1.1rem;
       font-weight: 600;
       margin-bottom: 0.3rem;
     }
+
     .prescription-info p {
       color: var(--gray);
       font-size: 0.9rem;
@@ -854,6 +1004,7 @@
       align-items: center;
       gap: 0.3rem;
     }
+
     .prescription-date {
       background: rgba(67, 97, 238, 0.1);
       color: var(--primary);
@@ -863,11 +1014,13 @@
       font-weight: 500;
       white-space: nowrap;
     }
+
     .prescription-medications {
       margin-top: 1rem;
       padding-top: 1rem;
       border-top: 1px solid var(--light-gray);
     }
+
     .prescription-medications h4 {
       color: var(--dark);
       font-size: 0.9rem;
@@ -877,11 +1030,13 @@
       align-items: center;
       gap: 0.3rem;
     }
+
     .medication-list {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
     }
+
     .medication-tag {
       background: var(--light-gray);
       color: var(--dark);
@@ -890,14 +1045,17 @@
       font-size: 0.8rem;
       border: 1px solid #e2e8f0;
     }
+
     .loading-state {
       text-align: center;
       padding: 3rem;
       color: var(--gray);
     }
+
     .loading-state .spinner {
       margin: 0 auto 1rem;
     }
+
     .no-prescriptions {
       text-align: center;
       padding: 3rem 2rem;
@@ -906,12 +1064,14 @@
       border-radius: var(--radius);
       margin-top: 1rem;
     }
+
     .no-prescriptions i {
       font-size: 4rem;
       margin-bottom: 1rem;
       opacity: 0.5;
       color: var(--primary);
     }
+
     /* 🔄 NEW: Prescription Actions Styles */
     .prescription-actions {
       margin-top: 1rem;
@@ -921,6 +1081,7 @@
       gap: 0.8rem;
       justify-content: flex-end;
     }
+
     .prescription-btn {
       padding: 0.6rem 1.2rem;
       border: none;
@@ -935,28 +1096,34 @@
       text-decoration: none;
       font-family: 'Inter', sans-serif;
     }
+
     .prescription-btn:hover {
       transform: translateY(-1px);
       box-shadow: var(--shadow-sm);
     }
+
     .prescription-btn.btn-view {
       background: var(--success);
       color: white;
       border: 1px solid var(--success);
     }
+
     .prescription-btn.btn-view:hover {
       background: #36b3d9;
       box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
     }
+
     .prescription-btn.btn-delete {
       background: var(--accent);
       color: white;
       border: 1px solid var(--accent);
     }
+
     .prescription-btn.btn-delete:hover {
       background: #e01e5a;
       box-shadow: 0 4px 12px rgba(247, 37, 133, 0.3);
     }
+
     .prescription-btn:disabled {
       background: var(--gray);
       color: white;
@@ -964,6 +1131,7 @@
       transform: none;
       box-shadow: none;
     }
+
     /* Prescription Modal Styles */
     .modal-prescription {
       position: fixed;
@@ -978,6 +1146,7 @@
       align-items: center;
       justify-content: center;
     }
+
     .modal-content-prescription {
       background: var(--white);
       border-radius: var(--radius);
@@ -987,35 +1156,42 @@
       overflow: hidden;
       box-shadow: var(--shadow-xl);
     }
+
     .modal-body-prescription {
       padding: 2rem;
       max-height: 70vh;
       overflow-y: auto;
     }
+
     .prescription-details {
       padding: 0;
     }
+
     .detail-row {
       display: flex;
       margin-bottom: 1rem;
       border-bottom: 1px solid var(--light-gray);
       padding-bottom: 0.5rem;
     }
+
     .detail-label {
       font-weight: 600;
       color: var(--dark);
       min-width: 120px;
       flex-shrink: 0;
     }
+
     .detail-value {
       color: var(--gray);
       flex: 1;
     }
+
     .medications-detail {
       margin-top: 1.5rem;
       padding-top: 1.5rem;
       border-top: 2px solid var(--light-gray);
     }
+
     .medications-detail h4 {
       color: var(--primary);
       margin-bottom: 1rem;
@@ -1024,6 +1200,7 @@
       align-items: center;
       gap: 0.5rem;
     }
+
     .medication-item {
       background: var(--light-gray);
       padding: 1rem;
@@ -1031,12 +1208,14 @@
       margin-bottom: 0.8rem;
       border-left: 3px solid var(--primary);
     }
+
     .medication-name {
       font-weight: 600;
       color: var(--dark);
       font-size: 1rem;
       margin-bottom: 0.3rem;
     }
+
     /* 🔄 NEW: Confirmation Dialog Styles */
     .confirmation-overlay {
       position: fixed;
@@ -1054,10 +1233,12 @@
       visibility: hidden;
       transition: var(--transition);
     }
+
     .confirmation-overlay.show {
       opacity: 1;
       visibility: visible;
     }
+
     .confirmation-dialog {
       background: var(--white);
       border-radius: var(--radius);
@@ -1069,24 +1250,29 @@
       transform: scale(0.9);
       transition: var(--transition);
     }
+
     .confirmation-overlay.show .confirmation-dialog {
       transform: scale(1);
     }
+
     .confirmation-dialog h3 {
       color: var(--dark);
       margin-bottom: 1rem;
       font-size: 1.2rem;
     }
+
     .confirmation-dialog p {
       color: var(--gray);
       margin-bottom: 2rem;
       line-height: 1.5;
     }
+
     .confirmation-actions {
       display: flex;
       gap: 1rem;
       justify-content: center;
     }
+
     .confirm-btn {
       padding: 0.8rem 1.5rem;
       border: none;
@@ -1096,49 +1282,59 @@
       transition: var(--transition);
       font-size: 0.9rem;
     }
+
     .confirm-btn.danger {
       background: var(--accent);
       color: white;
     }
+
     .confirm-btn.danger:hover {
       background: #e01e5a;
       transform: translateY(-1px);
     }
+
     .confirm-btn.cancel {
       background: var(--light-gray);
       color: var(--dark);
       border: 1px solid #e2e8f0;
     }
+
     .confirm-btn.cancel:hover {
       background: #e2e8f0;
       transform: translateY(-1px);
     }
+
     /* 🔄 NEW: Toast Animations */
     @keyframes slideInRight {
       from {
         transform: translateX(100%);
         opacity: 0;
       }
+
       to {
         transform: translateX(0);
         opacity: 1;
       }
     }
+
     @keyframes slideOutRight {
       from {
         transform: translateX(0);
         opacity: 1;
       }
+
       to {
         transform: translateX(100%);
         opacity: 0;
       }
     }
+
     /* Mobile Responsive Styles */
     @media (max-width: 768px) {
       .mobile-menu-toggle {
         display: block !important;
       }
+
       .nav-menu {
         display: none;
         position: fixed;
@@ -1151,107 +1347,133 @@
         padding: 1.5rem;
         gap: 1rem;
         z-index: 999;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         border-bottom: 1px solid rgba(67, 97, 238, 0.1);
         max-height: calc(100vh - 70px);
         overflow-y: auto;
       }
+
       .nav-menu.active {
         display: flex !important;
       }
+
       .nav-menu a {
         padding: 1rem 0;
         border-bottom: 1px solid rgba(67, 97, 238, 0.1);
         text-align: center;
         font-size: 1.1rem;
       }
+
       .nav-menu a:last-child {
         border-bottom: none;
       }
+
       .nav-container {
         padding: 0 1rem;
       }
+
       .dashboard-content {
         padding: 1rem;
       }
+
       .page-title h1 {
         font-size: 2rem;
       }
+
       .stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
       }
+
       .stat-card {
         padding: 1rem;
       }
+
       .form-row {
         grid-template-columns: 1fr;
       }
+
       .upload-btn {
         width: 100%;
         align-self: stretch;
       }
+
       .report-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
         padding: 1rem;
       }
+
       .report-actions {
         width: 100%;
         justify-content: flex-start;
         flex-wrap: wrap;
       }
+
       .user-info {
         display: none;
       }
+
       .logout-btn span {
         display: none;
       }
+
       .notification-dropdown {
         width: 350px;
         right: -50px;
       }
+
       .notification-item {
         min-width: 70px;
         min-height: 60px;
       }
+
       /* Prescription Mobile Styles */
       .prescription-header {
         flex-direction: column;
         gap: 1rem;
       }
+
       .prescription-date {
         align-self: flex-start;
       }
+
       .prescription-actions {
         flex-direction: column;
         gap: 0.5rem;
       }
+
       .prescription-btn {
         width: 100%;
         justify-content: center;
       }
+
       .modal-content-prescription {
         width: 95%;
         margin: 1rem;
       }
+
       .modal-body-prescription {
         padding: 1rem;
       }
+
       .detail-row {
         flex-direction: column;
         gap: 0.3rem;
       }
+
       .detail-label {
         min-width: auto;
         font-size: 0.9rem;
       }
     }
+
     @media (max-width: 480px) {
       .stats-grid {
         grid-template-columns: 1fr;
       }
+
       .notification-dropdown {
         width: calc(100vw - 2rem);
         right: -80px;
@@ -1259,6 +1481,7 @@
     }
   </style>
 </head>
+
 <body id="top">
   <!-- Header -->
   <header class="header">
@@ -1267,32 +1490,32 @@
         <i class="fas fa-heartbeat"></i>
         MediVault
       </a>
-     
+
       <nav class="nav-menu" id="navMenu">
         <a href="#top" class="active">Dashboard</a>
         <a href="#upload">Upload Reports</a>
         <a href="#reports">Reports</a>
-       
+
         <!-- 🚀 Enhanced Notification Bell -->
         <div class="notification-item" onclick="toggleNotifications()">
           <div class="notification-bell">
             <i class="fas fa-bell"></i>
             <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
           </div>
-         
+
           <!-- 🎯 Enhanced Notification Dropdown -->
           <div class="notification-dropdown" id="notificationDropdown">
             <div class="notification-header">
               <h3>Admin Notifications</h3>
               <button class="clear-all-btn" onclick="clearAllNotifications()">Clear All</button>
             </div>
-           
+
             <div class="notification-list" id="notificationList">
               <!-- Notifications will be populated here -->
             </div>
           </div>
         </div>
-       
+
         <a href="#prescription">Prescriptions</a>
       </nav>
       <button class="mobile-menu-toggle" onclick="toggleMenu()">
@@ -1321,6 +1544,35 @@
       </div>
 
       <!-- Dashboard Stats -->
+      
+      <!-- 🏥 SEARCH & BOOKING SECTION -->
+      <div class="upload-section" id="searchSection" style="border: 2px solid var(--primary-soft); margin-bottom: 2rem;">
+        <h2 class="section-title"><i class="fas fa-search"></i> Find Doctors & Laboratories</h2>
+        <div class="upload-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Search For</label>
+              <select id="searchType" style="width: 100%; padding: 0.8rem; border: 2px solid #e2e8f0; border-radius: 12px;">
+                <option value="doctor">Doctors</option>
+                <option value="hospital">Hospitals</option>
+                <option value="laboratory">Laboratories</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Specialization / City</label>
+              <input type="text" id="searchParam" placeholder="e.g. Cardio, Dentist, Mumbai" style="width: 100%; padding: 0.8rem; border: 2px solid #e2e8f0; border-radius: 12px;">
+            </div>
+          </div>
+          <div style="display: flex; gap: 1rem;">
+            <button class="upload-btn" onclick="performSearch()" style="flex: 1; padding: 1rem; border-radius: 12px;"><i class="fas fa-search"></i> Search Now</button>
+            <button class="upload-btn" onclick="findNearby()" style="flex: 1; padding: 1rem; border-radius: 12px; background: var(--gradient-secondary);">
+                <i class="fas fa-location-arrow"></i> Find Nearby
+            </button>
+          </div>
+        </div>
+        <div id="searchResults" class="reports-list" style="margin-top:2rem; display:none;"></div>
+      </div>
+
       <div class="stats-grid">
         <div class="stat-card">
           <div class="icon">
@@ -1329,7 +1581,7 @@
           <div class="title">Patient ID</div>
           <div class="value" id="userId">Loading...</div>
         </div>
-       
+
         <div class="stat-card">
           <div class="icon">
             <i class="fas fa-user"></i>
@@ -1337,7 +1589,7 @@
           <div class="title">Full Name</div>
           <div class="value" id="userName">Loading...</div>
         </div>
-       
+
         <div class="stat-card">
           <div class="icon">
             <i class="fas fa-phone"></i>
@@ -1345,7 +1597,7 @@
           <div class="title">Phone Number</div>
           <div class="value" id="userPhone">Loading...</div>
         </div>
-       
+
         <div class="stat-card">
           <div class="icon">
             <i class="fas fa-envelope"></i>
@@ -1353,7 +1605,7 @@
           <div class="title">Email Address</div>
           <div class="value" id="userEmail">Loading...</div>
         </div>
-       
+
         <div class="stat-card">
           <div class="icon">
             <i class="fas fa-file-medical"></i>
@@ -1364,39 +1616,60 @@
       </div>
 
       <!-- Upload Section -->
+      
+      <!-- 📅 UPCOMING APPOINTMENTS & QUEUE -->
+      <div class="reports-section" id="appointmentsSection">
+        <h2 class="section-title"><i class="fas fa-calendar-check"></i> Upcoming Appointments</h2>
+        
+        <!-- Live Queue Tracking Banner -->
+        <div id="queueBanner" style="display: none; background: var(--gradient-primary); color: white; padding: 2rem; border-radius: 15px; margin-bottom: 2rem; box-shadow: var(--shadow-lg);">
+           <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                 <h3>Live Queue Tracking</h3>
+                 <p id="queueDoc" style="opacity:0.9">Consultation in progress...</p>
+              </div>
+              <div id="qTime" style="font-weight: 800; background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 30px;">~ 0 mins wait</div>
+           </div>
+           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+              <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 12px;">
+                 <div style="font-size:0.75rem; text-transform:uppercase;">Your Token</div>
+                 <div id="tokenNum" style="font-size: 2.2rem; font-weight: 900;">0</div>
+              </div>
+              <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 12px;">
+                 <div style="font-size:0.75rem; text-transform:uppercase;">Current</div>
+                 <div id="currentNum" style="font-size: 2.2rem; font-weight: 900;">0</div>
+              </div>
+              <div style="text-align: center; background: rgba(255,255,255,0.1); padding: 1.2rem; border-radius: 12px;">
+                 <div style="font-size:0.75rem; text-transform:uppercase;">Ahead</div>
+                 <div id="aheadNum" style="font-size: 2.2rem; font-weight: 900;">0</div>
+              </div>
+           </div>
+        </div>
+
+        <div id="appointmentList" class="reports-list"></div>
+      </div>
+
       <div class="upload-section" id="upload">
         <h2 class="section-title">
           <i class="fas fa-upload"></i>
           Upload New Report
         </h2>
-       
+
         <form class="upload-form" id="uploadForm" enctype="multipart/form-data">
           <div class="form-row">
             <div class="form-group">
               <label for="reportType">Report Type</label>
-              <input
-                type="text"
-                id="reportType"
-                name="reportType"
-                placeholder="e.g., X-Ray, Blood Test, MRI"
-                required
-                autocomplete="off"
-              />
+              <input type="text" id="reportType" name="reportType" placeholder="e.g., X-Ray, Blood Test, MRI" required
+                autocomplete="off" />
               <div id="suggestions" class="suggestions"></div>
             </div>
-           
+
             <div class="form-group">
               <label for="reportFile">Select File</label>
-              <input
-                type="file"
-                id="reportFile"
-                name="report"
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                required
-              />
+              <input type="file" id="reportFile" name="report" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required />
             </div>
           </div>
-         
+
           <button type="submit" class="upload-btn">
             <i class="fas fa-upload"></i>
             Upload Report
@@ -1405,18 +1678,27 @@
       </div>
 
       <!-- Reports Section -->
+      
+      <!-- 🔬 LAB TESTS TRACKING -->
+      <div class="reports-section" id="labTests" style="border-left: 6px solid var(--accent);">
+        <h2 class="section-title"><i class="fas fa-microscope"></i> Lab Tests Tracking</h2>
+        <div id="patientLabList" class="reports-list">
+             <p style="text-align:center; color:gray; padding:2rem;">Checking for active lab requests...</p>
+        </div>
+      </div>
+
       <div class="reports-section" id="reports">
         <div class="reports-header">
           <h2 class="section-title">
             <i class="fas fa-file-medical"></i>
             Medical Reports
           </h2>
-         
+
           <select id="filterSelect" class="filter-select">
             <option value="all">All Reports</option>
           </select>
         </div>
-       
+
         <div id="reportList" class="reports-list">
           <div class="no-reports">
             <i class="fas fa-file-medical"></i>
@@ -1432,18 +1714,18 @@
           <i class="fas fa-prescription-bottle-alt"></i>
           My Prescriptions
         </h2>
-        
+
         <!-- Loading State -->
         <div id="prescriptionLoading" class="loading-state" style="display: none;">
           <div class="spinner"></div>
           <p>Loading prescriptions...</p>
         </div>
-        
+
         <!-- Prescriptions List -->
         <div id="prescriptionsList" class="prescriptions-list">
           <!-- Prescriptions will be populated here -->
         </div>
-        
+
         <!-- No Prescriptions State -->
         <div id="noPrescriptions" class="no-prescriptions" style="display: none;">
           <i class="fas fa-prescription-bottle-alt"></i>
@@ -1462,14 +1744,14 @@
           <i class="fas fa-file-medical"></i>
           <span id="modalTitle">Medical Report</span>
         </div>
-       
+
         <div class="window-controls">
           <button class="control-btn close" onclick="closeModal()" title="Close">
             <i class="fas fa-times"></i>
           </button>
         </div>
       </div>
-     
+
       <div class="modal-body">
         <div class="modal-loading" id="modalLoading">
           <div class="spinner"></div>
@@ -1494,7 +1776,7 @@
           </button>
         </div>
       </div>
-      
+
       <div class="modal-body-prescription">
         <div id="prescriptionDetails">
           <!-- Prescription details will be loaded here -->
@@ -1508,7 +1790,7 @@
     let allReports = [];
     let patientNotifications = [];
     let patientPrescriptions = [];
-   
+
     const globalReportNames = [
       "X-Ray", "MRI", "CT Scan", "Blood Test", "Urine Test", "Liver Function Test",
       "Kidney Function Test", "Electrocardiogram (ECG)", "EEG", "Lipid Profile", "CBC",
@@ -1536,27 +1818,27 @@
         // Fallback to localStorage for demo
         const patientNotificationsLocal = JSON.parse(localStorage.getItem('notifications_patient')) || [];
         const allUserNotifications = JSON.parse(localStorage.getItem('notifications_all')) || [];
-       
+
         patientNotifications = [...patientNotificationsLocal, ...allUserNotifications];
         patientNotifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
       }
-     
+
       updateNotificationUI();
     }
 
     function updateNotificationUI() {
       const notificationList = document.getElementById('notificationList');
       const notificationBadge = document.getElementById('notificationBadge');
-     
+
       const unreadCount = patientNotifications.filter(n => !n.isRead).length;
-     
+
       if (unreadCount > 0) {
         notificationBadge.textContent = unreadCount;
         notificationBadge.style.display = 'flex';
       } else {
         notificationBadge.style.display = 'none';
       }
-     
+
       if (patientNotifications.length === 0) {
         notificationList.innerHTML = `
           <div class="no-notifications">
@@ -1567,7 +1849,7 @@
         `;
         return;
       }
-     
+
       notificationList.innerHTML = patientNotifications.map(notification => `
         <div class="notification-item-dropdown ${!notification.isRead ? 'unread' : ''}" onclick="markAsRead('${notification._id || notification.id}')">
           <div class="notification-content">
@@ -1589,7 +1871,7 @@
     }
 
     function getNotificationIcon(priority) {
-      switch(priority) {
+      switch (priority) {
         case 'urgent': return 'fas fa-exclamation-triangle';
         case 'high': return 'fas fa-exclamation-circle';
         default: return 'fas fa-info-circle';
@@ -1603,7 +1885,7 @@
       const diffInMinutes = Math.floor(diffInMillis / (1000 * 60));
       const diffInHours = Math.floor(diffInMinutes / 60);
       const diffInDays = Math.floor(diffInHours / 24);
-     
+
       if (diffInMinutes < 1) return 'Just now';
       if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
       if (diffInHours < 24) return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
@@ -1613,7 +1895,7 @@
     function toggleNotifications() {
       const dropdown = document.getElementById('notificationDropdown');
       const isVisible = dropdown.classList.contains('show');
-     
+
       if (isVisible) {
         dropdown.classList.remove('show');
         document.removeEventListener('click', handleOutsideClick);
@@ -1628,7 +1910,7 @@
     function handleOutsideClick(event) {
       const dropdown = document.getElementById('notificationDropdown');
       const notificationItem = document.querySelector('.notification-item');
-     
+
       if (!dropdown.contains(event.target) && !notificationItem.contains(event.target)) {
         dropdown.classList.remove('show');
         document.removeEventListener('click', handleOutsideClick);
@@ -1674,7 +1956,7 @@
     async function loadPrescriptions() {
       try {
         const userId = document.getElementById('userId').textContent;
-        
+
         if (!userId || userId === 'Loading...') {
           setTimeout(loadPrescriptions, 1000);
           return;
@@ -1703,7 +1985,7 @@
     // 🔄 Updated Render Prescriptions with Delete Button
     function renderPrescriptions() {
       document.getElementById('prescriptionLoading').style.display = 'none';
-      
+
       if (patientPrescriptions.length === 0) {
         document.getElementById('noPrescriptions').style.display = 'block';
         document.getElementById('prescriptionsList').innerHTML = '';
@@ -1712,7 +1994,7 @@
 
       document.getElementById('noPrescriptions').style.display = 'none';
       const prescriptionsList = document.getElementById('prescriptionsList');
-      
+
       prescriptionsList.innerHTML = patientPrescriptions.map(prescription => `
         <div class="prescription-item">
           <div class="prescription-header">
@@ -1761,7 +2043,7 @@
         if (data.success) {
           const prescription = data.prescription;
           const detailsContainer = document.getElementById('prescriptionDetails');
-          
+
           detailsContainer.innerHTML = `
             <div class="prescription-details">
               <div class="detail-row">
@@ -1805,7 +2087,7 @@
               ` : ''}
             </div>
           `;
-          
+
           document.getElementById('prescriptionModal').style.display = 'flex';
           document.body.style.overflow = 'hidden';
         } else {
@@ -1840,10 +2122,10 @@
             if (data.success) {
               // Show success message
               showToast('✅ Prescription deleted successfully!', 'success');
-              
+
               // Remove from local array
               patientPrescriptions = patientPrescriptions.filter(p => p._id !== prescriptionId);
-              
+
               // Re-render prescriptions
               renderPrescriptions();
             } else {
@@ -1852,7 +2134,7 @@
           } catch (error) {
             console.error('Error deleting prescription:', error);
             showToast(`❌ Failed to delete prescription: ${error.message}`, 'error');
-            
+
             // Reset button state
             const deleteBtn = document.querySelector(`button[onclick*="${prescriptionId}"]`);
             if (deleteBtn) {
@@ -1887,15 +2169,15 @@
       `;
 
       document.body.appendChild(overlay);
-      
+
       // Store the confirm callback
       window.confirmCallback = onConfirm;
-      
+
       // Show dialog
       setTimeout(() => {
         overlay.classList.add('show');
       }, 10);
-      
+
       // Prevent body scroll
       document.body.style.overflow = 'hidden';
     }
@@ -1930,13 +2212,13 @@
       // Create new toast
       const toast = document.createElement('div');
       toast.className = `toast-notification ${type}`;
-      
+
       const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
       toast.innerHTML = `
         <i class="${icon}"></i>
         <span>${message}</span>
       `;
-      
+
       // Add toast styles
       toast.style.cssText = `
         position: fixed;
@@ -1956,9 +2238,9 @@
         max-width: 400px;
         word-wrap: break-word;
       `;
-      
+
       document.body.appendChild(toast);
-      
+
       // Auto remove after 4 seconds
       setTimeout(() => {
         toast.style.animation = 'slideOutRight 0.3s ease-out';
@@ -1976,10 +2258,10 @@
     function toggleMenu() {
       const navMenu = document.getElementById('navMenu');
       const mobileToggle = document.querySelector('.mobile-menu-toggle');
-     
+
       navMenu.classList.toggle('active');
       mobileToggle.classList.toggle('active');
-     
+
       if (navMenu.classList.contains('active')) {
         document.body.style.overflow = 'hidden';
       } else {
@@ -1990,7 +2272,7 @@
     function closeMenu() {
       const navMenu = document.getElementById('navMenu');
       const mobileToggle = document.querySelector('.mobile-menu-toggle');
-     
+
       navMenu.classList.remove('active');
       mobileToggle.classList.remove('active');
       document.body.style.overflow = 'auto';
@@ -2002,14 +2284,14 @@
         const res = await fetch('/api/patient-dashboard');
         const data = await res.json();
         allReports = data.reports;
-       
+
         document.getElementById('userId').textContent = data.user._id;
         document.getElementById('userName').textContent = data.user.name || "N/A";
         document.getElementById('userPhone').textContent = data.user.phone || "N/A";
         document.getElementById('userEmail').textContent = data.user.email || "N/A";
         document.getElementById('reportCount').textContent = allReports.length;
         document.getElementById('headerUserName').textContent = data.user.name || "Patient";
-       
+
         populateFilterOptions();
         renderReports(allReports);
       } catch (error) {
@@ -2020,10 +2302,10 @@
     // Populate Filter Options
     function populateFilterOptions() {
       const filterSelect = document.getElementById('filterSelect');
-      while(filterSelect.children.length > 1) {
+      while (filterSelect.children.length > 1) {
         filterSelect.removeChild(filterSelect.lastChild);
       }
-     
+
       const types = [...new Set(allReports.map(r => r.reportType))];
       types.forEach(type => {
         const option = document.createElement('option');
@@ -2066,7 +2348,7 @@
       }
     });
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       const suggestions = document.getElementById('suggestions');
       const reportType = document.getElementById('reportType');
       if (!suggestions.contains(e.target) && e.target !== reportType) {
@@ -2086,7 +2368,7 @@
           </div>`;
         return;
       }
-     
+
       reportList.innerHTML = reports.map(r => `
         <div class="report-item">
           <div class="report-details">
@@ -2112,7 +2394,7 @@
       const iframe = document.getElementById('reportFrame');
       const title = document.getElementById('modalTitle');
       const loading = document.getElementById('modalLoading');
-     
+
       title.textContent = reportType;
       loading.style.display = 'flex';
       iframe.style.display = 'none';
@@ -2134,10 +2416,10 @@
       document.body.style.overflow = 'auto';
     }
 
-    window.onclick = function(event) {
+    window.onclick = function (event) {
       const modal = document.getElementById('reportModal');
       const prescriptionModal = document.getElementById('prescriptionModal');
-      
+
       if (event.target === modal) {
         closeModal();
       }
@@ -2146,7 +2428,7 @@
       }
     }
 
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') {
         closeModal();
         closePrescriptionModal();
@@ -2157,7 +2439,7 @@
     // Delete Report
     async function deleteReport(id) {
       if (!confirm('Are you sure you want to delete this report?')) return;
-     
+
       try {
         await fetch(`/delete-report/${id}`, { method: 'DELETE' });
         loadDashboard();
@@ -2170,16 +2452,16 @@
     // Upload Form Handler
     document.getElementById('uploadForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-     
+
       const submitBtn = this.querySelector('.upload-btn');
       const originalText = submitBtn.innerHTML;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
       submitBtn.disabled = true;
-     
+
       try {
         const formData = new FormData(this);
         const res = await fetch('/upload-report', { method: 'POST', body: formData });
-       
+
         if (res.ok) {
           alert('✅ Report uploaded successfully!');
           this.reset();
@@ -2220,66 +2502,249 @@
             behavior: 'smooth',
             block: 'start'
           });
-         
+
           document.querySelectorAll('.nav-menu a').forEach(link => link.classList.remove('active'));
           this.classList.add('active');
-         
+
           // Load prescriptions when prescription section is clicked
           if (this.getAttribute('href') === '#prescription') {
             loadPrescriptions();
           }
-         
+
           closeMenu();
         }
       });
     });
 
     // Close mobile menu when clicking outside
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       const navMenu = document.getElementById('navMenu');
       const mobileToggle = document.querySelector('.mobile-menu-toggle');
       const logo = document.querySelector('.logo');
-     
+
       if (!navMenu.contains(e.target) &&
-          !mobileToggle.contains(e.target) &&
-          !logo.contains(e.target) &&
-          navMenu.classList.contains('active')) {
+        !mobileToggle.contains(e.target) &&
+        !logo.contains(e.target) &&
+        navMenu.classList.contains('active')) {
         closeMenu();
       }
     });
 
     // Handle window resize
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
       if (window.innerWidth > 768) {
         closeMenu();
       }
     });
 
     // Handle ESC key to close menu
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape' && document.getElementById('navMenu').classList.contains('active')) {
         closeMenu();
       }
     });
 
-    // 🔄 Initialize Dashboard
-    document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Patient Dashboard initializing care modules...');
+
+
+      
+    // --- ADVANCED MEDICAL FEATURES ---
+    window.performSearch = async function() {
+        const type = document.getElementById('searchType').value;
+        const q = document.getElementById('searchParam').value;
+        const results = document.getElementById('searchResults');
+        results.style.display = 'block';
+        results.innerHTML = '<p style="text-align:center">Finding clinicians...</p>';
+        try {
+            const res = await fetch(`/api/search?type=${type}&q=${q}`);
+            const data = await res.json();
+            if (data.success && data.results.length > 0) {
+                results.innerHTML = data.results.map(r => `
+                    <div class="report-item">
+                        <div class="report-details">
+                            <div class="report-type">${r.name}</div>
+                            <div class="report-date">${r.specialization || r.location?.city || 'Healthcare Provider'}</div>
+                        </div>
+                        <button class="upload-btn" onclick="bookAppointment('${r._id}', '${type}', '${r.name}')">Book Appointment</button>
+                    </div>`).join('');
+            } else {
+                results.innerHTML = '<p style="text-align:center; color:gray">No active results found.</p>';
+            }
+        } catch(e) { console.error(e); results.innerHTML = '<p>Search failed.</p>'; }
+    }
+
+    window.findNearby = async function() {
+        const results = document.getElementById('searchResults');
+        results.style.display = 'block';
+        results.innerHTML = '<p style="text-align:center">Detecting location...</p>';
+        
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const { latitude: lat, longitude: lng } = pos.coords;
+            const type = document.getElementById('searchType').value;
+            try {
+                const res = await fetch(`/api/search/nearby?lat=${lat}&lng=${lng}&type=${type}`);
+                const data = await res.json();
+                if(data.success && data.results.length > 0) {
+                    results.innerHTML = data.results.map(r => `
+                        <div class="report-item">
+                            <div class="report-details">
+                                <div class="report-type">${r.name}</div>
+                                <div class="report-date">${r.specialization || r.location?.city || 'Nearby Clinician'}</div>
+                            </div>
+                            <button class="upload-btn" onclick="bookAppointment('${r._id}', '${type}', '${r.name}')">Book</button>
+                        </div>`).join('');
+                } else {
+                    results.innerHTML = '<p style="text-align:center; color:gray">No clinicians found nearby.</p>';
+                }
+            } catch(e) { results.innerHTML = '<p>Search failed.</p>'; }
+        });
+    }
+
+    window.bookAppointment = async function(id, type, name) {
+        if(!confirm(`Do you want to request an appointment with ${name}?`)) return;
+        try {
+            const res = await fetch('/api/book-appointment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    doctorId: id, 
+                    scheduledTime: new Date().toISOString(),
+                    notes: 'Requested from unified dashboard'
+                })
+            });
+            const data = await res.json();
+            if(data.success) {
+                showToast('✅ Appointment Requested Successfully!');
+                loadAppointments();
+            } else { alert('❌ Error: ' + data.message); }
+        } catch(e) { alert('Booking failed.'); }
+    }
+
+    window.loadAppointments = async function() {
+        try {
+            const res = await fetch('/api/appointments');
+            const data = await res.json();
+            if(data.success) {
+                const list = document.getElementById('appointmentList');
+                if(!data.appointments || data.appointments.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:gray">No active appointments.</p>';
+                } else {
+                   list.innerHTML = data.appointments.map(a => `
+                    <div class="report-item">
+                        <div class="report-details">
+                            <div class="report-type">Dr. ${a.doctor_id?.user_id?.name || 'Practitioner'}</div>
+                            <div class="report-date">Status: <span style="color:var(--primary)">${a.status.toUpperCase()}</span> | Token: #${a.token_number || '...'}</div>
+                        </div>
+                    </div>`).join('');
+                }
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    window.loadLabTests = async function() {
+        try {
+            const res = await fetch('/api/patient/lab-results');
+            const data = await res.json();
+            if(data.success) {
+                const list = document.getElementById('patientLabList');
+                if(!data.requests || data.requests.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:gray">No pending lab results found.</p>';
+                } else {
+                    list.innerHTML = data.requests.map(l => `
+                        <div class="report-item">
+                            <div class="report-details">
+                                <div class="report-type">${l.testType || l.testName}</div>
+                                <div class="report-date">Lab: ${l.labId?.name || 'MediVault Lab'} | Status: <span style="color:var(--secondary); font-weight:700;">${l.status}</span></div>
+                            </div>
+                            ${l.status === 'Completed' && l.reportFile ? `<a href="/${l.reportFile}" target="_blank" class="upload-btn" style="text-decoration:none; transform: scale(0.85);"><i class="fas fa-file-pdf"></i> View Result</a>` : ''}
+                        </div>`).join('');
+                }
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    function initSocket() {
+        if (typeof io === 'undefined') return;
+        const socket = io();
+        const patientId = document.getElementById('userId').textContent;
+        socket.on('connect', () => {
+            if (patientId && patientId !== 'Loading...') {
+                socket.emit('joinUserRoom', patientId);
+                console.log('📡 Connected to server socket and joined private room.');
+            }
+        });
+
+        socket.on('queueUpdated', (data) => {
+            // Find if this patient has an appointment for this doctor
+            checkPatientQueueStatus(data);
+        });
+
+        socket.on('turnAlert', (data) => {
+            showToast(`🚀 ${data.message}`, 'urgent');
+            document.getElementById('queueBanner').style.background = 'var(--gradient-secondary)';
+        });
+    }
+
+    async function checkPatientQueueStatus(updateData) {
+        try {
+            const res = await fetch('/api/appointments');
+            const data = await res.json();
+            if(data.success) {
+                const myApp = data.appointments.find(a => a.doctor_id?._id === updateData.doctorId && a.status === 'Scheduled');
+                if(myApp) {
+                   document.getElementById('queueBanner').style.display = 'block';
+                   document.getElementById('queueDoc').textContent = "Consultation with " + (myApp.doctor_id?.user_id?.name || 'Dr.');
+                   document.getElementById('tokenNum').textContent = myApp.token_number;
+                   document.getElementById('currentNum').textContent = updateData.currentToken;
+                   const ahead = Math.max(0, myApp.token_number - updateData.currentToken);
+                   document.getElementById('aheadNum').textContent = ahead;
+                   document.getElementById('qTime').textContent = `~ ${ahead * 10} mins wait`;
+                }
+            }
+        } catch(e) {}
+    }
+
+    // 🔄 Consolidated Medical Dashboard Initialization
+    async function startMedicalSystems() {
+        console.log('💊 Starting medical data systems...');
+        loadAppointments();
+        loadLabTests();
+        
+        // Wait for user ID to be available if it's still 'Loading...'
+        let retry = 0;
+        const checkId = setInterval(() => {
+            const uid = document.getElementById('userId').textContent;
+            if (uid && uid !== 'Loading...') {
+                clearInterval(checkId);
+                initSocket();
+            } else if (retry++ > 15) {
+                clearInterval(checkId);
+                console.warn('⚠️ Giving up on Patient ID retrieval for socket.');
+            }
+        }, 1000);
+    }
+
+    // 🚀 SINGLE INITIALIZATION BLOCK
+    document.addEventListener('DOMContentLoaded', function () {
       console.log('🚀 Patient Dashboard initializing...');
       loadDashboard();
       loadNotifications();
       
+      // Start Medical Systems (Appointments, Labs, Queue)
+      startMedicalSystems();
+
       // Load prescriptions after dashboard is loaded
       setTimeout(() => {
         loadPrescriptions();
       }, 1500);
-      
-      // Check for new notifications every 30 seconds
-      setInterval(loadNotifications, 30000);
-      
-      // Check for new prescriptions every 60 seconds
-      setInterval(loadPrescriptions, 60000);
-      
-      console.log('✅ Patient Dashboard initialized with notifications and prescriptions');
+
+      // Refresh data periodically
+      setInterval(loadNotifications, 30000); // 30s
+      setInterval(loadPrescriptions, 60000); // 60s
+      setInterval(loadAppointments, 20000);  // 20s
+      setInterval(loadLabTests, 20000);      // 20s
+
+      console.log('✅ Patient Dashboard fully initialized with Unified Care Features.');
     });
   </script>
 </body>

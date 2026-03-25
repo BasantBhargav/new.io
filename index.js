@@ -1,430 +1,63 @@
-// const express = require('express');
-// const path = require('path');
-// const mongoose = require('mongoose');
-// const session = require('express-session');
-// const multer = require('multer');
-// const fs = require('fs');
-
-
-// // admin 
-// const adminRoutes = require('./routes/admin');
-// app.use('/api/admin', adminRoutes);
-
-
-// // Schemas and Routes
-// const authRoutes = require('./routes/auth');
-// const uploadRoutes = require('./routes/upload');
-// const User = require('./schema/user');
-// const Report = require('./schema/report');
-
-// const app = express();
-// const port = 3000;
-
-// // 🧠 Middleware
-// app.use(session({
-//   secret: 'yourSecretKey',
-//   resave: false,
-//   saveUninitialized: false,
-//   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
-// }));
-
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
-
-// // 🧾 Serve frontend files (HTML, CSS, JS)
-// app.use(express.static(path.join(__dirname, 'front')));
-
-// // 📁 Serve uploaded report files
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// // ✅ Connect to MongoDB
-// mongoose.connect('mongodb://localhost:27017/medivault', {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// }).then(() => console.log("✅ MongoDB Connected"))
-//   .catch(err => console.error("❌ MongoDB Error:", err));
-
-// // ✅ Route: Authentication
-// app.use('/', authRoutes);
-
-// // ✅ Middleware: Protected routes
-// const requireAuth = (req, res, next) => {
-//   if (!req.session.userId) return res.redirect('/login');
-//   next();
-// };
-
-
-
-
-// // ✅ Dashboard Pages
-// app.get('/', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'front/home.html'));
-// });
-
-// app.get('/dashboard', requireAuth, (req, res) => {
-//   res.sendFile(path.join(__dirname, 'front/dashboard.html'));
-// });
-
-// app.get('/doctordashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'doctor') return res.redirect('/');
-//   res.sendFile(path.join(__dirname, 'front/doctordashboard.html'));
-// });
-
-// app.get('/patientdashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'patient') return res.redirect('/');
-//   res.sendFile(path.join(__dirname, 'front/patientdashboard.html'));
-// });
-
-// app.get('/hospitaldashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'hospital_staff') return res.redirect('/');
-//   res.sendFile(path.join(__dirname, 'front/hospitaldashboard.html'));
-// });
-
-// app.get('/admindashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'admin') return res.redirect('/');
-//   res.sendFile(path.join(__dirname, 'front/admindashboard.html'));
-// });
-
-// app.get('/logout', (req, res) => {
-//   req.session.destroy(() => res.redirect('/'));
-// });
-
-// // ✅ Use existing upload routes
-// app.use('/', uploadRoutes);
-
-// // ✅ STEP 3: New API route to serve patient dashboard data
-// app.get('/api/patient-dashboard', requireAuth, async (req, res) => {
-//   try {
-//     const userId = req.session.userId;
-//     const user = await User.findById(userId).lean();
-//     const reports = await Report.find({ patientId: userId }).sort({ uploadedAt: -1 }).lean();
-
-//     if (!user || user.role !== 'patient') {
-//       return res.status(403).json({ message: 'Unauthorized' });
-//     }
-
-//     res.json({ user, reports });
-//   } catch (error) {
-//     console.error('❌ Error fetching patient dashboard data:', error);
-//     res.status(500).json({ message: 'Internal Server Error' });
-//   }
-// });
-
-// //✅ Start Server
-// app.listen(port, () => {
-//   console.log(`✅ Server running at http://localhost:${port}`);
-// });
-
-// // // ✅ Start Server
-// // app.listen(port, '0.0.0.0', () => {
-// //   console.log(`✅ Server running on http://0.0.0.0:${port}`);
-// // });
-
-
-
-/////// 222222222////////
-// const express = require('express');
-// const path = require('path');
-// const mongoose = require('mongoose');
-// const session = require('express-session');
-// const multer = require('multer');
-// const fs = require('fs');
-
-// const app = express();
-// const port = 3000;
-
-// // ✅ Import Routes and Schemas
-// const adminRoutes = require('./routes/admin');       // Admin routes (CRUD)
-// const authRoutes = require('./routes/auth');         // Login, Signup, etc.
-// const uploadRoutes = require('./routes/upload');     // Report upload routes
-// const User = require('./schema/user');               // User schema
-// const Report = require('./schema/report');           // Report schema
-
-// // ✅ Middleware
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
-
-// // ✅ Configure session
-// app.use(session({
-//   secret: 'yourSecretKey', // Change this in production
-//   resave: false,
-//   saveUninitialized: false,
-//   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 1 day
-// }));
-
-// // ✅ Serve frontend files from /front folder
-// app.use(express.static(path.join(__dirname, 'front')));
-
-// // ✅ Serve uploaded report files
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// // ✅ Connect to MongoDB
-// mongoose.connect('mongodb://localhost:27017/medivault', {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// }).then(() => console.log("✅ MongoDB Connected"))
-//   .catch(err => console.error("❌ MongoDB Connection Error:", err));
-
-// // ✅ Authentication Routes
-// app.use('/', authRoutes);
-
-// // ✅ Admin Routes (APIs)
-// app.use('/api/admin', adminRoutes);
-
-// // ✅ Upload Routes (Hospitals uploading reports)
-// app.use('/', uploadRoutes);
-
-// // ✅ Role-Based Middleware
-// const requireAuth = (req, res, next) => {
-//   if (!req.session.userId) {
-//     return res.redirect('/login.html'); // Redirect to login if not authenticated
-//   }
-//   next();
-// };
-
-// // ✅ General Pages
-// app.get('/', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'front/home.html'));
-// });
-
-// // ✅ Dashboards (Role Based)
-// app.get('/dashboard', requireAuth, (req, res) => {
-//   res.sendFile(path.join(__dirname, 'front/dashboard.html'));
-// });
-
-// app.get('/doctordashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'doctor') return res.redirect('/');
-//   res.sendFile(path.join(__dirname, 'front/doctordashboard.html'));
-// });
-
-// app.get('/patientdashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'patient') return res.redirect('/');
-//   res.sendFile(path.join(__dirname, 'front/patientdashboard.html'));
-// });
-
-// app.get('/hospitaldashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'hospital_staff') return res.redirect('/');
-//   res.sendFile(path.join(__dirname, 'front/hospitaldashboard.html'));
-// });
-
-// app.get('/admindashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'admin') return res.redirect('/');
-//   res.sendFile(path.join(__dirname, 'front/admindashboard.html'));
-// });
-
-// // ✅ Logout
-// app.get('/logout', (req, res) => {
-//   req.session.destroy(() => res.redirect('/'));
-// });
-
-// // ✅ Patient Dashboard API (Fetch personal details + reports)
-// app.get('/api/patient-dashboard', requireAuth, async (req, res) => {
-//   try {
-//     const userId = req.session.userId;
-//     const user = await User.findById(userId).lean();
-//     const reports = await Report.find({ patientId: userId }).sort({ uploadedAt: -1 }).lean();
-
-//     if (!user || user.role !== 'patient') {
-//       return res.status(403).json({ message: 'Unauthorized' });
-//     }
-
-//     res.json({ user, reports });
-//   } catch (error) {
-//     console.error('❌ Error fetching patient dashboard data:', error);
-//     res.status(500).json({ message: 'Internal Server Error' });
-//   }
-// });
-
-// // ✅ Start Server
-// app.listen(port, () => {
-//   console.log(`✅ Server running at http://localhost:${port}`);
-// });
-
-
-
-
-
-////////// 33333333333/////////////////
-// const express = require('express');
-// const path = require('path');
-// const mongoose = require('mongoose');
-// const session = require('express-session');
-// const multer = require('multer');
-// const fs = require('fs');
-
-// const app = express();
-// const port = 3000;
-
-// // ✅ Import Routes and Schemas
-// const adminRoutes = require('./routes/admin');       // Admin routes (CRUD)
-// const authRoutes = require('./routes/auth');         // Login, Signup, etc.
-// const uploadRoutes = require('./routes/upload');     // Report upload routes
-// const User = require('./schema/user');               // User schema
-// const Report = require('./schema/report');           // Report schema
-
-// // ✅ Middleware
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
-
-// // ✅ Configure session
-// app.use(session({
-//   secret: 'yourSecretKey',
-//   resave: false,
-//   saveUninitialized: false,
-//   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 1 day
-// }));
-
-// // ✅ Serve frontend files from /front folder
-// app.use(express.static(path.join(__dirname, 'front')));
-
-// // ✅ Serve uploaded report files
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-
-
-// // // ✅ old Connection karne ka  to MongoDB
-// // mongoose.connect('mongodb://localhost:27017/medivault', {
-// //   useNewUrlParser: true,
-// //   useUnifiedTopology: true
-// // })
-// // .then(() => console.log("✅ MongoDB Connected"))
-// // .catch(err => console.error("❌ MongoDB Connection Error:", err));
-
-
-
-// // ✅ new Connection ke liye to MongoDB atlas
-// mongoose.connect('mongodb+srv://basantbhargav335:basant@cluster0.thdcvhb.mongodb.net/medivault?retryWrites=true&w=majority', {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// })
-// .then(() => console.log("✅ Connected to MongoDB Atlas"))
-// .catch(err => console.error("❌ MongoDB Atlas Connection Error:", err));
-
-
-
-
-
-//   // ✅ Authentication Routes
-// app.use('/', authRoutes);
-
-// // ✅ Middleware: Require Login
-// const requireAuth = (req, res, next) => {
-//   if (!req.session.userId) {
-//     console.log("⚠️ Not logged in, redirecting...");
-//     return res.redirect('/login');
-//   }
-//   next();
-// };
-
-// // ✅ Middleware: Require Admin
-// const requireAdmin = (req, res, next) => {
-//   if (!req.session.userId || req.session.role !== 'admin') {
-//     console.log("⛔ Admin access only. Redirecting to login...");
-//     return res.redirect('/login');
-//   }
-//   next();
-// };
-
-// // ✅ Admin Routes (protected)
-// app.use('/api/admin', requireAdmin, adminRoutes);
-
-// // ✅ Upload Routes
-// app.use('/', uploadRoutes);
-
-// // ✅ Pages
-// app.get('/', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'front/home.html'));
-// });
-
-// // ✅ Dashboards (Role Based)
-// app.get('/dashboard', requireAuth, (req, res) => {
-//   res.sendFile(path.join(__dirname, 'front/dashboard.html'));
-// });
-
-// app.get('/doctordashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'doctor') return res.redirect('/login');
-//   res.sendFile(path.join(__dirname, 'front/doctordashboard.html'));
-// });
-
-// app.get('/patientdashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'patient') return res.redirect('/login');
-//   res.sendFile(path.join(__dirname, 'front/patientdashboard.html'));
-// });
-
-// app.get('/hospitaldashboard', requireAuth, (req, res) => {
-//   if (req.session.role !== 'hospital_staff') return res.redirect('/login');
-//   res.sendFile(path.join(__dirname, 'front/hospitaldashboard.html'));
-// });
-
-// // ✅ Protect Admin Dashboard
-// app.get('/admindashboard', requireAdmin, (req, res) => {
-//   res.sendFile(path.join(__dirname, 'front/admindashboard.html'));
-// });
-
-// // ✅ Logout
-// app.get('/logout', (req, res) => {
-//   req.session.destroy(() => res.redirect('/login'));
-// });
-
-// // ✅ Patient Dashboard API
-// app.get('/api/patient-dashboard', requireAuth, async (req, res) => {
-//   try {
-//     const userId = req.session.userId;
-//     const user = await User.findById(userId).lean();
-//     const reports = await Report.find({ patientId: userId }).sort({ uploadedAt: -1 }).lean();
-
-//     if (!user || user.role !== 'patient') {
-//       return res.status(403).json({ message: 'Unauthorized' });
-//     }
-
-//     res.json({ user, reports });
-//   } catch (error) {
-//     console.error('❌ Error fetching patient dashboard data:', error);
-//     res.status(500).json({ message: 'Internal Server Error' });
-//   }
-// });
-
-
-// const hospitalRoutes = require('./routes/hospital');
-// app.use(hospitalRoutes);
-
-
-
-
-// // ✅ Start Server
-// app.listen(port, () => {
-//   console.log(`✅ Server running at http://localhost:${port}`);
-// });
-
-
-
-///////// 44444444444444 ////////////////
-
-
 const express = require('express');
+const http = require('http'); // 🌍 Added HTTP Server
+const { Server } = require('socket.io'); // 🌍 Added Socket.IO
 const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
+
 const multer = require('multer');
 const fs = require('fs');
 
 const app = express();
+const server = http.createServer(app); // 🌍 Attach Express to HTTP server
+const io = new Server(server); // 🌍 Initialize Socket.IO
 const port = 3000;
 
-//  Import Routes and Schemas
-const adminRoutes = require('./routes/admin');        // Admin routes (CRUD)
-const authRoutes = require('./routes/auth');          // Login, Signup, etc.
-const uploadRoutes = require('./routes/upload');      // Report upload routes
-const reportsRoutes = require('./routes/reports');    // 🆕 Reports fetch routes
-const hospitalRoutes = require('./routes/hospital');  // Hospital routes
-const User = require('./schema/user');                // User schema
-const Report = require('./schema/report');            // Report schema
+// 🌍 Socket logic
+io.on('connection', (socket) => {
+  console.log('🔗 A user connected:', socket.id);
+  
+  socket.on('joinDoctorQueue', (doctorId) => {
+    socket.join(`doctor_${doctorId}`);
+    console.log(`📡 User joined queue room: doctor_${doctorId}`);
+  });
 
-//  Middleware
+  socket.on('joinUserRoom', (userId) => {
+    socket.join(`user_${userId}`);
+    console.log(`📡 Private user room joined: user_${userId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('❌ User disconnected');
+  });
+});
+
+// 🌍 Share io with routes
+app.set('socketio', io);
+
+// Import Routes and Schemas
+const adminRoutes = require('./routes/admin');        
+const authRoutes = require('./routes/auth');          
+const uploadRoutes = require('./routes/upload');      
+const reportsRoutes = require('./routes/reports');    
+const hospitalRoutes = require('./routes/hospital');  
+const patientRoutes = require('./routes/patient');
+const prescriptionRoutes = require('./routes/prescriptions');
+const notificationsRoutes = require('./routes/notifications');
+const hospitalSettingsRoutes = require('./routes/hospitalSettings');
+const appointmentsRoutes = require('./routes/appointments');
+const labRoutes = require('./routes/lab'); // 🆕 Added Lab Routes
+const searchRoutes = require('./routes/search');
+const labRequestsRoutes = require('./routes/labRequests'); // 🆕 Added Lab Request Routes
+
+const User = require('./schema/user');                
+const Report = require('./schema/report');            
+
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ✅ Configure session
+// Configure session
 app.use(session({
   secret: 'yourSecretKey',
   resave: false,
@@ -432,13 +65,14 @@ app.use(session({
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 1 day
 }));
 
-//  Serve frontend files from /front folder
+// Serve frontend files from /front folder
 app.use(express.static(path.join(__dirname, 'front')));
 
-//  Serve uploaded report files
+// Serve uploaded report files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-//  MongoDB Atlas Connection
+// MongoDB Atlas Connection
+// ... (connection part remains same)
 mongoose.connect('mongodb+srv://basantbhargav335:basant@cluster0.thdcvhb.mongodb.net/medivault?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -446,46 +80,48 @@ mongoose.connect('mongodb+srv://basantbhargav335:basant@cluster0.thdcvhb.mongodb
 .then(() => console.log("✅ Connected to MongoDB Atlas"))
 .catch(err => console.error("❌ MongoDB Atlas Connection Error:", err));
 
-
-//  Authentication Routes
-app.use('/', authRoutes);
-
-//  Upload Routes
-app.use('/', uploadRoutes);
-
-//  Reports API Routes
-app.use('/', reportsRoutes);
-
-//  Hospital Routes
-app.use('/', hospitalRoutes);
-
-//  Middleware: Require Login
+// Role-Based Middleware
 const requireAuth = (req, res, next) => {
   if (!req.session.userId) {
-    console.log("⚠️ Not logged in, redirecting...");
+    console.log("⚠️ Not logged in, redirecting from " + req.url + " to /login");
     return res.redirect('/login');
   }
+  console.log(`✅ Auth successful for user: ${req.session.userId}, role: ${req.session.role} on ${req.url}`);
   next();
 };
 
-//  Middleware: Require Admin
 const requireAdmin = (req, res, next) => {
   if (!req.session.userId || req.session.role !== 'admin') {
-    console.log("⛔ Admin access only. Redirecting to login...");
+    console.log(`⛔ Admin access only for ${req.url}. Current user: ${req.session.userId}, role: ${req.session.role}. Redirecting...`);
     return res.redirect('/login');
   }
   next();
 };
 
-//  Admin Routes (protected)
-app.use('/api/admin', requireAdmin, adminRoutes);
+// Authentication Routes
+app.use('/', authRoutes);
 
-//  Pages
+// Protected API Routes
+app.use('/api/admin', requireAdmin, adminRoutes);
+app.use('/', uploadRoutes);
+app.use('/', reportsRoutes);
+app.use('/', hospitalRoutes);
+app.use('/', patientRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/notifications', notificationsRoutes);
+app.use('/', hospitalSettingsRoutes);
+app.use('/', appointmentsRoutes);
+app.use('/', labRoutes);
+app.use('/', labRequestsRoutes); // 🆕 Use Lab Request Routes
+app.use('/', searchRoutes);
+
+
+
+// Dashboards and Pages
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'front/home.html'));
 });
 
-//  Dashboards (Role Based)
 app.get('/dashboard', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'front/dashboard.html'));
 });
@@ -500,30 +136,44 @@ app.get('/patientdashboard', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'front/patientdashboard.html'));
 });
 
+app.get('/hospitaldetails', requireAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'front/hospitaldetails.html'));
+});
+
 app.get('/hospitaldashboard', requireAuth, (req, res) => {
   if (req.session.role !== 'hospital_staff') return res.redirect('/login');
   res.sendFile(path.join(__dirname, 'front/hospitaldashboard.html'));
 });
 
-//  Protect Admin Dashboard
+app.get('/labdashboard', requireAuth, (req, res) => {
+  if (req.session.role !== 'laboratory') return res.redirect('/login');
+  res.sendFile(path.join(__dirname, 'front/labdashboard.html'));
+});
+
+
 app.get('/admindashboard', requireAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'front/admindashboard.html'));
 });
 
-//  Logout
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/login'));
+app.get('/hospital-settings', requireAuth, (req, res) => {
+  if (req.session.role !== 'hospital_staff') return res.redirect('/login');
+  res.sendFile(path.join(__dirname, 'front/hospital-settings.html'));
 });
 
-//  Patient Dashboard API
+// APIs
 app.get('/api/patient-dashboard', requireAuth, async (req, res) => {
   try {
     const userId = req.session.userId;
     const user = await User.findById(userId).lean();
     const reports = await Report.find({ patientId: userId }).sort({ uploadedAt: -1 }).lean();
 
-    if (!user || user.role !== 'patient') {
-      return res.status(403).json({ message: 'Unauthorized' });
+    if (!user) {
+      console.log(`❌ User not found for session ID: ${userId}`);
+      return res.status(403).json({ message: 'Unauthorized: User not found' });
+    }
+    if (user.role !== 'patient') {
+      console.log(`❌ User found but role is not patient. Role is: ${user.role} for session ID: ${userId}`);
+      return res.status(403).json({ message: 'Unauthorized: Not a patient' });
     }
 
     res.json({ user, reports });
@@ -533,33 +183,11 @@ app.get('/api/patient-dashboard', requireAuth, async (req, res) => {
   }
 });
 
-// PRESCRIPTIONS KE LIYE ROUTES
-const patientRoutes = require('./routes/patient');
-const prescriptionRoutes = require('./routes/prescriptions');
-
-// Use routes (existing app.use statements के बाद add करें)
-app.use('/', patientRoutes);
-app.use('/api/prescriptions', prescriptionRoutes);
-
-
-//notification ke liye
-const notificationsRoutes = require('./routes/notifications');
-app.use('/notifications', notificationsRoutes);
-
-//hospital setting ke liye 
-const hospitalSettingsRoutes = require('./routes/hospitalSettings');
-app.use('/', hospitalSettingsRoutes);
-app.get('/hospital-settings', (req, res) => {
-  if (!req.session.userId || req.session.role !== 'hospital_staff') {
-    return res.redirect('/login');
-  }
-  res.sendFile(path.join(__dirname, 'front', 'hospital-settings.html'));
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/login'));
 });
 
-
-
-
-//  Start Server
-app.listen(port, () => {
+// Start Server
+server.listen(port, () => {
   console.log(`✅ Server running at http://localhost:${port}`);
 });

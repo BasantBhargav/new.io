@@ -5,7 +5,7 @@ const router = express.Router();
 const Prescription = require('../schema/Prescription');
 const User = require('../schema/user');
 
-// ✅ Get patient details
+// ✅ Get patient details for prescriptions
 router.get('/patients/:id', async (req, res) => {
   try {
     const patientId = req.params.id.trim();
@@ -13,15 +13,42 @@ router.get('/patients/:id', async (req, res) => {
       _id: { $regex: new RegExp(`^${patientId}$`, "i") },
       role: 'patient'
     });
-
-    if (!patient) {
-      return res.status(404).json({ message: 'Patient not found' });
-    }
-
+    if (!patient) return res.status(404).json({ message: 'Patient not found' });
     res.json(patient);
   } catch (error) {
-    console.error('❌ Error fetching patient:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// ✅ Get all prescriptions for a patient
+router.get('/patient/:id/prescriptions', async (req, res) => {
+  try {
+    const patientId = req.params.id;
+    const prescriptions = await Prescription.find({ patientId })
+      .populate('doctorId', 'name email speciality')
+      .sort({ date: -1 });
+    
+    res.json({ success: true, prescriptions });
+  } catch (error) {
+    console.error('❌ Error fetching prescriptions:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ✅ Get a single prescription by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const prescription = await Prescription.findById(req.params.id)
+      .populate('doctorId', 'name email speciality');
+    
+    if (!prescription) {
+      return res.status(404).json({ success: false, message: 'Prescription not found' });
+    }
+    
+    res.json({ success: true, prescription });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 

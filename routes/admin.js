@@ -714,6 +714,7 @@ const Report = require('../schema/report'); // Report schema
 const PendingUser = require('../schema/pendingUser'); // PendingUser schema
 const Doctor = require('../schema/doctor'); // Doctor details
 const Hospital = require('../schema/hospital'); // Hospital details
+const Laboratory = require('../schema/laboratory'); // 🧪 Laboratory details
 const Counter = require('../schema/counter'); // Counter for IDs
 
 const router = express.Router();
@@ -912,6 +913,7 @@ router.post('/pending-requests/accept/:id', async (req, res) => {
           license_number: pending.extraData.license_number,
           specialization: pending.extraData.specialization,
           hospital_id: pending.extraData.hospital_id,
+          workingHours: pending.extraData.workingHours || "9:00 AM - 5:00 PM", // Default if missing
           contact_number: pending.extraData.contact_number,
           experience_years: pending.extraData.experience_years
         });
@@ -930,7 +932,11 @@ router.post('/pending-requests/accept/:id', async (req, res) => {
             city: pending.extraData.city,
             state: pending.extraData.state,
             pin_code: pending.extraData.pin_code,
-            country: "India"
+            country: "India",
+            geo: {
+              type: 'Point',
+              coordinates: [parseFloat(pending.extraData.lng) || 0, parseFloat(pending.extraData.lat) || 0]
+            }
           },
           contact: {
             phone: pending.extraData.hospital_phone,
@@ -939,6 +945,32 @@ router.post('/pending-requests/accept/:id', async (req, res) => {
           admin_user_id: pending._id
         });
         await newHospital.save();
+      } else if (pending.role === 'laboratory') {
+        const labId = await Counter.findOneAndUpdate(
+          { name: 'laboratory' },
+          { $inc: { seq: 1 } },
+          { new: true, upsert: true }
+        );
+        const newLab = new Laboratory({
+          lab_id: labId.seq,
+          admin_user_id: pending._id,
+          name: pending.extraData.lab_name || pending.name,
+          location: {
+            address_line: pending.extraData.address_line,
+            city: pending.extraData.city,
+            state: pending.extraData.state,
+            pin_code: pending.extraData.pin_code,
+            geo: {
+              type: 'Point',
+              coordinates: [parseFloat(pending.extraData.lng) || 0, parseFloat(pending.extraData.lat) || 0]
+            }
+          },
+          contact: {
+            phone: pending.extraData.lab_phone || pending.phone,
+            email: pending.extraData.lab_email || pending.email
+          }
+        });
+        await newLab.save();
       }
     }
 

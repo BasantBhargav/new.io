@@ -1051,7 +1051,10 @@
         right: -80px;
       }
     }
-  </style>
+  
+    
+    
+    </style>
 </head>
 <body>
   <!-- Enhanced Header -->
@@ -1063,9 +1066,9 @@
       </a>
       
       <nav class="nav-menu" id="navMenu">
-        <a href="#" class="active">Dashboard</a>
-        <a href="#">Patients</a>
-        <a href="#">Reports</a>
+        <a href="#doctorsSection">Manage Doctors</a>
+        <a href="#labManagementSection">Lab Management</a>
+        <a href="#uploadReportSection" class="active">Upload Reports</a>
         
         <!-- Enhanced Notification Bell -->
         <div class="notification-item" onclick="toggleNotifications()">
@@ -1122,6 +1125,67 @@
         <div class="date-display" id="dateDisplay">
           <i class="far fa-calendar-alt"></i>
           <span>Loading...</span>
+        </div>
+      </div>
+
+      <!-- 🧪 LABORATORY MANAGEMENT SECTION -->
+      <div class="upload-section" id="labManagementSection" style="margin-bottom: 3rem;">
+        <h2 class="section-title">
+          <i class="fas fa-microscope"></i>
+          Laboratory Management
+        </h2>
+        
+        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+           <button class="btn btn-primary" onclick="showAddLabModal()" style="background: var(--gradient-primary); padding: 0.8rem 1.5rem; border-radius: var(--radius-sm); color: white; border: none; font-weight: 600; cursor: pointer;">
+              <i class="fas fa-plus"></i> Add External Lab
+           </button>
+           <button class="btn btn-secondary" onclick="loadConnectedLabs()" style="background: var(--gradient-secondary); padding: 0.8rem 1.5rem; border-radius: var(--radius-sm); color: white; border: none; font-weight: 600; cursor: pointer;">
+              <i class="fas fa-sync"></i> Refresh Labs
+           </button>
+        </div>
+
+        <div class="reports-container">
+           <div style="background: var(--light-gray); padding: 1.5rem; border-radius: var(--radius-sm); border-left: 4px solid var(--primary);">
+              <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Linked Laboratories</h3>
+              <div id="labsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                 <!-- Labs will be populated here -->
+                 <div style="text-align: center; color: var(--gray); padding: 2rem;">No labs connected yet.</div>
+              </div>
+           </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+           <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Recent Lab Requests</h3>
+           <div id="hospitalLabRequests" style="background: white; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid #eee;">
+               <!-- Table for lab requests -->
+               <div style="padding: 2rem; text-align: center; color: var(--gray);">No recent laboratory requests.</div>
+           </div>
+        </div>
+      </div>
+      <!-- 👨‍⚕️ DOCTOR MANAGEMENT SECTION -->
+      <div class="upload-section" id="doctorManagement" style="margin-bottom: 2.5rem;">
+        <h2 class="section-title">
+          <i class="fas fa-user-md"></i>
+          Manage Doctors
+        </h2>
+        
+        <form id="addDoctorSubForm" class="upload-form" onsubmit="addDoctorToHospital(event)" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label for="doctorEmailInput">Link Existing Doctor (Email)</label>
+            <div style="position: relative; display: flex; gap: 10px;">
+              <input type="email" id="doctorEmailInput" placeholder="Enter doctor's email to link" required style="flex: 1;">
+              <button type="submit" class="logout-btn" style="height: auto; width: auto;">
+                <i class="fas fa-plus"></i> Link
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div id="hospitalDoctorsList" class="reports-list" style="margin-top: 2rem;">
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading doctors...</p>
+          </div>
         </div>
       </div>
 
@@ -1594,12 +1658,200 @@
       }
     }
 
+    async function loadHospitalDetails() {
+       try {
+          const res = await fetch('/api/hospital/details');
+          const data = await res.json();
+          if (data) {
+             document.getElementById('headerUserName').textContent = data.name || "Hospital Admin";
+             document.getElementById('totalReports').textContent = data.totalReports || 0;
+             // activePatients count can also be fetched if needed, using reports for now
+             document.getElementById('activePatients').textContent = (data.totalReports > 0 ? Math.ceil(data.totalReports / 1.5) : 0);
+          }
+       } catch (error) {
+          console.error('Error loading hospital details:', error);
+       }
+    }
+
+    async function loadHospitalDoctors() {
+
+      const list = document.getElementById('hospitalDoctorsList');
+      try {
+        const res = await fetch('/api/hospital/doctors');
+        const data = await res.json();
+        const docs = data.doctors || [];
+        if (docs.length > 0) {
+          list.innerHTML = docs.map(d => `
+            <div class="report-item">
+              <div class="report-details">
+                <div class="report-type">Dr. ${d.name}</div>
+                <div class="report-date">${d.specialization || 'General'} | ${d.experience_years || 0} yrs exp</div>
+                <div style="font-size: 0.8rem; color: var(--gray);">${d.email || d.contact_number || 'N/A'}</div>
+              </div>
+              <div class="report-actions">
+                <button class="btn btn-view" onclick="alert('Viewing doctor profile: ${d.name}')">View Profile</button>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          list.innerHTML = '<div class="no-reports"><h3>No doctors linked yet</h3></div>';
+        }
+      } catch (error) {
+        console.error('Error loading doctors');
+      }
+    }
+
+    async function addDoctorToHospital(event) {
+      if (typeof event !== 'undefined' && event.preventDefault) event.preventDefault();
+      const emailInput = document.getElementById('doctorEmailInput');
+      const email = emailInput ? emailInput.value : '';
+      try {
+        const res = await fetch('/api/hospital/add-doctor', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ doctorEmail: email })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`Success: ${data.message}`);
+          const form = document.getElementById('addDoctorSubForm');
+          if (form) form.reset();
+          loadHospitalDoctors();
+        } else {
+          alert(`Error: ${data.message || 'Failed to link doctor'}`);
+        }
+      } catch (error) {
+        alert('An error occurred');
+      }
+    }
+
+
+    async function loadConnectedLabs() {
+      const labsList = document.getElementById('labsList');
+      try {
+        const res = await fetch('/api/hospital/connected-labs');
+        const data = await res.json();
+        const labs = data.labs || [];
+        if (labs.length > 0) {
+          labsList.innerHTML = labs.map(lab => `
+            <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #ddd; position: relative;">
+               <div style="font-weight: 700; color: var(--primary);">${lab.name}</div>
+               <div style="font-size: 0.8rem; color: var(--gray);">${lab.location.city}, ${lab.location.state}</div>
+               <div style="font-size: 0.8rem; margin-top: 5px;">📞 ${lab.contact?.phone || 'N/A'}</div>
+               <button class="btn btn-primary" onclick="showAssignTestModal('${lab._id}', '${lab.name}')" style="margin-top: 10px; width: 100%; font-size: 0.8rem; padding: 0.4rem;">Assign Test</button>
+            </div>
+          `).join('');
+        } else {
+          labsList.innerHTML = '<div style="text-align: center; color: var(--gray); padding: 2rem; width: 100%;">No labs connected yet.</div>';
+        }
+      } catch (error) {
+        console.error('Error loading labs');
+      }
+    }
+
+    function showAddLabModal() {
+       const email = prompt("Enter Laboratory Admin Email to Link:");
+       if (!email) return;
+       linkLab(email);
+    }
+
+    async function linkLab(email) {
+       try {
+          const res = await fetch('/api/hospital/link-lab', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ labEmail: email })
+          });
+          const data = await res.json();
+          if (data.success) {
+             showToast('Laboratory linked successfully!', 'success');
+             loadConnectedLabs();
+          } else {
+             showToast(data.message, 'error');
+          }
+       } catch (err) {
+          showToast('Failed to link lab', 'error');
+       }
+    }
+
+    function showAssignTestModal(labId, labName) {
+       const patientId = prompt("Enter Patient ID for assignment:");
+       if (!patientId) return;
+       const testName = prompt(`Enter Test Name for ${labName} (e.g. CBC, MRI):`);
+       if (!testName) return;
+       
+       assignTest(labId, patientId, testName);
+    }
+
+    async function assignTest(labId, patientId, testName) {
+       try {
+          const res = await fetch('/api/hospital/assign-test', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ labId, patientId, testName })
+          });
+          const data = await res.json();
+          if (data.success) {
+             showToast(`Test "${testName}" assigned successfully!`, 'success');
+             loadHospitalLabRequests();
+          } else {
+             showToast(data.message, 'error');
+          }
+       } catch (err) {
+          showToast('Failed to assign test', 'error');
+       }
+    }
+
+    async function loadHospitalLabRequests() {
+       const list = document.getElementById('hospitalLabRequests');
+       try {
+          const res = await fetch('/api/hospital/lab-requests');
+          const data = await res.json();
+          const requests = data.requests || [];
+          if (requests.length > 0) {
+             list.innerHTML = `
+                <table class="table" style="margin: 0;">
+                   <thead style="background: #f8f9fa;">
+                      <tr>
+                         <th>Patient</th>
+                         <th>Lab</th>
+                         <th>Test</th>
+                         <th>Status</th>
+                         <th>Date</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                      ${requests.map(r => `
+                         <tr>
+                            <td>${r.patient_id?.name || 'Unknown'}</td>
+                            <td>${r.lab_id?.name || 'Unknown'}</td>
+                            <td>${r.test_name}</td>
+                            <td><span class="badge priority-${r.status === 'Completed' ? 'normal' : 'high'}" style="background: ${r.status === 'Completed' ? '#e8f5e9' : '#fff3e0'}; color: ${r.status === 'Completed' ? '#2e7d32' : '#ef6c00'};">${r.status}</span></td>
+                            <td>${new Date(r.created_at).toLocaleDateString()}</td>
+                         </tr>
+                      `).join('')}
+                   </tbody>
+                </table>
+             `;
+          } else {
+             list.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--gray);">No recent laboratory requests.</div>';
+          }
+       } catch (error) {
+          console.error('Error loading lab requests');
+       }
+    }
+
     // Initialize everything
     document.addEventListener('DOMContentLoaded', function() {
       console.log('🚀 Hospital Dashboard initializing...');
      
       updateDate();
+      loadHospitalDetails();
       loadNotifications();
+      loadHospitalDoctors();
+      loadConnectedLabs();
+      loadHospitalLabRequests();
+
      
       // Update time every minute
       setInterval(updateDate, 60000);
