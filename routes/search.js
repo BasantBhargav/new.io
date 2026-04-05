@@ -159,18 +159,20 @@ router.get('/api/search', async (req, res) => {
         };
       });
     } else if (type === 'hospital') {
-
       results = await Hospital.find({
         $or: [
           { name: { $regex: q || '', $options: 'i' } },
-          { 'location.city': { $regex: q || '', $options: 'i' } }
+          { 'location.city': { $regex: q || '', $options: 'i' } },
+          { specialization: { $regex: q || '', $options: 'i' } },
+          { services: { $regex: q || '', $options: 'i' } } 
         ]
       }).lean();
     } else if (type === 'laboratory') {
       results = await Laboratory.find({
         $or: [
           { name: { $regex: q || '', $options: 'i' } },
-          { 'location.city': { $regex: q || '', $options: 'i' } }
+          { 'location.city': { $regex: q || '', $options: 'i' } },
+          { 'test_catalog.name': { $regex: q || '', $options: 'i' } }
         ]
       }).lean();
     }

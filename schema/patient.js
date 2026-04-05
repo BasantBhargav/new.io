@@ -8,6 +8,10 @@ const patientSchema = new mongoose.Schema({
   address: String,
   contact_number: String,
   medical_history: [String], // Optional
+  blood_group: String,
+  emergency_contact: String,
+  allergies: [String],
+  current_medications: [String],
   location: {
     address_line: String,
     city: String,

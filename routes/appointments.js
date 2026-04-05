@@ -62,6 +62,17 @@ router.get('/api/doctor/stats', requireAuth, async (req, res) => {
     
     if (!doctor) return res.status(404).json({ success: false, message: 'Doctor not found' });
 
+    let calculatedCurrentToken = doctor.current_token || 0;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    if (doctor.last_token_date) {
+        const lastDate = new Date(doctor.last_token_date);
+        lastDate.setHours(0,0,0,0);
+        if (lastDate.getTime() !== today.getTime()) {
+             calculatedCurrentToken = 0;
+        }
+    }
+
     const totalPatients = await Appointment.countDocuments({ doctor_id: doctor._id });
     const pendingAppointments = await Appointment.countDocuments({ doctor_id: doctor._id, status: 'Scheduled' });
     const completedAppointments = await Appointment.countDocuments({ doctor_id: doctor._id, status: 'Completed' });
@@ -71,7 +82,7 @@ router.get('/api/doctor/stats', requireAuth, async (req, res) => {
       totalPatients,
       pendingAppointments,
       completedAppointments,
-      currentToken: doctor.current_token || 0,
+      currentToken: calculatedCurrentToken,
       doctorId: doctor._id
     });
   } catch (error) {
@@ -130,9 +141,20 @@ router.get('/api/doctor/:id/queue-info', requireAuth, async (req, res) => {
     const doctor = await Doctor.findById(req.params.id);
     if (!doctor) return res.status(404).json({ success: false, message: 'Doctor not found' });
     
+    let calculatedCurrentToken = doctor.current_token || 0;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    if (doctor.last_token_date) {
+        const lastDate = new Date(doctor.last_token_date);
+        lastDate.setHours(0,0,0,0);
+        if (lastDate.getTime() !== today.getTime()) {
+             calculatedCurrentToken = 0;
+        }
+    }
+
     res.json({
       success: true,
-      currentToken: doctor.current_token || 0,
+      currentToken: calculatedCurrentToken,
       avgTime: doctor.avg_time_per_patient || 15
     });
   } catch (error) {
@@ -154,24 +176,53 @@ router.post('/api/book-appointment', requireAuth, async (req, res) => {
     const patient = await Patient.findOne({ user_id: patientUserId });
     if (!patient) return res.status(404).json({ success: false, message: 'Patient profile not found' });
 
-    // 🔢 GENERATE TOKEN NUMBER FOR DOCTOR TODAY
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-
-    const lastAppointment = await Appointment.findOne({
-      doctor_id: doctorId,
-      scheduled_time: { $gte: today, $lt: tomorrow }
-    }).sort({ token_number: -1 });
-
-    const tokenNumber = lastAppointment ? (lastAppointment.token_number + 1) : 1;
-
-    // Optional: Log doctor lookup
     const doctor = await Doctor.findById(doctorId);
     if (!doctor) {
       console.log(`❌ Doctor record not found for ID: ${doctorId}`);
       return res.status(404).json({ success: false, message: 'Doctor profile not found. Please ensure you selected a valid doctor.' });
+    }
+
+    // 🔢 ATOMIC TOKEN GENERATION FOR DOCTOR TODAY
+    const targetDate = new Date(scheduledTime);
+    targetDate.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let tokenNumber = 1;
+
+    // Only use the atomic counter if the appointment is for today
+    if (targetDate.getTime() === today.getTime()) {
+      let updatedDoctor = await Doctor.findOneAndUpdate(
+        { _id: doctorId, last_token_date: today },
+        { $inc: { last_token_number: 1 } },
+        { new: true }
+      );
+
+      if (!updatedDoctor) {
+        updatedDoctor = await Doctor.findOneAndUpdate(
+          { _id: doctorId, last_token_date: { $ne: today } },
+          { $set: { last_token_number: 1, last_token_date: today } },
+          { new: true }
+        );
+
+        if (!updatedDoctor) {
+          updatedDoctor = await Doctor.findOneAndUpdate(
+            { _id: doctorId },
+            { $inc: { last_token_number: 1 } },
+            { new: true }
+          );
+        }
+      }
+      tokenNumber = updatedDoctor.last_token_number;
+    } else {
+      // For future dates, just count appointments (not atomic across days, but okay for pre-booking)
+      const nextDate = new Date(targetDate);
+      nextDate.setDate(targetDate.getDate() + 1);
+      const lastAppointment = await Appointment.findOne({
+        doctor_id: doctorId,
+        scheduled_time: { $gte: targetDate, $lt: nextDate }
+      }).sort({ token_number: -1 });
+      tokenNumber = lastAppointment ? (lastAppointment.token_number + 1) : 1;
     }
 
     const newAppointment = new Appointment({
@@ -272,13 +323,30 @@ router.patch('/api/doctor/call-next', requireAuth, async (req, res) => {
     if (req.session.role !== 'doctor') return res.status(403).json({ success: false, message: 'Unauthorized' });
     
     const userId = req.session.userId;
-    const doctor = await Doctor.findOneAndUpdate(
-       { user_id: userId },
-       { $inc: { current_token: 1 } },
-       { new: true }
-    ).populate('user_id');
+    let doctor = await Doctor.findOne({ user_id: userId });
 
     if (!doctor) return res.status(404).json({ success: false, message: 'Doctor not found' });
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    let isNewDay = true;
+    if (doctor.last_token_date) {
+        const lastDate = new Date(doctor.last_token_date);
+        lastDate.setHours(0,0,0,0);
+        if (lastDate.getTime() === today.getTime()) {
+            isNewDay = false;
+        }
+    }
+
+    if (isNewDay) {
+        doctor.current_token = 1;
+        doctor.last_token_date = today;
+    } else {
+        doctor.current_token = (doctor.current_token || 0) + 1;
+    }
+    await doctor.save();
+    doctor = await Doctor.findById(doctor._id).populate('user_id');
 
     const io = req.app.get('socketio');
     const nextToken = doctor.current_token;

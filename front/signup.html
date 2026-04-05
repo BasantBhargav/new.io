@@ -837,9 +837,37 @@
             <input type="tel" id="contact_number" name="contact_number" placeholder="Enter contact number">
           </div>
           
+          <div class="form-row">
+            <div class="form-group">
+              <label for="blood_group">Blood Group</label>
+              <select id="blood_group" name="blood_group">
+                <option value="">Select</option>
+                <option value="A+">A+</option><option value="A-">A-</option>
+                <option value="B+">B+</option><option value="B-">B-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                <option value="O+">O+</option><option value="O-">O-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="emergency_contact">Emergency Contact</label>
+              <input type="tel" id="emergency_contact" name="emergency_contact" placeholder="Emergency Phone">
+            </div>
+          </div>
+          
           <div class="form-group">
-            <label for="medical_history">Medical History (comma separated)</label>
-            <textarea id="medical_history" name="medical_history" placeholder="e.g. Diabetes, Hypertension" rows="3"></textarea>
+            <label for="medical_history">Medical History/Conditions</label>
+            <textarea id="medical_history" name="medical_history" placeholder="e.g. Diabetes, Hypertension" rows="2"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="allergies">Allergies</label>
+              <input type="text" id="allergies" name="allergies" placeholder="e.g. Peanuts, Penicillin">
+            </div>
+            <div class="form-group">
+              <label for="medications">Current Medications</label>
+              <input type="text" id="medications" name="current_medications" placeholder="e.g. Metformin">
+            </div>
           </div>
 
           <!-- NEW: Location Coordinates for 5km Radius feature -->

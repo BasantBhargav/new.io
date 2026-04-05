@@ -8,10 +8,36 @@ const session = require('express-session');
 const multer = require('multer');
 const fs = require('fs');
 
+const rateLimit = require('express-rate-limit');
+
+const compression = require('compression');
+
 const app = express();
+app.use(compression()); // 🚄 Fast delivery
 const server = http.createServer(app); // 🌍 Attach Express to HTTP server
-const io = new Server(server); // 🌍 Initialize Socket.IO
+const io = new Server(server, {
+  cors: { origin: "*" }
+}); // 🌍 Initialize Socket.IO
 const port = 3000;
+
+// 🛡️ Global Rate Limiting - Prevent Server Crashes
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Limit each IP to 1000 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Too many requests from this IP, please try again later.'
+});
+app.use(limiter);
+
+// 🛡️ Auth Rate Limiting (Stricter for login/register)
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 50, // 50 attempts
+  message: 'Too many login attempts, please try again in an hour'
+});
+app.use('/login', authLimiter);
+app.use('/register', authLimiter);
 
 // 🌍 Socket logic
 io.on('connection', (socket) => {
@@ -185,6 +211,27 @@ app.get('/api/patient-dashboard', requireAuth, async (req, res) => {
 
 app.get('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
+});
+
+// 🛡️ 404 Handler - Catch dead links
+app.use((req, res) => {
+  res.status(404).send('<h1>404: Page Not Found</h1><a href="/">Back Home</a>');
+});
+
+// 🛡️ Global Exception Catcher - Prevents Server Crash on logical errors
+app.use((err, req, res, next) => {
+  console.error('🔥 Server Error:', err.stack);
+  res.status(500).json({ success: false, message: 'Internal Server Error' });
+});
+
+// 🛡️ Process-Level Error Listeners - Last line of defense against crashes
+process.on('uncaughtException', (err) => {
+  console.error('💥 UNCAUGHT EXCEPTION:', err);
+  // Optional: Graceful shutdown or PM2 will restart it
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 UNHANDLED REJECTION:', reason);
 });
 
 // Start Server

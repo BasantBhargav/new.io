@@ -1649,6 +1649,14 @@
         <div id="appointmentList" class="reports-list"></div>
       </div>
 
+      <!-- 🕒 APPOINTMENT HISTORY -->
+      <div class="reports-section" id="appointmentHistorySection" style="margin-top: 2rem; border-left: 6px solid #6c757d;">
+        <h2 class="section-title" style="color:#6c757d;"><i class="fas fa-history"></i> Appointment History</h2>
+        <div id="historyFilterContainer" style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+        <div id="appointmentHistoryList" class="reports-list"></div>
+      </div>
+
+
       <div class="upload-section" id="upload">
         <h2 class="section-title">
           <i class="fas fa-upload"></i>
@@ -1780,6 +1788,94 @@
       <div class="modal-body-prescription">
         <div id="prescriptionDetails">
           <!-- Prescription details will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🧪 Laboratory Detail Modal -->
+  <div id="labModal" class="modal-prescription" style="display: none;">
+    <div class="modal-content-prescription" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-flask"></i>
+          <span>Laboratory Details</span>
+        </div>
+        <div class="window-controls">
+          <button class="control-btn close" onclick="closeLabModal()" title="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body-prescription" style="padding: 1.5rem;">
+        <div id="labModalContent">
+            <h3 id="labDetailName" style="color: var(--primary); margin-bottom: 0.5rem;">Lab Name</h3>
+            <p id="labDetailLocation" style="color: var(--gray); margin-bottom: 1.5rem;"><i class="fas fa-map-marker-alt"></i> Location</p>
+            
+            <div style="background: var(--light-gray); padding: 1.2rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                <h4 style="margin-bottom: 0.8rem;"><i class="fas fa-house-user"></i> Book Home Visit</h4>
+                <p style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--gray);">Choose a test and schedule a technician for home sample collection.</p>
+                
+                <input type="hidden" id="homeVisitLabId">
+                
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Select Test</label>
+                <select id="homeVisitTest" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 1rem;">
+                    <option value="">-- Choose Test --</option>
+                </select>
+
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Preferred Date & Time</label>
+                <input type="datetime-local" id="homeVisitTime" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 1rem;">
+
+                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Your Full Address</label>
+                <textarea id="homeVisitAddress" rows="2" placeholder="House no, Building, Area..." style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 1rem;"></textarea>
+
+                <button class="upload-btn" onclick="submitHomeVisit()" style="width: 100%; padding: 1rem; border-radius: 8px; font-weight: 700; background: var(--gradient-secondary);">
+                    Confirm Home Visit Booking
+                </button>
+            </div>
+
+            <div id="labTestCatalog">
+                <h4 style="margin-bottom: 1rem;">Test Catalog</h4>
+                <div id="catalogList" class="reports-list">
+                    <!-- Catalog items -->
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📅 Appointment Booking Modal -->
+  <div id="appointmentModal" class="modal-prescription" style="display: none;">
+    <div class="modal-content-prescription" style="max-width: 500px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fas fa-calendar-plus"></i>
+          <span>Book Appointment</span>
+        </div>
+        <div class="window-controls">
+          <button class="control-btn close" onclick="closeAppointmentModal()" title="Close">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body-prescription">
+        <div id="appointmentDetails" style="padding: 1rem;">
+          <h3 id="bookDoctorName" style="color: var(--primary); margin-bottom: 1.5rem;">Dr. Name</h3>
+          
+          <input type="hidden" id="bookDoctorId">
+
+          <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Select Date & Time</label>
+          <input type="datetime-local" id="bookScheduledTime" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 1.5rem;" required>
+
+          <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Reason for Visit (Optional)</label>
+          <textarea id="bookNotes" rows="3" placeholder="Briefly describe your symptoms..." style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 1.5rem;"></textarea>
+
+          <button class="upload-btn" onclick="submitAppointmentRequest()" style="width: 100%; padding: 1rem; border-radius: 8px; font-weight: 700;">
+             Confirm Booking
+          </button>
         </div>
       </div>
     </div>
@@ -2559,14 +2655,24 @@
             const res = await fetch(`/api/search?type=${type}&q=${q}`);
             const data = await res.json();
             if (data.success && data.results.length > 0) {
-                results.innerHTML = data.results.map(r => `
+                results.innerHTML = data.results.map(r => {
+                    let actionButton = '';
+                    if (type === 'doctor') {
+                        actionButton = `<button class="upload-btn" onclick="bookAppointment('${r._id}', '${type}', '${r.name}')">Book Appointment</button>`;
+                    } else if (type === 'hospital') {
+                        actionButton = `<button class="upload-btn" onclick="window.location.href='/hospitaldetails?id=${r._id}'">View Hospital</button>`;
+                    } else {
+                        actionButton = `<button class="upload-btn" onclick="viewLaboratory('${r._id}')">View Lab</button>`;
+                    }
+                    return `
                     <div class="report-item">
                         <div class="report-details">
                             <div class="report-type">${r.name}</div>
                             <div class="report-date">${r.specialization || r.location?.city || 'Healthcare Provider'}</div>
                         </div>
-                        <button class="upload-btn" onclick="bookAppointment('${r._id}', '${type}', '${r.name}')">Book Appointment</button>
-                    </div>`).join('');
+                        ${actionButton}
+                    </div>`;
+                }).join('');
             } else {
                 results.innerHTML = '<p style="text-align:center; color:gray">No active results found.</p>';
             }
@@ -2585,39 +2691,196 @@
                 const res = await fetch(`/api/search/nearby?lat=${lat}&lng=${lng}&type=${type}`);
                 const data = await res.json();
                 if(data.success && data.results.length > 0) {
-                    results.innerHTML = data.results.map(r => `
+                    results.innerHTML = data.results.map(r => {
+                        let actionButton = '';
+                        if (type === 'doctor') {
+                            actionButton = `<button class="upload-btn" onclick="bookAppointment('${r._id}', '${type}', '${r.name}')">Book</button>`;
+                        } else if (type === 'hospital') {
+                            actionButton = `<button class="upload-btn" onclick="window.location.href='/hospitaldetails?id=${r._id}'">View Hospital</button>`;
+                        } else {
+                            actionButton = `<button class="upload-btn" onclick="viewLaboratory('${r._id}')">View Lab</button>`;
+                        }
+                        return `
                         <div class="report-item">
                             <div class="report-details">
                                 <div class="report-type">${r.name}</div>
                                 <div class="report-date">${r.specialization || r.location?.city || 'Nearby Clinician'}</div>
                             </div>
-                            <button class="upload-btn" onclick="bookAppointment('${r._id}', '${type}', '${r.name}')">Book</button>
-                        </div>`).join('');
+                            ${actionButton}
+                        </div>`;
+                    }).join('');
                 } else {
                     results.innerHTML = '<p style="text-align:center; color:gray">No clinicians found nearby.</p>';
                 }
             } catch(e) { results.innerHTML = '<p>Search failed.</p>'; }
         });
     }
+    // Default common lab tests used as fallback when lab has no test_catalog
+    const DEFAULT_LAB_TESTS = [
+        { name: 'Blood Test (CBC)', category: 'Blood', price: 300, turnaround_time: '24 hours' },
+        { name: 'Blood Sugar (Fasting)', category: 'Blood', price: 150, turnaround_time: '4 hours' },
+        { name: 'Blood Sugar (Random)', category: 'Blood', price: 150, turnaround_time: '4 hours' },
+        { name: 'HbA1c (Diabetes)', category: 'Blood', price: 450, turnaround_time: '24 hours' },
+        { name: 'Lipid Profile', category: 'Blood', price: 500, turnaround_time: '24 hours' },
+        { name: 'Liver Function Test (LFT)', category: 'Blood', price: 600, turnaround_time: '24 hours' },
+        { name: 'Kidney Function Test (KFT)', category: 'Blood', price: 600, turnaround_time: '24 hours' },
+        { name: 'Thyroid Profile (T3,T4,TSH)', category: 'Blood', price: 700, turnaround_time: '24 hours' },
+        { name: 'Urine Routine Test', category: 'Urine', price: 100, turnaround_time: '4 hours' },
+        { name: 'Urine Culture', category: 'Urine', price: 350, turnaround_time: '48 hours' },
+        { name: 'Stool Test', category: 'Stool', price: 200, turnaround_time: '24 hours' },
+        { name: 'X-Ray (Chest)', category: 'Radiology', price: 400, turnaround_time: '2 hours' },
+        { name: 'Ultrasound (Abdomen)', category: 'Radiology', price: 800, turnaround_time: '1 hour' },
+        { name: 'ECG', category: 'Cardiac', price: 250, turnaround_time: '1 hour' },
+        { name: 'Vitamin D Test', category: 'Blood', price: 900, turnaround_time: '24 hours' },
+        { name: 'Vitamin B12 Test', category: 'Blood', price: 800, turnaround_time: '24 hours' },
+        { name: 'COVID-19 RT-PCR', category: 'Viral', price: 500, turnaround_time: '24 hours' },
+        { name: 'COVID-19 Antigen', category: 'Viral', price: 250, turnaround_time: '2 hours' },
+        { name: 'Dengue NS1 Antigen', category: 'Blood', price: 600, turnaround_time: '6 hours' },
+        { name: 'Malaria Test', category: 'Blood', price: 300, turnaround_time: '4 hours' },
+        { name: 'Iron Profile', category: 'Blood', price: 500, turnaround_time: '24 hours' },
+        { name: 'Allergy Test', category: 'Blood', price: 1200, turnaround_time: '48 hours' },
+        { name: 'Pap Smear', category: 'Gynaecology', price: 700, turnaround_time: '48 hours' },
+        { name: 'Sputum Test', category: 'Respiratory', price: 300, turnaround_time: '48 hours' },
+    ];
 
-    window.bookAppointment = async function(id, type, name) {
-        if(!confirm(`Do you want to request an appointment with ${name}?`)) return;
+    window.viewLaboratory = async function(labId) {
+        try {
+            const res = await fetch(`/api/lab/${labId}`);
+            const data = await res.json();
+            if(!data.success) return alert('Lab details not found');
+
+            const lab = data.lab;
+            document.getElementById('homeVisitLabId').value = lab._id;
+            document.getElementById('labDetailName').textContent = lab.name;
+            document.getElementById('labDetailLocation').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${lab.location?.address_line || ''}, ${lab.location?.city || ''}`;
+            
+            // Use lab's test_catalog if available, otherwise fall back to default tests
+            const testsToShow = (lab.test_catalog && lab.test_catalog.length > 0)
+                ? lab.test_catalog
+                : DEFAULT_LAB_TESTS;
+
+            const isDefault = !(lab.test_catalog && lab.test_catalog.length > 0);
+
+            // Populate test select dropdown
+            const testSelect = document.getElementById('homeVisitTest');
+            testSelect.innerHTML = '<option value="">-- Choose Test --</option>' + 
+                testsToShow.map(t => `<option value="${t.name}">${t.name} (₹${t.price})</option>`).join('');
+
+            // Populate catalog list
+            const catalogList = document.getElementById('catalogList');
+            catalogList.innerHTML = (isDefault
+                ? `<p style="color: var(--warning); font-size: 0.82rem; margin-bottom: 0.8rem;"><i class="fas fa-info-circle"></i> Lab has not listed specific tests. Showing common tests — final pricing may vary.</p>`
+                : '') +
+                testsToShow.map(t => `
+                    <div class="report-item" style="padding: 0.8rem; margin-bottom: 0.5rem;">
+                        <div class="report-details">
+                            <div style="font-weight: 600;">${t.name}</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">${t.category} | ${t.turnaround_time}</div>
+                        </div>
+                        <div style="font-weight: 700; color: var(--primary);">₹${t.price}</div>
+                    </div>
+                `).join('');
+
+            document.getElementById('labModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        } catch(e) { console.error(e); alert('Failed to fetch lab details'); }
+    }
+
+    window.closeLabModal = function() {
+        document.getElementById('labModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    window.submitHomeVisit = async function() {
+        const labId = document.getElementById('homeVisitLabId').value;
+        const testName = document.getElementById('homeVisitTest').value;
+        const date = document.getElementById('homeVisitTime').value;
+        const address = document.getElementById('homeVisitAddress').value;
+
+        if(!testName || !date || !address) return alert('Please fill all home visit details.');
+
+        try {
+            const res = await fetch('/api/lab/book-test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    labId,
+                    testName,
+                    date,
+                    address,
+                    collectionType: 'Home Sample'
+                })
+            });
+            const data = await res.json();
+            if(data.success) {
+                showToast('🏠 Home visit requested successfully!', 'success');
+                closeLabModal();
+                if(typeof loadLabTests === "function") loadLabTests(); 
+            } else {
+                alert(data.message || 'Booking failed');
+            }
+        } catch(e) { alert('Connection error'); }
+    }
+
+    window.bookAppointment = function(id, type, name) {
+        document.getElementById('bookDoctorId').value = id;
+        document.getElementById('bookDoctorName').textContent = `Request appointment with ${name}`;
+        
+        const now = new Date();
+        now.setHours(now.getHours() + 1);
+        now.setMinutes(0);
+        
+        const tzoffset = (new Date()).getTimezoneOffset() * 60000; 
+        const localISOTime = (new Date(now - tzoffset)).toISOString().slice(0, 16);
+        
+        document.getElementById('bookScheduledTime').value = localISOTime;
+        document.getElementById('bookNotes').value = '';
+        
+        document.getElementById('appointmentModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    window.closeAppointmentModal = function() {
+        document.getElementById('appointmentModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    window.submitAppointmentRequest = async function() {
+        const id = document.getElementById('bookDoctorId').value;
+        const scheduledTime = document.getElementById('bookScheduledTime').value;
+        const notes = document.getElementById('bookNotes').value;
+
+        if (!scheduledTime) {
+            alert('Please select a valid date and time.');
+            return;
+        }
+
+        const submitBtn = document.querySelector('#appointmentDetails .upload-btn');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking...';
+        submitBtn.disabled = true;
+
         try {
             const res = await fetch('/api/book-appointment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     doctorId: id, 
-                    scheduledTime: new Date().toISOString(),
-                    notes: 'Requested from unified dashboard'
+                    scheduledTime: new Date(scheduledTime).toISOString(),
+                    notes: notes
                 })
             });
             const data = await res.json();
             if(data.success) {
                 showToast('✅ Appointment Requested Successfully!');
                 loadAppointments();
+                closeAppointmentModal();
             } else { alert('❌ Error: ' + data.message); }
-        } catch(e) { alert('Booking failed.'); }
+        } catch(e) { 
+            alert('Booking failed.'); 
+        } finally {
+            submitBtn.innerHTML = 'Confirm Booking';
+            submitBtn.disabled = false;
+        }
     }
 
     window.loadAppointments = async function() {
@@ -2625,20 +2888,157 @@
             const res = await fetch('/api/appointments');
             const data = await res.json();
             if(data.success) {
+                // Collect active doctor IDs and join socket rooms
+                window.activeDoctorIds = [...new Set(
+                    data.appointments
+                        .filter(a => a.status === 'Scheduled' && a.doctor_id)
+                        .map(a => a.doctor_id._id || a.doctor_id)
+                )];
+                if (window.patientSocket) {
+                    window.activeDoctorIds.forEach(docId => {
+                        window.patientSocket.emit('joinDoctorQueue', docId);
+                    });
+                }
+
                 const list = document.getElementById('appointmentList');
-                if(!data.appointments || data.appointments.length === 0) {
-                    list.innerHTML = '<p style="text-align:center; color:gray">No active appointments.</p>';
+                const historyList = document.getElementById('appointmentHistoryList');
+
+                const activeAppts = !data.appointments ? [] : data.appointments.filter(a => a.status === 'Scheduled');
+                const historyAppts = !data.appointments ? [] : data.appointments.filter(a => a.status !== 'Scheduled');
+                window.patientHistoryAppts = historyAppts;
+
+                if(activeAppts.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:gray">No upcoming appointments.</p>';
                 } else {
-                   list.innerHTML = data.appointments.map(a => `
-                    <div class="report-item">
-                        <div class="report-details">
+                   list.innerHTML = activeAppts.map(a => `
+                    <div class="report-item" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="report-details" style="flex:1;">
                             <div class="report-type">Dr. ${a.doctor_id?.user_id?.name || 'Practitioner'}</div>
-                            <div class="report-date">Status: <span style="color:var(--primary)">${a.status.toUpperCase()}</span> | Token: #${a.token_number || '...'}</div>
+                            <div class="report-date">
+                                <i class="fas fa-clock"></i> ${new Date(a.scheduled_time).toLocaleString('en-IN')} | 
+                                Status: <span style="color:var(--primary); font-weight:bold;">${a.status.toUpperCase()}</span> | Token: #${a.token_number || '...'}
+                            </div>
+                        </div>
+                        <div class="report-actions" style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                            <button class="upload-btn btn-track" onclick="trackQueue('${a.doctor_id?._id}')" style="background:var(--gradient-secondary); padding: 0.5rem 1rem; border-radius:8px; font-size:0.85rem;"><i class="fas fa-sync"></i> Track Queue</button>
+                            <button class="upload-btn btn-cancel" onclick="cancelAppointment('${a._id}')" style="background:#dc3545; padding: 0.5rem 1rem; border-radius:8px; font-size:0.85rem;"><i class="fas fa-times"></i> Cancel</button>
                         </div>
                     </div>`).join('');
                 }
+
+                // Build dates for filter
+                const filterContainer = document.getElementById('historyFilterContainer');
+                if (filterContainer) {
+                    const uniqueDates = [...new Set(historyAppts.map(a => {
+                        const d = new Date(a.scheduled_time);
+                        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                    }))].sort((a,b) => new Date(b) - new Date(a));
+                    
+                    if (uniqueDates.length > 0) {
+                        let filterHtml = `<button class="btn date-filter-btn" onclick="window.renderHistoryAppts(null, false, this)" style="background:var(--primary); color:white; border-radius:20px; font-size:0.8rem; padding:0.4rem 0.8rem; border:1px solid var(--primary);">All History</button>`;
+                        uniqueDates.slice(0, 5).forEach(dt => {
+                            const displayDate = new Date(dt).toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+                            filterHtml += `<button class="btn date-filter-btn" onclick="window.renderHistoryAppts('${dt}', true, this)" style="background:var(--light-gray); color:var(--dark); border-radius:20px; font-size:0.8rem; padding:0.4rem 0.8rem; border:1px solid #e2e8f0; transition:all 0.3s;">${displayDate}</button>`;
+                        });
+                        filterContainer.innerHTML = filterHtml;
+                    } else {
+                        filterContainer.innerHTML = '';
+                    }
+                }
+                
+                window.renderHistoryAppts(null, false);
             }
         } catch(e) { console.error(e); }
+    }
+
+    window.patientHistoryAppts = [];
+    window.renderHistoryAppts = function(filterDate = null, showAll = false, btnElem = null) {
+        const historyList = document.getElementById('appointmentHistoryList');
+        if (!historyList) return;
+
+        if (btnElem) {
+           const btns = document.querySelectorAll('.date-filter-btn');
+           btns.forEach(b => {
+               b.style.background = 'var(--light-gray)';
+               b.style.color = 'var(--dark)';
+               b.style.borderColor = '#e2e8f0';
+           });
+           btnElem.style.background = 'var(--primary)';
+           btnElem.style.color = 'white';
+           btnElem.style.borderColor = 'var(--primary)';
+        }
+        
+        let filtered = window.patientHistoryAppts;
+        if (filterDate) {
+            filtered = filtered.filter(a => {
+                const tempDate = new Date(a.scheduled_time);
+                const strDate = tempDate.getFullYear() + '-' + String(tempDate.getMonth()+1).padStart(2, '0') + '-' + String(tempDate.getDate()).padStart(2, '0');
+                return strDate === filterDate;
+            });
+        }
+
+        // Limit to latest 3 if not showAll and no filterDate
+        let isTruncated = false;
+        if (!showAll && !filterDate && filtered.length > 3) {
+            filtered = filtered.slice(0, 3);
+            isTruncated = true;
+        }
+
+        if(filtered.length === 0) {
+            historyList.innerHTML = '<p style="text-align:center; color:gray">No past appointments.</p>';
+        } else {
+            let html = filtered.map(a => `
+            <div class="report-item" style="display:flex; justify-content:space-between; align-items:center; opacity: 0.8; margin-bottom: 0.8rem;">
+                <div class="report-details" style="flex:1;">
+                    <div class="report-type">Dr. ${a.doctor_id?.user_id?.name || 'Practitioner'}</div>
+                    <div class="report-date">
+                        <i class="fas fa-clock"></i> ${new Date(a.scheduled_time).toLocaleString('en-IN')} | 
+                        Status: <span style="font-weight:bold; color:${a.status === 'Cancelled' ? '#dc3545' : '#28a745'};">${a.status.toUpperCase()}</span> | Token: #${a.token_number || '...'}
+                    </div>
+                </div>
+            </div>`).join('');
+            
+            if (isTruncated) {
+               html += `<div style="text-align:center; margin-top:1rem;">
+                   <button class="upload-btn" onclick="window.renderHistoryAppts(null, true)" style="display:inline-block; font-size:0.85rem; padding: 0.5rem 1rem; background: var(--gray); margin:0 auto;">Show All History</button>
+               </div>`;
+            } else if (showAll && !filterDate && window.patientHistoryAppts.length > 3) {
+               html += `<div style="text-align:center; margin-top:1rem;">
+                   <button class="upload-btn" onclick="window.renderHistoryAppts(null, false)" style="display:inline-block; font-size:0.85rem; padding: 0.5rem 1rem; background: var(--gray); margin:0 auto;">Show Less</button>
+               </div>`;
+            }
+            historyList.innerHTML = html;
+        }
+    }
+
+    window.cancelAppointment = async function(appointmentId) {
+        if(!confirm('Are you sure you want to cancel this appointment?')) return;
+        try {
+            const res = await fetch(`/api/appointments/${appointmentId}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Cancelled' })
+            });
+            const data = await res.json();
+            if(data.success) {
+                showToast('❌ Appointment cancelled.', 'success');
+                loadAppointments();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch(e) { console.error('Cancel failed', e); }
+    }
+
+    window.trackQueue = async function(doctorId) {
+        try {
+            const res = await fetch(`/api/doctor/${doctorId}/queue-info`);
+            const data = await res.json();
+            if(data.success) {
+                checkPatientQueueStatus({ doctorId, currentToken: data.currentToken });
+                document.getElementById('appointmentsSection').scrollIntoView({ behavior: 'smooth' });
+                showToast('Live Queue tracking enabled.', 'success');
+            }
+        } catch(e) { console.error('Track queue failed', e); }
     }
 
     window.loadLabTests = async function() {
@@ -2663,23 +3063,30 @@
         } catch(e) { console.error(e); }
     }
 
+    window.patientSocket = null;
     function initSocket() {
         if (typeof io === 'undefined') return;
-        const socket = io();
+        window.patientSocket = io();
         const patientId = document.getElementById('userId').textContent;
-        socket.on('connect', () => {
+        window.patientSocket.on('connect', () => {
             if (patientId && patientId !== 'Loading...') {
-                socket.emit('joinUserRoom', patientId);
+                window.patientSocket.emit('joinUserRoom', patientId);
                 console.log('📡 Connected to server socket and joined private room.');
+                
+                if (window.activeDoctorIds) {
+                    window.activeDoctorIds.forEach(docId => {
+                        window.patientSocket.emit('joinDoctorQueue', docId);
+                    });
+                }
             }
         });
 
-        socket.on('queueUpdated', (data) => {
+        window.patientSocket.on('queueUpdated', (data) => {
             // Find if this patient has an appointment for this doctor
             checkPatientQueueStatus(data);
         });
 
-        socket.on('turnAlert', (data) => {
+        window.patientSocket.on('turnAlert', (data) => {
             showToast(`🚀 ${data.message}`, 'urgent');
             document.getElementById('queueBanner').style.background = 'var(--gradient-secondary)';
         });
@@ -2728,6 +3135,17 @@
     document.addEventListener('DOMContentLoaded', function () {
       console.log('🚀 Patient Dashboard initializing...');
       loadDashboard();
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const bookDoc = urlParams.get('bookDoc');
+      const docName = urlParams.get('docName');
+      if (bookDoc && docName) {
+        setTimeout(() => {
+            bookAppointment(bookDoc, 'doctor', docName);
+            window.history.replaceState({}, document.title, "/patientdashboard");
+        }, 1500);
+      }
+
       loadNotifications();
       
       // Start Medical Systems (Appointments, Labs, Queue)

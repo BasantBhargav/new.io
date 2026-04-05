@@ -13,6 +13,8 @@ const doctorSchema = new mongoose.Schema({
     endTime: String    // E.g., "16:00"
   }],
   current_token: { type: Number, default: 0 }, // 🔢 Track currently called patient
+  last_token_number: { type: Number, default: 0 }, // 🎟️ Track highest issued token today
+  last_token_date: { type: Date }, // 📅 Tracks which day the tokens apply to
   avg_time_per_patient: { type: Number, default: 15 }, // ⏱️ In minutes
   contact_number: String,
   experience_years: Number,

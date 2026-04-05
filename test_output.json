@@ -1,0 +1,158 @@
+{
+  "doctors": [
+    {
+      "_id": "68777c9491de0f201a12b39b",
+      "user": "doctor"
+    },
+    {
+      "_id": "6878a5b487cd69339f960927",
+      "user": null
+    },
+    {
+      "_id": "687a06395eff5c343aba6f8c",
+      "user": null
+    },
+    {
+      "_id": "687dec8848a8584789a49495",
+      "user": null
+    },
+    {
+      "_id": "688f9767240a6765adbad11e",
+      "user": "dc"
+    },
+    {
+      "_id": "6903640bf3ff524e87bda9b3",
+      "user": "d1"
+    },
+    {
+      "_id": "6951311a8941052663c05b99",
+      "user": "d"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "69bbfd9d24046bfb09da7831",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Cancelled",
+      "notes": "fever"
+    },
+    {
+      "id": "69bccb366aad6b924723f47d",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Cancelled",
+      "notes": "fever"
+    },
+    {
+      "id": "69bccd766aad6b924723f54e",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Cancelled",
+      "notes": "fever"
+    },
+    {
+      "id": "69bccdd36aad6b924723f599",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Completed",
+      "notes": "sd"
+    },
+    {
+      "id": "69bcecf40c200b242c7abac4",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Completed",
+      "notes": "w",
+      "token": 1
+    },
+    {
+      "id": "69bced710c200b242c7abb15",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "68dff5b1809fe19759daed70",
+      "status": "Cancelled",
+      "notes": "twd",
+      "token": 2
+    },
+    {
+      "id": "69bcf0a50c200b242c7abdb3",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "68dff5b1809fe19759daed70",
+      "status": "Completed",
+      "notes": "loki",
+      "token": 3
+    },
+    {
+      "id": "69bcf0bf0c200b242c7abde9",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Cancelled",
+      "notes": "",
+      "token": 4
+    },
+    {
+      "id": "69bcf6f10c200b242c7abf08",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Cancelled",
+      "notes": "k",
+      "token": 5
+    },
+    {
+      "id": "69bed1f7b83679666168d656",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Cancelled",
+      "notes": "we",
+      "token": 1
+    },
+    {
+      "id": "69c41083d83bb2a075c1cd58",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Cancelled",
+      "notes": "Requested from unified dashboard",
+      "token": 1
+    },
+    {
+      "id": "69c414a8d83bb2a075c1cfdf",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Cancelled",
+      "notes": "nothing",
+      "token": 2
+    },
+    {
+      "id": "69c41a4dd83bb2a075c1d328",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Cancelled",
+      "notes": "fever",
+      "token": 3
+    },
+    {
+      "id": "69cf9643545de20f268d4644",
+      "doc": "68777c9491de0f201a12b39b",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Cancelled",
+      "notes": "ee",
+      "token": 1
+    },
+    {
+      "id": "69cf97e3545de20f268d4724",
+      "doc": "688f9767240a6765adbad11e",
+      "pat": "6877727828202dd9ebcb5bcb",
+      "status": "Scheduled",
+      "notes": "a",
+      "token": 1
+    },
+    {
+      "id": "69cf9815545de20f268d4765",
+      "doc": "688f9767240a6765adbad11e",
+      "pat": "695130208941052663c05b4d",
+      "status": "Scheduled",
+      "notes": "e",
+      "token": 2
+    }
+  ]
+}

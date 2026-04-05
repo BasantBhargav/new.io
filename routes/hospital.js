@@ -12,15 +12,22 @@ const Notification = require('../schema/notification');
 router.get('/api/hospital/details', async (req, res) => {
   try {
     const hospitalId = req.session.userId; // assuming hospital user is logged in
-    const hospital = await User.findById(hospitalId);
+    const hospitalUserId = req.session.userId;
+    const hospital = await User.findById(hospitalUserId);
     if (!hospital) return res.status(404).json({ error: 'Hospital not found' });
-    const totalReports = await Report.countDocuments({ hospitalId: hospitalId });
+    const totalReports = await Report.countDocuments({ hospitalId: hospitalUserId });
+    const hospitalProfile = await Hospital.findOne({ admin_user_id: hospitalUserId });
+    let totalDoctors = 0;
+    if (hospitalProfile) {
+      totalDoctors = await Doctor.countDocuments({ hospital_id: hospitalProfile.hospital_id.toString() });
+    }
     res.json({
       id: hospital._id,
       name: hospital.name,
       phone: hospital.phone,
       email: hospital.email,
-      totalReports
+      totalReports,
+      totalDoctors
     });
   } catch (err) {
     console.error('Error fetching hospital details:', err);
@@ -212,6 +219,18 @@ router.get('/api/hospital/lab-requests', async (req, res) => {
     res.json({ success: true, requests });
   } catch (err) {
     res.status(500).json({ success: false });
+  }
+});
+
+// ❌ UNLINK DOCTOR FROM HOSPITAL
+router.delete('/api/hospital/remove-doctor', async (req, res) => {
+  try {
+    const { doctorId } = req.body;
+    const doctor = await Doctor.findByIdAndUpdate(doctorId, { $unset: { hospital_id: '' } }, { new: true });
+    if (!doctor) return res.status(404).json({ success: false, message: 'Doctor not found' });
+    res.json({ success: true, message: 'Doctor unlinked from hospital' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 

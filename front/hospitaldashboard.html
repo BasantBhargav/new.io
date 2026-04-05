@@ -374,6 +374,101 @@
       color: var(--accent);
     }
 
+
+    /* === IMPROVED HOSPITAL MODALS === */
+    .hospital-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; padding: 1rem;
+      visibility: visible; opacity: 1; transition: 0.3s;
+    }
+    .hospital-modal {
+      background: white; border-radius: 12px; padding: 2rem;
+      max-width: 480px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      animation: slideDown 0.3s ease; position: relative;
+    }
+    .hospital-modal h3 {
+      font-size: 1.3rem; font-weight: 700; color: var(--primary);
+      margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem;
+    }
+    .hospital-modal .form-group { margin-bottom: 1rem; }
+    .hospital-modal label {
+      display: block; font-weight: 600; margin-bottom: 0.4rem;
+      font-size: 0.9rem; color: var(--dark);
+    }
+    .hospital-modal input, .hospital-modal select {
+      width: 100%; padding: 0.8rem 1rem; border: 2px solid #e2e8f0;
+      border-radius: var(--radius-sm); font-family: inherit; font-size: 0.95rem;
+      transition: var(--transition);
+    }
+    .hospital-modal input:focus, .hospital-modal select:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67,97,238,0.1);
+    }
+    .hospital-modal .modal-actions {
+      display: flex; gap: 1rem; margin-top: 1.5rem;
+    }
+    .hospital-modal .modal-actions button {
+      flex: 1; padding: 0.8rem; border: none; border-radius: var(--radius-sm);
+      font-weight: 600; cursor: pointer; font-family: inherit; font-size: 0.95rem;
+    }
+    .modal-confirm { background: var(--gradient-primary); color: white; }
+    .modal-cancel { background: #f1f3f5; color: var(--dark); }
+
+    /* Doctor card improvements */
+    .doc-card {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.2rem 1.5rem; background: white; border-radius: var(--radius-sm);
+      border: 1px solid rgba(67,97,238,0.08); margin-bottom: 0.8rem;
+      box-shadow: var(--shadow-sm); transition: var(--transition);
+    }
+    .doc-card:hover { transform: translateX(4px); box-shadow: var(--shadow-md); }
+    .doc-card .doc-info .name { font-weight: 700; color: var(--primary); }
+    .doc-card .doc-info .meta { font-size: 0.82rem; color: var(--gray); margin-top: 0.2rem; }
+    .doc-card .doc-actions { display: flex; gap: 0.5rem; }
+    .btn-sm {
+      padding: 0.4rem 0.9rem; border: none; border-radius: var(--radius-sm);
+      font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 0.3rem; transition: var(--transition);
+    }
+    .btn-sm:hover { transform: scale(1.05); }
+    .btn-sm.view { background: linear-gradient(135deg, #4cc9f0, #36d1dc); color: white; }
+    .btn-sm.remove { background: #fee2e2; color: #dc3545; }
+
+    /* Lab card improvements */
+    .lab-card {
+      background: white; padding: 1.2rem; border-radius: var(--radius-sm);
+      border: 1px solid rgba(67,97,238,0.1); box-shadow: var(--shadow-sm);
+      transition: var(--transition); position: relative; overflow: hidden;
+    }
+    .lab-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; background: var(--gradient-primary);
+    }
+    .lab-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .lab-card .lab-name { font-weight: 700; color: var(--primary); font-size: 1rem; }
+    .lab-card .lab-meta { font-size: 0.82rem; color: var(--gray); margin: 0.3rem 0; }
+    .lab-card .btn-assign {
+      margin-top: 0.8rem; width: 100%; padding: 0.6rem;
+      background: var(--gradient-primary); color: white; border: none;
+      border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;
+      font-family: inherit; transition: var(--transition);
+    }
+    .lab-card .btn-assign:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+
+    /* Lab requests table */
+    .lab-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .lab-table th { background: var(--gradient-primary); color: white; padding: 0.8rem 1rem; text-align: left; font-weight: 600; }
+    .lab-table td { padding: 0.8rem 1rem; border-bottom: 1px solid #f1f3f5; }
+    .lab-table tr:hover td { background: #f8f9ff; }
+    .status-pill {
+      display: inline-block; padding: 0.2rem 0.7rem; border-radius: 20px;
+      font-size: 0.78rem; font-weight: 700;
+    }
+    .status-completed { background: #e8f5e9; color: #2e7d32; }
+    .status-pending { background: #fff3e0; color: #ef6c00; }
+    .status-cancelled { background: #fce4ec; color: #c62828; }
+
     .no-notifications {
       padding: 3rem 2rem;
       text-align: center;
@@ -1196,7 +1291,7 @@
             <i class="fas fa-file-medical"></i>
           </div>
           <div class="title">Total Reports</div>
-          <div class="value" id="totalReports">4,562</div>
+          <div class="value" id="totalReports">0</div>
           <div class="trend">
             <i class="fas fa-arrow-up"></i>
             <span>12.3% from last month</span>
@@ -1208,7 +1303,7 @@
             <i class="fas fa-procedures"></i>
           </div>
           <div class="title">Active Patients</div>
-          <div class="value" id="activePatients">1,247</div>
+          <div class="value" id="activePatients">0</div>
           <div class="trend">
             <i class="fas fa-arrow-up"></i>
             <span>8.5% increase this week</span>
@@ -1334,6 +1429,33 @@
     }
 
     // 🔄 Updated load notifications function
+    function viewDoctorProfile(btn) {
+      const idx = btn.dataset.docIdx;
+      const d = window._hospitalDoctors[idx];
+      if (!d) { showToast('Doctor data not found', 'error'); return; }
+      document.getElementById('dpName').textContent = 'Dr. ' + (d.name || 'N/A');
+      document.getElementById('dpSpec').textContent = d.specialization || 'General';
+      document.getElementById('dpEmail').textContent = d.email || 'N/A';
+      document.getElementById('dpExp').textContent = (d.experience_years || 0) + ' years';
+      document.getElementById('dpPhone').textContent = d.phone || d.contact_number || 'N/A';
+      document.getElementById('dpFee').textContent = d.consultation_fee ? '₹' + d.consultation_fee : 'N/A';
+      document.getElementById('doctorProfileModal').style.display = 'flex';
+    }
+
+    async function unlinkDoctor(doctorId) {
+      if(!confirm('Are you sure you want to unlink this doctor from your hospital?')) return;
+      try {
+        const res = await fetch('/api/hospital/remove-doctor', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ doctorId })
+        });
+        const data = await res.json();
+        if (data.success) { showToast('Doctor unlinked successfully.', 'success'); loadHospitalDoctors(); }
+        else showToast(data.message || 'Failed to unlink', 'error');
+      } catch(e) { showToast('An error occurred.', 'error'); }
+    }
+
     async function loadNotifications() {
       try {
         const response = await fetch('/notifications/hospital');
@@ -1666,7 +1788,7 @@
              document.getElementById('headerUserName').textContent = data.name || "Hospital Admin";
              document.getElementById('totalReports').textContent = data.totalReports || 0;
              // activePatients count can also be fetched if needed, using reports for now
-             document.getElementById('activePatients').textContent = (data.totalReports > 0 ? Math.ceil(data.totalReports / 1.5) : 0);
+             document.getElementById('activePatients').textContent = data.totalDoctors || 0;
           }
        } catch (error) {
           console.error('Error loading hospital details:', error);
@@ -1681,18 +1803,19 @@
         const data = await res.json();
         const docs = data.doctors || [];
         if (docs.length > 0) {
-          list.innerHTML = docs.map(d => `
-            <div class="report-item">
-              <div class="report-details">
-                <div class="report-type">Dr. ${d.name}</div>
-                <div class="report-date">${d.specialization || 'General'} | ${d.experience_years || 0} yrs exp</div>
-                <div style="font-size: 0.8rem; color: var(--gray);">${d.email || d.contact_number || 'N/A'}</div>
+          // Store doctors globally for profile lookup
+          window._hospitalDoctors = docs;
+          list.innerHTML = docs.map((d, idx) => `
+            <div class="doc-card">
+              <div class="doc-info">
+                <div class="name"><i class="fas fa-user-md" style="color:var(--primary); margin-right:0.4rem;"></i>Dr. ${d.name}</div>
+                <div class="meta">${d.specialization || 'General'} | ${d.experience_years || 0} yrs exp | ${d.email || 'N/A'}</div>
               </div>
-              <div class="report-actions">
-                <button class="btn btn-view" onclick="alert('Viewing doctor profile: ${d.name}')">View Profile</button>
+              <div class="doc-actions">
+                <button class="btn-sm view" data-doc-idx="${idx}" onclick="viewDoctorProfile(this)"><i class="fas fa-eye"></i> Profile</button>
+                <button class="btn-sm remove" data-doc-id="${d._id}" onclick="unlinkDoctor(this.dataset.docId)"><i class="fas fa-unlink"></i> Unlink</button>
               </div>
-            </div>
-          `).join('');
+            </div>`).join('');
         } else {
           list.innerHTML = '<div class="no-reports"><h3>No doctors linked yet</h3></div>';
         }
@@ -1734,13 +1857,12 @@
         const labs = data.labs || [];
         if (labs.length > 0) {
           labsList.innerHTML = labs.map(lab => `
-            <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid #ddd; position: relative;">
-               <div style="font-weight: 700; color: var(--primary);">${lab.name}</div>
-               <div style="font-size: 0.8rem; color: var(--gray);">${lab.location.city}, ${lab.location.state}</div>
-               <div style="font-size: 0.8rem; margin-top: 5px;">📞 ${lab.contact?.phone || 'N/A'}</div>
-               <button class="btn btn-primary" onclick="showAssignTestModal('${lab._id}', '${lab.name}')" style="margin-top: 10px; width: 100%; font-size: 0.8rem; padding: 0.4rem;">Assign Test</button>
-            </div>
-          `).join('');
+             <div class="lab-card">
+               <div class="lab-name"><i class="fas fa-flask" style="color:var(--accent); margin-right:0.4rem;"></i>${lab.name}</div>
+               <div class="lab-meta"><i class="fas fa-map-marker-alt" style="color:var(--gray);"></i> ${lab.location?.city || ''}, ${lab.location?.state || ''}</div>
+               <div class="lab-meta"><i class="fas fa-phone" style="color:var(--gray);"></i> ${lab.contact?.phone || 'N/A'}</div>
+               <button class="btn-assign" onclick="showAssignTestModal('${lab._id}', '${lab.name}')"><i class="fas fa-vial"></i> Assign Test</button>
+             </div>`).join('');
         } else {
           labsList.innerHTML = '<div style="text-align: center; color: var(--gray); padding: 2rem; width: 100%;">No labs connected yet.</div>';
         }
@@ -1750,11 +1872,18 @@
     }
 
     function showAddLabModal() {
-       const email = prompt("Enter Laboratory Admin Email to Link:");
-       if (!email) return;
-       linkLab(email);
+      document.getElementById('labEmailInput').value = '';
+      document.getElementById('addLabModal').style.display = 'flex';
     }
-
+    function closeAddLabModal() {
+      document.getElementById('addLabModal').style.display = 'none';
+    }
+    async function submitLinkLab() {
+      const email = document.getElementById('labEmailInput').value.trim();
+      if (!email) { showToast('Please enter a valid email', 'error'); return; }
+      await linkLab(email);
+      closeAddLabModal();
+    }
     async function linkLab(email) {
        try {
           const res = await fetch('/api/hospital/link-lab', {
@@ -1775,33 +1904,50 @@
     }
 
     function showAssignTestModal(labId, labName) {
-       const patientId = prompt("Enter Patient ID for assignment:");
-       if (!patientId) return;
-       const testName = prompt(`Enter Test Name for ${labName} (e.g. CBC, MRI):`);
-       if (!testName) return;
-       
-       assignTest(labId, patientId, testName);
+      document.getElementById('assignLabId').value = labId;
+      document.getElementById('assignLabName').value = labName;
+      document.getElementById('assignPatientId').value = '';
+      document.getElementById('assignTestType').value = '';
+      document.getElementById('assignOtherTest').value = '';
+      document.getElementById('otherTestGroup').style.display = 'none';
+      document.getElementById('assignTestModal').style.display = 'flex';
     }
-
+    function closeAssignTestModal() {
+      document.getElementById('assignTestModal').style.display = 'none';
+    }
+    document.addEventListener('change', function(e) {
+      if(e.target && e.target.id === 'assignTestType') {
+        document.getElementById('otherTestGroup').style.display = e.target.value === 'Other' ? 'block' : 'none';
+      }
+    });
+    async function submitAssignTest() {
+      const labId = document.getElementById('assignLabId').value;
+      const patientId = document.getElementById('assignPatientId').value.trim();
+      let testName = document.getElementById('assignTestType').value;
+      if (testName === 'Other') testName = document.getElementById('assignOtherTest').value.trim();
+      if (!patientId) { showToast('Please enter a patient ID', 'error'); return; }
+      if (!testName) { showToast('Please select a test type', 'error'); return; }
+      await assignTest(labId, patientId, testName);
+      closeAssignTestModal();
+    }
     async function assignTest(labId, patientId, testName) {
-       try {
-          const res = await fetch('/api/hospital/assign-test', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ labId, patientId, testName })
-          });
-          const data = await res.json();
-          if (data.success) {
-             showToast(`Test "${testName}" assigned successfully!`, 'success');
-             loadHospitalLabRequests();
-          } else {
-             showToast(data.message, 'error');
-          }
-       } catch (err) {
-          showToast('Failed to assign test', 'error');
-       }
+      try {
+        const res = await fetch('/api/hospital/assign-test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ labId, patientId, testName })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`Test "${testName}" assigned successfully!`, 'success');
+          loadHospitalLabRequests();
+        } else {
+          showToast(data.message, 'error');
+        }
+      } catch (err) {
+        showToast('Failed to assign test', 'error');
+      }
     }
-
     async function loadHospitalLabRequests() {
        const list = document.getElementById('hospitalLabRequests');
        try {
@@ -1810,30 +1956,28 @@
           const requests = data.requests || [];
           if (requests.length > 0) {
              list.innerHTML = `
-                <table class="table" style="margin: 0;">
-                   <thead style="background: #f8f9fa;">
-                      <tr>
-                         <th>Patient</th>
-                         <th>Lab</th>
-                         <th>Test</th>
-                         <th>Status</th>
-                         <th>Date</th>
-                      </tr>
-                   </thead>
-                   <tbody>
-                      ${requests.map(r => `
-                         <tr>
-                            <td>${r.patient_id?.name || 'Unknown'}</td>
-                            <td>${r.lab_id?.name || 'Unknown'}</td>
-                            <td>${r.test_name}</td>
-                            <td><span class="badge priority-${r.status === 'Completed' ? 'normal' : 'high'}" style="background: ${r.status === 'Completed' ? '#e8f5e9' : '#fff3e0'}; color: ${r.status === 'Completed' ? '#2e7d32' : '#ef6c00'};">${r.status}</span></td>
-                            <td>${new Date(r.created_at).toLocaleDateString()}</td>
-                         </tr>
-                      `).join('')}
-                   </tbody>
-                </table>
-             `;
-          } else {
+            <table class="lab-table">
+              <thead>
+                <tr>
+                  <th><i class="fas fa-user"></i> Patient</th>
+                  <th><i class="fas fa-flask"></i> Lab</th>
+                  <th><i class="fas fa-vial"></i> Test</th>
+                  <th>Status</th>
+                  <th><i class="fas fa-calendar"></i> Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${requests.map(r => `
+                  <tr>
+                    <td>${r.patient_id?.name || r.patient_id?.user_id?.name || 'Unknown Patient'}</td>
+                    <td>${r.lab_id?.name || r.labId?.name || 'Unknown Lab'}</td>
+                    <td>${r.testType || r.test_name || 'N/A'}</td>
+                    <td><span class="status-pill ${r.status === 'Completed' ? 'status-completed' : r.status === 'Cancelled' ? 'status-cancelled' : 'status-pending'}">${r.status || 'Pending'}</span></td>
+                    <td>${new Date(r.createdAt || r.created_at).toLocaleDateString('en-IN')}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>`;
+        } else {
              list.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--gray);">No recent laboratory requests.</div>';
           }
        } catch (error) {
@@ -1884,5 +2028,101 @@
       }
     });
   </script>
+
+  <!-- ADD LAB MODAL -->
+  <div id="addLabModal" class="hospital-modal-overlay" style="display:none;">
+    <div class="hospital-modal">
+      <h3><i class="fas fa-flask" style="color:var(--accent);"></i> Link External Laboratory</h3>
+      <div class="form-group">
+        <label>Laboratory Admin Email</label>
+        <input type="email" id="labEmailInput" placeholder="Enter lab admin email address...">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel btn-sm" onclick="closeAddLabModal()"><i class="fas fa-times"></i> Cancel</button>
+        <button class="modal-confirm btn-sm" onclick="submitLinkLab()"><i class="fas fa-link"></i> Link Lab</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSIGN TEST MODAL -->
+  <div id="assignTestModal" class="hospital-modal-overlay" style="display:none;">
+    <div class="hospital-modal">
+      <h3><i class="fas fa-microscope" style="color:var(--primary);"></i> Assign Lab Test</h3>
+      <input type="hidden" id="assignLabId">
+      <div class="form-group">
+        <label>Lab Name</label>
+        <input type="text" id="assignLabName" readonly style="background:#f8f9fa; color:var(--gray);">
+      </div>
+      <div class="form-group">
+        <label>Patient ID</label>
+        <input type="text" id="assignPatientId" placeholder="Enter patient unique ID...">
+      </div>
+      <div class="form-group">
+        <label>Test Type</label>
+        <select id="assignTestType">
+          <option value="">-- Select Test --</option>
+          <option>CBC (Complete Blood Count)</option>
+          <option>Blood Glucose Test</option>
+          <option>Lipid Profile</option>
+          <option>Liver Function Test</option>
+          <option>Kidney Function Test</option>
+          <option>Thyroid Function Test</option>
+          <option>Urine Analysis</option>
+          <option>X-Ray</option>
+          <option>MRI</option>
+          <option>CT Scan</option>
+          <option>Ultrasound</option>
+          <option>ECG</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div id="otherTestGroup" class="form-group" style="display:none;">
+        <label>Custom Test Name</label>
+        <input type="text" id="assignOtherTest" placeholder="Enter test name...">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel btn-sm" onclick="closeAssignTestModal()"><i class="fas fa-times"></i> Cancel</button>
+        <button class="modal-confirm btn-sm" onclick="submitAssignTest()"><i class="fas fa-check"></i> Assign</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- DOCTOR PROFILE MODAL -->
+  <div id="doctorProfileModal" class="hospital-modal-overlay" style="display:none;">
+    <div class="hospital-modal" style="max-width:520px;">
+      <h3><i class="fas fa-user-md" style="color:var(--primary);"></i> Doctor Profile</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+        <div>
+          <div style="font-size:0.8rem; color:var(--gray); font-weight:600; margin-bottom:0.2rem;">FULL NAME</div>
+          <div id="dpName" style="font-weight:700; font-size:1.05rem; color:var(--dark);"></div>
+        </div>
+        <div>
+          <div style="font-size:0.8rem; color:var(--gray); font-weight:600; margin-bottom:0.2rem;">SPECIALIZATION</div>
+          <div id="dpSpec" style="font-weight:600;"></div>
+        </div>
+        <div>
+          <div style="font-size:0.8rem; color:var(--gray); font-weight:600; margin-bottom:0.2rem;">EMAIL</div>
+          <div id="dpEmail" style="word-break:break-all;"></div>
+        </div>
+        <div>
+          <div style="font-size:0.8rem; color:var(--gray); font-weight:600; margin-bottom:0.2rem;">EXPERIENCE</div>
+          <div id="dpExp"></div>
+        </div>
+        <div>
+          <div style="font-size:0.8rem; color:var(--gray); font-weight:600; margin-bottom:0.2rem;">PHONE</div>
+          <div id="dpPhone"></div>
+        </div>
+        <div>
+          <div style="font-size:0.8rem; color:var(--gray); font-weight:600; margin-bottom:0.2rem;">CONSULTATION FEE</div>
+          <div id="dpFee"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-cancel btn-sm" onclick="document.getElementById('doctorProfileModal').style.display='none'"><i class="fas fa-times"></i> Close</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

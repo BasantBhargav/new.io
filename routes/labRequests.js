@@ -1,12 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const LabRequest = require('../schema/labRequest');
+const LabTestRequest = require('../schema/labtest_request');
 const Laboratory = require('../schema/laboratory');
 const Appointment = require('../schema/appointment');
 const Notification = require('../schema/notification');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+
+// 🧪 GET individual laboratory by ID
+router.get('/api/lab/:id', async (req, res) => {
+  try {
+    const lab = await Laboratory.findById(req.params.id);
+    if (!lab) return res.status(404).json({ success: false, message: 'Laboratory not found' });
+    res.json({ success: true, lab });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
 
 // 🧪 GET all laboratories
 router.get('/api/laboratories', async (req, res) => {
@@ -141,38 +153,60 @@ router.post('/api/lab-request/:id/upload', requireAuth, upload.single('report'),
   try {
      if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
 
-     const request = await LabRequest.findByIdAndUpdate(req.params.id, {
-        reportFile: req.file.path,
-        status: 'Completed'
-     }, { new: true }).populate({ path: 'doctorId', select: 'name _id' });
+      let request = await LabRequest.findById(req.params.id);
+      let isLabTestRequest = false;
 
-     // 🔔 Notify Patient
-     const patientNotif = new Notification({
-        role: 'patient',
-        targetUserId: request.patientId,
-        title: "📄 Lab Report Ready!",
-        message: `Your ${request.testType} report is now available in your dashboard.`,
-        priority: 'high'
-     });
-     await patientNotif.save();
+      if (!request) {
+          // Fallback: Check if it's a self-booked request (LabTestRequest)
+          request = await LabTestRequest.findById(req.params.id);
+          if (request) isLabTestRequest = true;
+      }
 
-     // 🔔 Notify Doctor
-     if (request.doctorId) {
-        const doctorNotif = new Notification({
-           role: 'doctor',
-           targetUserId: request.doctorId._id,
-           title: "🧪 Lab Report Submitted",
-           message: `Lab report for ${request.testType} has been completed and sent to the patient.`,
-           priority: 'normal'
-        });
-        await doctorNotif.save();
-     }
+      if (!request) {
+          console.error("❌ Request not found for upload:", req.params.id);
+          return res.status(404).json({ success: false, message: 'Request not found in any collection' });
+      }
 
-     res.json({ success: true, message: 'Report uploaded successfully', request });
-  } catch (error) {
-     console.error('Upload error:', error);
-     res.status(500).json({ success: false, message: 'Upload failed' });
-  }
+      // Update the correct model
+      const updateData = isLabTestRequest 
+          ? { status: 'Completed', report_url: `/uploads/lab_reports/${req.file.filename}` }
+          : { status: 'Completed', reportFile: `uploads/lab_reports/${req.file.filename}` };
+
+      const Model = isLabTestRequest ? LabTestRequest : LabRequest;
+      const updatedRequest = await Model.findByIdAndUpdate(req.params.id, updateData, { new: true })
+          .populate(isLabTestRequest ? 'patient_id' : 'patientId')
+          .populate(isLabTestRequest ? '' : 'doctorId');
+
+      // 🔔 Notify Patient
+      const patientId = isLabTestRequest ? updatedRequest.patient_id : updatedRequest.patientId;
+      const testName = isLabTestRequest ? updatedRequest.test_name : updatedRequest.testType;
+      
+      const patientNotif = new Notification({
+         role: 'patient',
+         targetUserId: patientId?._id || patientId,
+         title: "📄 Lab Report Ready!",
+         message: `Your ${testName} report is now available in your dashboard.`,
+         priority: 'high'
+      });
+      await patientNotif.save();
+
+      // 🔔 Notify Doctor (if applicable)
+      if (!isLabTestRequest && updatedRequest.doctorId) {
+         const doctorNotif = new Notification({
+            role: 'doctor',
+            targetUserId: updatedRequest.doctorId._id || updatedRequest.doctorId,
+            title: "🧪 Lab Report Submitted",
+            message: `Lab report for ${updatedRequest.testType} has been completed and sent to the patient.`,
+            priority: 'normal'
+         });
+         await doctorNotif.save();
+      }
+
+      res.json({ success: true, message: 'Report uploaded successfully', request: updatedRequest });
+   } catch (error) {
+      console.error('🔥 Severe Upload error:', error);
+      res.status(500).json({ success: false, message: 'Upload failed: ' + error.message });
+   }
 });
 
 // 🧪 LAB: Get today's completed reports

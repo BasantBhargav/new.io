@@ -15,6 +15,7 @@ const labTestRequestSchema = new mongoose.Schema({
   report_url: String, // Link to PDF result
   payment_status: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
   amount: Number,
+  notes: String,
   created_at: { type: Date, default: Date.now }
 });
 
