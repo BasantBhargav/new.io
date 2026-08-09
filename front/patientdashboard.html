@@ -2891,7 +2891,7 @@
                 // Collect active doctor IDs and join socket rooms
                 window.activeDoctorIds = [...new Set(
                     data.appointments
-                        .filter(a => a.status === 'Scheduled' && a.doctor_id)
+                        .filter(a => ['BOOKED', 'CHECKED_IN', 'WAITING', 'IN_PROGRESS', 'Scheduled'].includes(a.status) && a.doctor_id)
                         .map(a => a.doctor_id._id || a.doctor_id)
                 )];
                 if (window.patientSocket) {
@@ -2903,9 +2903,12 @@
                 const list = document.getElementById('appointmentList');
                 const historyList = document.getElementById('appointmentHistoryList');
 
-                const activeAppts = !data.appointments ? [] : data.appointments.filter(a => a.status === 'Scheduled');
-                const historyAppts = !data.appointments ? [] : data.appointments.filter(a => a.status !== 'Scheduled');
+                const activeStates = ['BOOKED', 'CHECKED_IN', 'WAITING', 'IN_PROGRESS', 'Scheduled'];
+                const activeAppts = !data.appointments ? [] : data.appointments.filter(a => activeStates.includes(a.status));
+                const historyAppts = !data.appointments ? [] : data.appointments.filter(a => !activeStates.includes(a.status));
                 window.patientHistoryAppts = historyAppts;
+                const queuedAppointment = activeAppts.find(a => a.doctor_id);
+                if (queuedAppointment) refreshQueueBanner(queuedAppointment.doctor_id._id || queuedAppointment.doctor_id);
 
                 if(activeAppts.length === 0) {
                     list.innerHTML = '<p style="text-align:center; color:gray">No upcoming appointments.</p>';
@@ -2920,6 +2923,7 @@
                             </div>
                         </div>
                         <div class="report-actions" style="display:flex; gap:0.5rem; justify-content:flex-end;">
+                            ${['BOOKED', 'Scheduled'].includes(a.status) ? `<button class="upload-btn" onclick="checkInAppointment('${a._id}')" style="padding:0.5rem 1rem; border-radius:8px; font-size:0.85rem;"><i class="fas fa-user-check"></i> Check in</button>` : ''}
                             <button class="upload-btn btn-track" onclick="trackQueue('${a.doctor_id?._id}')" style="background:var(--gradient-secondary); padding: 0.5rem 1rem; border-radius:8px; font-size:0.85rem;"><i class="fas fa-sync"></i> Track Queue</button>
                             <button class="upload-btn btn-cancel" onclick="cancelAppointment('${a._id}')" style="background:#dc3545; padding: 0.5rem 1rem; border-radius:8px; font-size:0.85rem;"><i class="fas fa-times"></i> Cancel</button>
                         </div>
@@ -2952,6 +2956,16 @@
     }
 
     window.patientHistoryAppts = [];
+
+    window.checkInAppointment = async function(appointmentId) {
+        try {
+            const res = await fetch(`/api/appointments/${appointmentId}/check-in`, { method: 'PATCH' });
+            const data = await res.json();
+            if (!data.success) return alert(data.message || 'Check-in failed');
+            showToast(`Checked in. Your token is #${data.appointment.token_number}.`, 'success');
+            loadAppointments();
+        } catch (error) { alert('Check-in failed'); }
+    }
     window.renderHistoryAppts = function(filterDate = null, showAll = false, btnElem = null) {
         const historyList = document.getElementById('appointmentHistoryList');
         if (!historyList) return;
@@ -3041,6 +3055,14 @@
         } catch(e) { console.error('Track queue failed', e); }
     }
 
+    async function refreshQueueBanner(doctorId) {
+        try {
+            const res = await fetch(`/api/doctor/${doctorId}/queue-info`);
+            const data = await res.json();
+            if (data.success) checkPatientQueueStatus({ doctorId, currentToken: data.currentToken });
+        } catch (e) { console.error('Queue refresh failed', e); }
+    }
+
     window.loadLabTests = async function() {
         try {
             const res = await fetch('/api/patient/lab-results');
@@ -3097,15 +3119,23 @@
             const res = await fetch('/api/appointments');
             const data = await res.json();
             if(data.success) {
-                const myApp = data.appointments.find(a => a.doctor_id?._id === updateData.doctorId && a.status === 'Scheduled');
+                const activeStates = ['BOOKED', 'CHECKED_IN', 'WAITING', 'IN_PROGRESS', 'Scheduled'];
+                const myApp = data.appointments.find(a => String(a.doctor_id?._id || a.doctor_id) === String(updateData.doctorId) && activeStates.includes(a.status));
                 if(myApp) {
                    document.getElementById('queueBanner').style.display = 'block';
                    document.getElementById('queueDoc').textContent = "Consultation with " + (myApp.doctor_id?.user_id?.name || 'Dr.');
+                   if (!myApp.token_number) {
+                     document.getElementById('tokenNum').textContent = '—';
+                     document.getElementById('currentNum').textContent = updateData.currentToken || '—';
+                     document.getElementById('aheadNum').textContent = '—';
+                     document.getElementById('qTime').textContent = 'Check in at hospital for your token';
+                     return;
+                   }
                    document.getElementById('tokenNum').textContent = myApp.token_number;
-                   document.getElementById('currentNum').textContent = updateData.currentToken;
-                   const ahead = Math.max(0, myApp.token_number - updateData.currentToken);
+                   document.getElementById('currentNum').textContent = updateData.currentToken || '—';
+                   const ahead = myApp.status === 'IN_PROGRESS' ? 0 : Math.max(0, myApp.token_number - (updateData.currentToken || 0));
                    document.getElementById('aheadNum').textContent = ahead;
-                   document.getElementById('qTime').textContent = `~ ${ahead * 10} mins wait`;
+                   document.getElementById('qTime').textContent = myApp.status === 'IN_PROGRESS' ? 'It is your turn' : `~ ${ahead * 10} mins wait`;
                 }
             }
         } catch(e) {}

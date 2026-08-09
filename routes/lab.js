@@ -29,6 +29,146 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// 🧪 TEST CATALOG — each laboratory manages only its own tests and prices
+router.get('/api/lab/test-catalog', requireLabRole, async (req, res) => {
+    try {
+        const lab = await Laboratory.findOne({ admin_user_id: req.session.userId })
+            .select('test_catalog');
+        if (!lab) return res.status(404).json({ success: false, message: 'Lab profile not found' });
+
+        res.json({ success: true, tests: lab.test_catalog || [] });
+    } catch (err) {
+        console.error('Test catalog fetch error:', err);
+        res.status(500).json({ success: false, message: 'Unable to load test catalog' });
+    }
+});
+
+router.post('/api/lab/test-catalog', requireLabRole, async (req, res) => {
+    try {
+        const name = typeof req.body.name === 'string' ? req.body.name.trim() : '';
+        const price = Number(req.body.price);
+
+        if (!name || name.length > 100) {
+            return res.status(400).json({ success: false, message: 'Enter a valid test name' });
+        }
+        if (!Number.isFinite(price) || price < 0) {
+            return res.status(400).json({ success: false, message: 'Enter a valid non-negative price' });
+        }
+
+        const lab = await Laboratory.findOne({ admin_user_id: req.session.userId });
+        if (!lab) return res.status(404).json({ success: false, message: 'Lab profile not found' });
+
+        const duplicate = (lab.test_catalog || []).some(test =>
+            test.name && test.name.trim().toLowerCase() === name.toLowerCase()
+        );
+        if (duplicate) {
+            return res.status(409).json({ success: false, message: 'This test is already in your catalog' });
+        }
+
+        lab.test_catalog.push({ name, price });
+        await lab.save();
+        const test = lab.test_catalog[lab.test_catalog.length - 1];
+        res.status(201).json({ success: true, message: 'Test added successfully', test });
+    } catch (err) {
+        console.error('Test catalog add error:', err);
+        res.status(500).json({ success: false, message: 'Unable to add test' });
+    }
+});
+
+router.delete('/api/lab/test-catalog/:testId', requireLabRole, async (req, res) => {
+    try {
+        const lab = await Laboratory.findOne({ admin_user_id: req.session.userId });
+        if (!lab) return res.status(404).json({ success: false, message: 'Lab profile not found' });
+
+        const test = lab.test_catalog.id(req.params.testId);
+        if (!test) return res.status(404).json({ success: false, message: 'Test not found' });
+
+        test.deleteOne();
+        await lab.save();
+        res.json({ success: true, message: 'Test deleted successfully' });
+    } catch (err) {
+        console.error('Test catalog delete error:', err);
+        res.status(500).json({ success: false, message: 'Unable to delete test' });
+    }
+});
+
+router.put('/api/lab/test-catalog/:testId', requireLabRole, async (req, res) => {
+    try {
+        const lab = await Laboratory.findOne({ admin_user_id: req.session.userId });
+        if (!lab) return res.status(404).json({ success: false, message: 'Lab profile not found' });
+
+        const test = lab.test_catalog.id(req.params.testId);
+        if (!test) return res.status(404).json({ success: false, message: 'Test not found' });
+
+        const name = typeof req.body.name === 'string' ? req.body.name.trim() : test.name;
+        const price = req.body.price === undefined ? test.price : Number(req.body.price);
+        if (!name || name.length > 100) {
+            return res.status(400).json({ success: false, message: 'Enter a valid test name' });
+        }
+        if (!Number.isFinite(price) || price < 0) {
+            return res.status(400).json({ success: false, message: 'Enter a valid non-negative price' });
+        }
+
+        const duplicate = lab.test_catalog.some(item =>
+            String(item._id) !== String(test._id) && item.name && item.name.trim().toLowerCase() === name.toLowerCase()
+        );
+        if (duplicate) return res.status(409).json({ success: false, message: 'This test is already in your catalog' });
+
+        test.name = name;
+        test.price = price;
+        if (typeof req.body.category === 'string') test.category = req.body.category.trim();
+        if (typeof req.body.turnaround_time === 'string') test.turnaround_time = req.body.turnaround_time.trim();
+        await lab.save();
+        res.json({ success: true, message: 'Test updated successfully', test });
+    } catch (err) {
+        console.error('Test catalog update error:', err);
+        res.status(500).json({ success: false, message: 'Unable to update test' });
+    }
+});
+
+// LAB SETTINGS — retains the existing Laboratory document and avoids touching other modules.
+router.get('/api/lab/settings', requireLabRole, async (req, res) => {
+    try {
+        const lab = await Laboratory.findOne({ admin_user_id: req.session.userId })
+            .select('name location contact');
+        if (!lab) return res.status(404).json({ success: false, message: 'Lab profile not found' });
+        res.json({ success: true, lab });
+    } catch (err) {
+        console.error('Lab settings fetch error:', err);
+        res.status(500).json({ success: false, message: 'Unable to load lab settings' });
+    }
+});
+
+router.put('/api/lab/settings', requireLabRole, async (req, res) => {
+    try {
+        const { name, address_line, city, state, pin_code, phone, email } = req.body;
+        if (typeof name !== 'string' || name.trim().length < 2) {
+            return res.status(400).json({ success: false, message: 'Lab name must contain at least 2 characters' });
+        }
+
+        const lab = await Laboratory.findOne({ admin_user_id: req.session.userId });
+        if (!lab) return res.status(404).json({ success: false, message: 'Lab profile not found' });
+
+        lab.name = name.trim();
+        lab.location = {
+            ...lab.location?.toObject?.(),
+            address_line: typeof address_line === 'string' ? address_line.trim() : '',
+            city: typeof city === 'string' ? city.trim() : '',
+            state: typeof state === 'string' ? state.trim() : '',
+            pin_code: typeof pin_code === 'string' ? pin_code.trim() : ''
+        };
+        lab.contact = {
+            phone: typeof phone === 'string' ? phone.trim() : '',
+            email: typeof email === 'string' ? email.trim().toLowerCase() : ''
+        };
+        await lab.save();
+        res.json({ success: true, message: 'Lab settings saved successfully', lab });
+    } catch (err) {
+        console.error('Lab settings update error:', err);
+        res.status(500).json({ success: false, message: 'Unable to save lab settings' });
+    }
+});
+
 // 🧪 GET LAB INFO
 router.get('/api/lab/info', requireLabRole, async (req, res) => {
     try {
@@ -90,6 +230,7 @@ router.get('/api/lab/all-requests', requireLabRole, async (req, res) => {
         const selfBookedNorm = selfBooked.map(r => ({
             _id: r._id,
             source: 'self',
+            healthId: r.patient_id?._id || null,
             patientName: r.patient_id?.name || 'Unknown Patient',
             patientPhone: r.patient_id?.phone || 'N/A',
             doctorName: null,
@@ -113,6 +254,7 @@ router.get('/api/lab/all-requests', requireLabRole, async (req, res) => {
         const doctorNorm = doctorAssigned.map(r => ({
             _id: r._id,
             source: 'doctor',
+            healthId: r.patientId?._id || null,
             patientName: r.patientId?.name || 'Unknown Patient',
             patientPhone: r.patientId?.phone || 'N/A',
             doctorName: r.doctorId?.name || null,

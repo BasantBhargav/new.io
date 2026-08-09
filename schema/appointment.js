@@ -16,10 +16,9 @@ const appointmentSchema = new mongoose.Schema({
     ref: 'Patient',
     required: true
   },
-  token_number: { // 🔢 Queue system token
-    type: Number,
-    required: true
-  },
+  token_number: { type: Number, default: null },
+  // Token is issued on check-in, not while booking.
+  queue_session: { type: String, default: 'default', trim: true },
 
   scheduled_time: {
     type: Date,
@@ -27,8 +26,8 @@ const appointmentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Scheduled', 'Completed', 'Cancelled'],
-    default: 'Scheduled'
+    enum: ['Scheduled', 'Completed', 'Cancelled', 'BOOKED', 'CHECKED_IN', 'WAITING', 'IN_PROGRESS', 'COMPLETED', 'SKIPPED', 'CANCELLED'],
+    default: 'BOOKED'
   },
   paymentStatus: { // 🆕 Added for payment tracking
     type: String,
@@ -44,5 +43,10 @@ const appointmentSchema = new mongoose.Schema({
   }
 
 }, { timestamps: true });
+
+appointmentSchema.index(
+  { doctor_id: 1, scheduled_time: 1, queue_session: 1, token_number: 1 },
+  { unique: true, sparse: true }
+);
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

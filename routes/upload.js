@@ -75,17 +75,17 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-const nodemailer = require('nodemailer'); // ✅ Added nodemailer
+const nodemailer = require('nodemailer'); 
 const Report = require('../schema/report');
-const User = require('../schema/user'); // ✅ For patient details
+const User = require('../schema/user'); 
 
 const router = express.Router();
 
-// Ensure uploads folder exists
+
 const uploadsDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 
-// Multer setup
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadsDir);
@@ -97,21 +97,19 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-/**
- * ✅ Send email notification to patient
- */
+
 async function sendReportMail(patient, report) {
   try {
-    // ✅ Create transporter with hardcoded credentials
+   
     let transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'bhargavbasant123@gmail.com', // 👉 Your Gmail here
-        pass: 'onok cstd xctp pguj'         // 👉 Your App Password here
+        user: 'bhargavbasant123@gmail.com', 
+        pass: 'onok cstd xctp pguj'         
       }
     });
 
-    // ✅ Mail content with Login Button
+    
     let mailOptions = {
       from: '"MediVault" <bhargavbasant123@gmail.com>',
       to: patient.email,
@@ -143,7 +141,7 @@ async function sendReportMail(patient, report) {
       `
     };
 
-    // ✅ Send mail
+    
     let info = await transporter.sendMail(mailOptions);
     console.log('📧 Mail sent to:', patient.email, '| Message ID:', info.messageId);
   } catch (err) {
@@ -151,9 +149,7 @@ async function sendReportMail(patient, report) {
   }
 }
 
-/**
- * ✅ Upload report endpoint
- */
+
 router.post('/upload-report', upload.single('report'), async (req, res) => {
   const { patientId, reportType } = req.body;
 
@@ -165,13 +161,13 @@ router.post('/upload-report', upload.single('report'), async (req, res) => {
   try {
     let finalPatientId = patientId;
 
-    // ✅ Check if this is a patient uploading their own report
+   
     let patient;
     if (req.session && req.session.userId && req.session.role === 'patient') {
-      finalPatientId = req.session.userId; // Use logged-in patient's ID
+      finalPatientId = req.session.userId;
       patient = await User.findOne({ _id: finalPatientId });
     } else {
-      // ✅ Hospital uploading: Validate patient ID
+      
       patient = await User.findOne({ _id: patientId, role: 'patient' });
       if (!patient) {
         console.error(`❌ Invalid patient ID or not a patient: ${patientId}`);
@@ -179,23 +175,23 @@ router.post('/upload-report', upload.single('report'), async (req, res) => {
       }
     }
 
-    // ✅ Save report
+    
     const report = new Report({
       report_id: uuidv4(),
       patientId: finalPatientId,
       reportType,
       filename: req.file.filename,
-      filePath: `uploads/${req.file.filename}`, // ✅ relative path
+      filePath: `uploads/${req.file.filename}`, 
       uploadedAt: new Date()
     });
 
     await report.save();
     console.log(`✅ Report uploaded for patient ${finalPatientId}: ${report.filePath}`);
 
-    // ✅ Send email notification
+    
     await sendReportMail(patient, report);
 
-    // Send appropriate response
+   
     if (req.session && req.session.role === 'patient') {
       res.send('✅ Report uploaded successfully!');
     } else {

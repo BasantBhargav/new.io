@@ -178,6 +178,23 @@
             background: rgba(247, 37, 133, 0.08);
         }
 
+        .quick-logout {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 0.9rem;
+            color: var(--accent);
+            background: var(--white);
+            border: 1.5px solid rgba(247, 37, 133, 0.25);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            box-shadow: var(--shadow);
+        }
+
+        .quick-logout:hover { background: rgba(247, 37, 133, 0.08); }
+
         /* ─── MAIN CONTENT ────────────────────────── */
         .main-content {
             margin-left: 260px;
@@ -519,6 +536,11 @@
             color: white;
         }
 
+        .btn-danger {
+            background: var(--accent);
+            color: white;
+        }
+
         .btn-outline {
             border: 2px solid var(--primary);
             color: var(--primary);
@@ -551,6 +573,80 @@
             margin-top: 1rem;
             border-radius: var(--radius-sm);
         }
+
+        .catalog-form {
+            display: grid;
+            grid-template-columns: minmax(180px, 1fr) minmax(130px, 180px) auto;
+            gap: 0.75rem;
+            align-items: end;
+        }
+
+        .catalog-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .catalog-field label {
+            color: var(--gray);
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .catalog-field input {
+            width: 100%;
+            padding: 0.7rem 0.8rem;
+            border: 1.5px solid rgba(67, 97, 238, 0.2);
+            border-radius: var(--radius-sm);
+            font: inherit;
+            color: var(--dark);
+        }
+
+        .catalog-field input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .catalog-empty {
+            color: var(--gray);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1rem;
+        }
+
+        .workflow-item {
+            background: var(--light);
+            border: 1px solid rgba(67, 97, 238, 0.1);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+        }
+
+        .workflow-item strong { color: var(--dark); display: block; margin-bottom: 0.35rem; }
+        .workflow-item p { color: var(--gray); font-size: 0.82rem; margin-bottom: 0.75rem; }
+
+        .filter-row, .settings-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-row input, .filter-row select, .settings-form input {
+            padding: 0.65rem 0.75rem;
+            border: 1.5px solid rgba(67, 97, 238, 0.2);
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        .notification-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .notification-item { padding: 0.9rem 1rem; background: var(--light); border-left: 4px solid var(--primary); border-radius: 8px; }
+        .notification-item.urgent { border-left-color: var(--accent); }
+        .notification-item small { color: var(--gray); display: block; margin-top: 0.3rem; }
 
         .table {
             width: 100%;
@@ -843,6 +939,12 @@
                 margin-left: 0;
                 padding: 1.5rem;
             }
+
+            .catalog-form {
+                grid-template-columns: 1fr;
+            }
+
+            .top-header { align-items: flex-start; }
         }
     </style>
 </head>
@@ -854,9 +956,17 @@
         <a href="#" class="logo"><i class="fas fa-flask"></i> MediVault Lab</a>
 
         <span class="nav-label">Navigation</span>
-        <a href="#pending-section" class="nav-link active"><i class="fas fa-th-large"></i> Dashboard</a>
-        <a href="#pending-section" class="nav-link"><i class="fas fa-vial"></i> Test Requests</a>
-        <a href="#today-section" class="nav-link"><i class="fas fa-history"></i> Today's Reports</a>
+        <a href="#overview-section" class="nav-link active"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="#pending-section" class="nav-link"><i class="fas fa-clipboard-list"></i> Test Requests</a>
+        <a href="#history-section" class="nav-link"><i class="fas fa-clock-rotate-left"></i> Request History</a>
+        <a href="#collection-section" class="nav-link"><i class="fas fa-tint"></i> Sample Collection</a>
+        <a href="#processing-section" class="nav-link"><i class="fas fa-cogs"></i> Processing</a>
+        <a href="#today-section" class="nav-link"><i class="fas fa-file-medical"></i> Reports</a>
+        <a href="#patients-section" class="nav-link"><i class="fas fa-users"></i> Patients</a>
+        <a href="#catalog-section" class="nav-link"><i class="fas fa-list-check"></i> Test Catalog</a>
+        <a href="#analytics-section" class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
+        <a href="#notifications-section" class="nav-link"><i class="fas fa-bell"></i> Notifications</a>
+        <a href="#settings-section" class="nav-link"><i class="fas fa-gear"></i> Settings</a>
 
         <div class="sidebar-footer">
             <div class="lab-badge">
@@ -876,6 +986,9 @@
                 <h1 id="labNameHeader">Laboratory Dashboard</h1>
                 <p id="labLocationText">Loading details...</p>
             </div>
+            <a href="/logout" class="quick-logout" aria-label="Log out of MediVault">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
             <div class="date-badge">
                 <i class="fas fa-calendar-alt" style="color:var(--primary)"></i>
                 <span id="todayDate">—</span>
@@ -883,7 +996,8 @@
         </div>
 
 
-        <!-- Stats -->
+        <!-- Overview -->
+        <section id="overview-section">
         <div class="stats-grid">
             <div class="stat-card pending">
                 <div class="stat-icon"><i class="fas fa-clock"></i></div>
@@ -903,6 +1017,36 @@
         </div>
 
         <!-- ── Pending / Active Requests ── -->
+        </section>
+
+        <div class="section-card" id="catalog-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-list-check"></i> Test Catalog & Prices</h2>
+                <button class="btn btn-refresh" type="button" onclick="loadTestCatalog()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            <form class="catalog-form" id="testCatalogForm" onsubmit="addCatalogTest(event)">
+                <div class="catalog-field">
+                    <label for="catalogTestName">Test name</label>
+                    <input id="catalogTestName" type="text" maxlength="100" placeholder="e.g. Complete Blood Count" required>
+                </div>
+                <div class="catalog-field">
+                    <label for="catalogTestPrice">Price (₹)</label>
+                    <input id="catalogTestPrice" type="number" min="0" step="0.01" placeholder="e.g. 500" required>
+                </div>
+                <button class="btn btn-success" type="submit"><i class="fas fa-plus"></i> Add Test</button>
+            </form>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead><tr><th>#</th><th>Test name</th><th>Price</th><th>Action</th></tr></thead>
+                    <tbody id="testCatalogList">
+                        <tr><td colspan="4" class="catalog-empty">Loading test catalog...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="section-card" id="pending-section">
             <div class="section-header">
                 <h2 class="section-title">
@@ -911,6 +1055,22 @@
                 <button class="btn btn-refresh" onclick="loadRequests()">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
+            </div>
+            <div class="filter-row">
+                <input id="requestSearch" type="search" placeholder="Search patient, phone or test" oninput="renderRequests()">
+                <select id="requestStatusFilter" onchange="renderRequests()">
+                    <option value="">All statuses</option>
+                    <option value="Pending">New requests</option>
+                    <option value="Sample Collected">Collected</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Rejected / cancelled</option>
+                </select>
+                <select id="requestSourceFilter" onchange="renderRequests()">
+                    <option value="">All sources</option>
+                    <option value="doctor">Doctor assigned</option>
+                    <option value="self">Self booking</option>
+                </select>
             </div>
             <div class="requests-list" id="requestsList">
                 <div class="empty-state">
@@ -921,6 +1081,47 @@
         </div>
 
         <!-- ── Today's Completed Reports ── -->
+        <div class="section-card" id="collection-section">
+            <div class="section-header"><h2 class="section-title"><i class="fas fa-tint"></i> Sample Collection</h2></div>
+            <div class="workflow-grid" id="collectionList"></div>
+        </div>
+
+        <div class="section-card" id="processing-section">
+            <div class="section-header"><h2 class="section-title"><i class="fas fa-cogs"></i> Processing Queue</h2></div>
+            <div class="workflow-grid" id="processingList"></div>
+        </div>
+
+        <div class="section-card" id="patients-section">
+            <div class="section-header"><h2 class="section-title"><i class="fas fa-users"></i> Patients</h2></div>
+            <div class="filter-row"><input id="patientSearch" type="search" placeholder="Search patient or phone" oninput="renderPatients()"></div>
+            <div class="table-wrap"><table class="table"><thead><tr><th>Health ID</th><th>Patient</th><th>Phone</th><th>Assigned</th><th>Completed</th></tr></thead><tbody id="patientsList"></tbody></table></div>
+        </div>
+
+        <div class="section-card" id="analytics-section">
+            <div class="section-header"><h2 class="section-title"><i class="fas fa-chart-line"></i> Analytics</h2></div>
+            <div class="stats-grid" id="analyticsCards"></div>
+            <div class="table-wrap"><table class="table"><thead><tr><th>Most booked test</th><th>Requests</th></tr></thead><tbody id="testAnalyticsList"></tbody></table></div>
+        </div>
+
+        <div class="section-card" id="notifications-section">
+            <div class="section-header"><h2 class="section-title"><i class="fas fa-bell"></i> Recent Activity</h2></div>
+            <div class="notification-list" id="notificationsList"></div>
+        </div>
+
+        <div class="section-card" id="settings-section">
+            <div class="section-header"><h2 class="section-title"><i class="fas fa-gear"></i> Laboratory Settings</h2></div>
+            <form class="settings-form" id="labSettingsForm" onsubmit="saveLabSettings(event)">
+                <input id="settingName" placeholder="Laboratory name" required>
+                <input id="settingPhone" placeholder="Phone number">
+                <input id="settingEmail" type="email" placeholder="Email address">
+                <input id="settingAddress" placeholder="Address">
+                <input id="settingCity" placeholder="City">
+                <input id="settingState" placeholder="State">
+                <input id="settingPin" placeholder="PIN code">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i> Save Settings</button>
+            </form>
+        </div>
+
         <div class="section-card" id="today-section">
             <div class="section-header">
                 <h2 class="section-title">
@@ -1008,6 +1209,7 @@
     <script>
         // ── Date display ──
         const now = new Date();
+        let labRequestsCache = [];
         document.getElementById('todayDate').textContent = now.toLocaleDateString('en-IN', {
             weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
         });
@@ -1039,6 +1241,148 @@
         }
 
         // ── Load Active Requests (merged: self-booked + doctor-assigned) ──
+        async function loadTestCatalog() {
+            const tbody = document.getElementById('testCatalogList');
+            tbody.innerHTML = '<tr><td colspan="4" class="catalog-empty">Loading test catalog...</td></tr>';
+            try {
+                const res = await fetch('/api/lab/test-catalog');
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message || 'Unable to load test catalog');
+
+                const tests = data.tests || [];
+                if (tests.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="catalog-empty"><i class="fas fa-vial"></i> No tests added yet. Add your first test above.</td></tr>';
+                    return;
+                }
+
+                tbody.replaceChildren();
+                tests.forEach((test, index) => {
+                    const row = document.createElement('tr');
+                    const number = document.createElement('td');
+                    number.textContent = index + 1;
+                    const name = document.createElement('td');
+                    name.textContent = test.name;
+                    const price = document.createElement('td');
+                    price.textContent = new Intl.NumberFormat('en-IN', {
+                        style: 'currency', currency: 'INR', maximumFractionDigits: 2
+                    }).format(test.price || 0);
+                    const action = document.createElement('td');
+                    const deleteButton = document.createElement('button');
+                    deleteButton.type = 'button';
+                    deleteButton.className = 'btn btn-danger btn-sm';
+                    deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                    deleteButton.addEventListener('click', () => deleteCatalogTest(test._id, test.name));
+                    action.appendChild(deleteButton);
+                    row.append(number, name, price, action);
+                    tbody.appendChild(row);
+                });
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="4" class="catalog-empty">Failed to load test catalog. Please refresh.</td></tr>';
+            }
+        }
+
+        async function addCatalogTest(event) {
+            event.preventDefault();
+            const nameInput = document.getElementById('catalogTestName');
+            const priceInput = document.getElementById('catalogTestPrice');
+            const name = nameInput.value.trim();
+            const price = Number(priceInput.value);
+
+            if (!name || !Number.isFinite(price) || price < 0) {
+                showToast('Enter a test name and a valid price', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/lab/test-catalog', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, price })
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message || 'Unable to add test');
+
+                event.target.reset();
+                showToast('Test and price added successfully');
+                loadTestCatalog();
+            } catch (err) {
+                showToast(err.message || 'Unable to add test', 'error');
+            }
+        }
+
+        async function deleteCatalogTest(testId, testName) {
+            if (!confirm(`Delete ${testName} and its price from the catalog?`)) return;
+            try {
+                const res = await fetch(`/api/lab/test-catalog/${encodeURIComponent(testId)}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message || 'Unable to delete test');
+
+                showToast('Test and price deleted successfully');
+                loadTestCatalog();
+            } catch (err) {
+                showToast(err.message || 'Unable to delete test', 'error');
+            }
+        }
+
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value == null ? '' : String(value);
+            return div.innerHTML;
+        }
+
+        function renderLisViews(requests) {
+            const collection = document.getElementById('collectionList');
+            const processing = document.getElementById('processingList');
+            const waiting = requests.filter(r => r.status === 'Pending' || r.status === 'Requested');
+            const collected = requests.filter(r => r.status === 'Sample Collected' || r.status === 'Processing');
+
+            collection.innerHTML = waiting.length ? waiting.map(r => `
+                <div class="workflow-item"><strong>${escapeHtml(r.patientName)}</strong><p>${escapeHtml(r.testType)} · Waiting collection</p>
+                <button class="btn btn-warning btn-sm" onclick="updateStatus('${r._id}', 'Sample Collected', '${r.source}')"><i class="fas fa-tint"></i> Collect Sample</button></div>`).join('')
+                : '<div class="catalog-empty">No samples are waiting for collection.</div>';
+
+            processing.innerHTML = collected.length ? collected.map(r => {
+                const nextStatus = r.status === 'Sample Collected' ? 'Processing' : 'Completed';
+                const label = r.status === 'Sample Collected' ? 'Start Processing' : 'Mark Complete';
+                return `<div class="workflow-item"><strong>${escapeHtml(r.patientName)}</strong><p>${escapeHtml(r.testType)} · ${escapeHtml(r.status)}</p>
+                <button class="btn btn-primary btn-sm" onclick="updateStatus('${r._id}', '${nextStatus}', '${r.source}')"><i class="fas fa-play"></i> ${label}</button></div>`;
+            }).join('') : '<div class="catalog-empty">No samples are in the processing queue.</div>';
+
+            const query = document.getElementById('patientSearch').value.trim().toLowerCase();
+            const patients = new Map();
+            requests.forEach(r => {
+                const key = r.healthId || `${r.patientName}|${r.patientPhone || ''}`;
+                const item = patients.get(key) || { healthId: r.healthId, name: r.patientName, phone: r.patientPhone, total: 0, completed: 0 };
+                item.total++;
+                if (r.status === 'Completed') item.completed++;
+                patients.set(key, item);
+            });
+            const patientRows = [...patients.values()].filter(p => !query || `${p.name} ${p.phone}`.toLowerCase().includes(query));
+            document.getElementById('patientsList').innerHTML = patientRows.length ? patientRows.map(p =>
+                `<tr><td>${escapeHtml(p.healthId || '—')}</td><td><strong>${escapeHtml(p.name)}</strong></td><td>${escapeHtml(p.phone || 'N/A')}</td><td>${p.total}</td><td>${p.completed}</td></tr>`
+            ).join('') : '<tr><td colspan="5" class="catalog-empty">No matching patients.</td></tr>';
+
+            const completed = requests.filter(r => r.status === 'Completed').length;
+            const processingCount = requests.filter(r => r.status === 'Processing').length;
+            const revenue = requests.filter(r => r.status === 'Completed').reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+            document.getElementById('analyticsCards').innerHTML = [
+                ['Today\'s Tests', requests.length, 'fa-vial'], ['Processing', processingCount, 'fa-cogs'],
+                ['Completed', completed, 'fa-check-circle'], ['Recorded Revenue', new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(revenue), 'fa-indian-rupee-sign']
+            ].map(([label, value, icon]) => `<div class="stat-card total"><div class="stat-icon"><i class="fas ${icon}"></i></div><div class="stat-label">${label}</div><div class="stat-val">${value}</div></div>`).join('');
+
+            const testCounts = requests.reduce((counts, r) => { counts[r.testType] = (counts[r.testType] || 0) + 1; return counts; }, {});
+            const tests = Object.entries(testCounts).sort((a, b) => b[1] - a[1]);
+            document.getElementById('testAnalyticsList').innerHTML = tests.length ? tests.map(([test, count]) => `<tr><td>${escapeHtml(test)}</td><td>${count}</td></tr>`).join('') : '<tr><td colspan="2" class="catalog-empty">No test data yet.</td></tr>';
+
+            const recent = [...requests].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+            document.getElementById('notificationsList').innerHTML = recent.length ? recent.map(r => `<div class="notification-item ${r.priority === 'Urgent' ? 'urgent' : ''}"><strong>${escapeHtml(r.testType)}</strong> for ${escapeHtml(r.patientName)} is ${escapeHtml(r.status)}<small>${new Date(r.createdAt).toLocaleString('en-IN')}</small></div>`).join('') : '<div class="catalog-empty">No recent activity.</div>';
+        }
+
+        function renderRequests() { loadRequests(); }
+
+        function renderPatients() { renderLisViews(labRequestsCache); }
+
         async function loadRequests() {
             const list = document.getElementById('requestsList');
             list.innerHTML = `<div class="empty-state"><div class="loading-dots"><span></span><span></span><span></span></div><p style="margin-top:1rem">Loading...</p></div>`;
@@ -1048,11 +1392,19 @@
 
                 if (!data.success) throw new Error(data.message);
 
-                const reqs = data.requests || [];
+                labRequestsCache = data.requests || [];
+                const search = document.getElementById('requestSearch').value.trim().toLowerCase();
+                const status = document.getElementById('requestStatusFilter').value;
+                const source = document.getElementById('requestSourceFilter').value;
+                const reqs = labRequestsCache.filter(req => {
+                    const searchable = `${req.patientName || ''} ${req.patientPhone || ''} ${req.testType || ''} ${req.doctorName || ''}`.toLowerCase();
+                    return (!search || searchable.includes(search)) && (!status || req.status === status) && (!source || req.source === source);
+                });
+                renderLisViews(labRequestsCache);
 
                 // Update stats
-                document.getElementById('statPending').textContent = reqs.filter(r => r.status === 'Pending' || r.status === 'Requested').length;
-                document.getElementById('statTotal').textContent = reqs.length;
+                document.getElementById('statPending').textContent = labRequestsCache.filter(r => r.status === 'Pending' || r.status === 'Requested').length;
+                document.getElementById('statTotal').textContent = labRequestsCache.length;
 
                 if (reqs.length === 0) {
                     list.innerHTML = `<div class="empty-state"><i class="fas fa-vial"></i><p>No active lab requests at the moment. Patient home visits and doctor requests will appear here.</p></div>`;
@@ -1280,6 +1632,48 @@
             }
         }
 
+        async function loadLabSettings() {
+            try {
+                const res = await fetch('/api/lab/settings');
+                const data = await res.json();
+                if (!data.success) return;
+                const lab = data.lab;
+                document.getElementById('settingName').value = lab.name || '';
+                document.getElementById('settingPhone').value = lab.contact?.phone || '';
+                document.getElementById('settingEmail').value = lab.contact?.email || '';
+                document.getElementById('settingAddress').value = lab.location?.address_line || '';
+                document.getElementById('settingCity').value = lab.location?.city || '';
+                document.getElementById('settingState').value = lab.location?.state || '';
+                document.getElementById('settingPin').value = lab.location?.pin_code || '';
+            } catch (err) {
+                console.error('Unable to load lab settings', err);
+            }
+        }
+
+        async function saveLabSettings(event) {
+            event.preventDefault();
+            const body = {
+                name: document.getElementById('settingName').value,
+                phone: document.getElementById('settingPhone').value,
+                email: document.getElementById('settingEmail').value,
+                address_line: document.getElementById('settingAddress').value,
+                city: document.getElementById('settingCity').value,
+                state: document.getElementById('settingState').value,
+                pin_code: document.getElementById('settingPin').value
+            };
+            try {
+                const res = await fetch('/api/lab/settings', {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message || 'Unable to save settings');
+                showToast('Laboratory settings saved successfully');
+                loadLabInfo();
+            } catch (err) {
+                showToast(err.message || 'Unable to save settings', 'error');
+            }
+        }
+
         // ── Close modal on outside click ──
         document.getElementById('uploadModal').addEventListener('click', function (e) {
             if (e.target === this) closeUploadModal();
@@ -1288,6 +1682,8 @@
         // ── Init ──
         window.onload = () => {
             loadLabInfo();
+            loadLabSettings();
+            loadTestCatalog();
             loadRequests();
             loadTodayReports();
         };

@@ -2234,12 +2234,35 @@
           if (data.success) {
              alert(`Calling Token: ${data.currentToken}`);
              loadDoctorStats(); // Refresh stats to show new token
+             loadDoctorAppointments();
           } else {
              alert(data.message);
           }
        } catch (error) {
           alert('Failed to call next patient');
        }
+    }
+
+    async function doctorCheckIn(appointmentId) {
+      try {
+        const res = await fetch(`/api/appointments/${appointmentId}/check-in`, { method: 'PATCH' });
+        const data = await res.json();
+        if (!data.success) return alert(data.message || 'Check-in failed');
+        alert(`Patient checked in. Token #${data.appointment.token_number} is waiting.`);
+        loadDoctorAppointments();
+      } catch (error) { alert('Check-in failed'); }
+    }
+
+    async function queueAction(appointmentId, action) {
+      const label = action === 'complete' ? 'complete this consultation' : 'skip this patient';
+      if (!confirm(`Do you want to ${label}?`)) return;
+      try {
+        const res = await fetch(`/api/doctor/queue/${appointmentId}/${action}`, { method: 'PATCH' });
+        const data = await res.json();
+        if (!data.success) return alert(data.message || 'Queue update failed');
+        loadDoctorAppointments();
+        loadDoctorStats();
+      } catch (error) { alert('Queue update failed'); }
     }
 
     async function saveAvailability() {
@@ -2274,8 +2297,9 @@
          const res = await fetch('/api/appointments');
          const data = await res.json();
          if (data.appointments && data.appointments.length > 0) {
-           const activeAppts = data.appointments.filter(a => a.status === 'Scheduled');
-           const historyAppts = data.appointments.filter(a => a.status !== 'Scheduled');
+           const activeStates = ['BOOKED', 'CHECKED_IN', 'WAITING', 'IN_PROGRESS', 'Scheduled'];
+           const activeAppts = data.appointments.filter(a => activeStates.includes(a.status));
+           const historyAppts = data.appointments.filter(a => !activeStates.includes(a.status));
            window.doctorHistoryAppts = historyAppts;
 
            if (activeAppts.length > 0) {
@@ -2292,8 +2316,10 @@
                  + '<div style="font-size: 0.8rem; font-weight: 600; color: var(--accent);">Token: #' + (app.token_number || '?') + '</div>'
                  + '</div>'
                  + '<div class="report-actions">'
-                 + '<button class="btn btn-view" onclick="updateStatus(\'' + app._id + '\', \'Completed\')">Mark Done</button>'
-                 + '<button class="btn btn-delete" onclick="updateStatus(\'' + app._id + '\', \'Cancelled\')">Cancel</button>'
+                 + (['BOOKED', 'Scheduled'].includes(app.status) ? '<button class="btn btn-view" onclick="doctorCheckIn(\'' + app._id + '\')">Check in</button>' : '')
+                 + (app.status === 'IN_PROGRESS' ? '<button class="btn btn-view" onclick="queueAction(\'' + app._id + '\', \'complete\')">Complete</button>' : '')
+                 + (['WAITING', 'IN_PROGRESS'].includes(app.status) ? '<button class="btn btn-delete" onclick="queueAction(\'' + app._id + '\', \'skip\')">Skip</button>' : '')
+                 + (['BOOKED', 'Scheduled'].includes(app.status) ? '<button class="btn btn-delete" onclick="updateStatus(\'' + app._id + '\', \'Cancelled\')">Cancel</button>' : '')
                  + '<button class="btn lab-test-btn" style="background:#4cc9f0;color:white;" onclick="openLabTestModal(\'' + patientUserId + '\', \'' + app._id + '\', \'' + patientName + '\')">'
                  + '<i class="fas fa-flask"></i> Lab Test'
                  + '</button>'

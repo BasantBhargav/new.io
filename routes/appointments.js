@@ -5,6 +5,7 @@ const Doctor = require('../schema/doctor');
 const Patient = require('../schema/patient');
 const User = require('../schema/user');
 const Notification = require('../schema/notification');
+const Counter = require('../schema/counter');
 const { v4: uuidv4 } = require('uuid');
 
 // ✅ Middleware to check authentication
@@ -12,6 +13,46 @@ const requireAuth = (req, res, next) => {
   if (!req.session.userId) return res.status(401).json({ success: false, message: 'Unauthorized' });
   next();
 };
+
+const startOfDay = (value = new Date()) => {
+  const date = new Date(value);
+  date.setHours(0, 0, 0, 0);
+  return date;
+};
+const endOfDay = (value = new Date()) => {
+  const date = startOfDay(value);
+  date.setDate(date.getDate() + 1);
+  return date;
+};
+const queueKey = (doctorId, date, session = 'default') =>
+  `queue:${doctorId}:${startOfDay(date).toISOString().slice(0, 10)}:${session}`;
+
+async function getQueueSnapshot(doctorId, date = new Date(), session = 'default') {
+  const appointments = await Appointment.find({
+    doctor_id: doctorId,
+    scheduled_time: { $gte: startOfDay(date), $lt: endOfDay(date) },
+    queue_session: session
+  }).sort({ token_number: 1 }).lean();
+  const current = appointments.find(item => item.status === 'IN_PROGRESS');
+  const waiting = appointments.filter(item => item.status === 'WAITING');
+  return {
+    doctorId: String(doctorId),
+    queueDate: startOfDay(date).toISOString(),
+    session,
+    currentToken: current ? current.token_number : 0,
+    currentAppointmentId: current ? String(current._id) : null,
+    waitingCount: waiting.length,
+    waitingTokens: waiting.map(item => item.token_number),
+    lastToken: appointments.reduce((max, item) => Math.max(max, item.token_number || 0), 0)
+  };
+}
+
+async function emitQueueUpdate(req, doctorId, date, session) {
+  const snapshot = await getQueueSnapshot(doctorId, date, session);
+  const io = req.app.get('socketio');
+  if (io) io.to(`doctor_${doctorId}`).emit('queueUpdated', snapshot);
+  return snapshot;
+}
 
 // 🏥 GET ALL APPOINTMENTS (Role based)
 router.get('/api/appointments', requireAuth, async (req, res) => {
@@ -62,27 +103,21 @@ router.get('/api/doctor/stats', requireAuth, async (req, res) => {
     
     if (!doctor) return res.status(404).json({ success: false, message: 'Doctor not found' });
 
-    let calculatedCurrentToken = doctor.current_token || 0;
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    if (doctor.last_token_date) {
-        const lastDate = new Date(doctor.last_token_date);
-        lastDate.setHours(0,0,0,0);
-        if (lastDate.getTime() !== today.getTime()) {
-             calculatedCurrentToken = 0;
-        }
-    }
+    // The displayed token must come from today's real queue, never the old
+    // doctor-level counter (which mixed different dates and cancelled entries).
+    const queue = await getQueueSnapshot(doctor._id);
 
     const totalPatients = await Appointment.countDocuments({ doctor_id: doctor._id });
-    const pendingAppointments = await Appointment.countDocuments({ doctor_id: doctor._id, status: 'Scheduled' });
-    const completedAppointments = await Appointment.countDocuments({ doctor_id: doctor._id, status: 'Completed' });
+    const pendingAppointments = await Appointment.countDocuments({ doctor_id: doctor._id, status: { $in: ['BOOKED', 'CHECKED_IN', 'WAITING', 'IN_PROGRESS', 'Scheduled'] } });
+    const completedAppointments = await Appointment.countDocuments({ doctor_id: doctor._id, status: { $in: ['COMPLETED', 'Completed'] } });
 
     res.json({ 
       success: true, 
       totalPatients,
       pendingAppointments,
       completedAppointments,
-      currentToken: calculatedCurrentToken,
+      currentToken: queue.currentToken,
+      queue,
       doctorId: doctor._id
     });
   } catch (error) {
@@ -140,21 +175,11 @@ router.get('/api/doctor/:id/queue-info', requireAuth, async (req, res) => {
   try {
     const doctor = await Doctor.findById(req.params.id);
     if (!doctor) return res.status(404).json({ success: false, message: 'Doctor not found' });
-    
-    let calculatedCurrentToken = doctor.current_token || 0;
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    if (doctor.last_token_date) {
-        const lastDate = new Date(doctor.last_token_date);
-        lastDate.setHours(0,0,0,0);
-        if (lastDate.getTime() !== today.getTime()) {
-             calculatedCurrentToken = 0;
-        }
-    }
+    const queue = await getQueueSnapshot(doctor._id, req.query.date || new Date(), req.query.session || 'default');
 
     res.json({
       success: true,
-      currentToken: calculatedCurrentToken,
+      ...queue,
       avgTime: doctor.avg_time_per_patient || 15
     });
   } catch (error) {
@@ -237,6 +262,10 @@ router.post('/api/book-appointment', requireAuth, async (req, res) => {
       amountPaid: 500
     });
 
+    // Compatibility note: older code computes a provisional number above.  A
+    // real token is deliberately issued only on check-in.
+    newAppointment.token_number = null;
+    newAppointment.status = 'BOOKED';
     await newAppointment.save();
 
     // 🌍 Emit live queue update via socket
@@ -318,7 +347,94 @@ router.patch('/api/appointments/:id/status', requireAuth, async (req, res) => {
 });
 
 // 🔔 CALL NEXT PATIENT
+// Check-in is when a booking becomes part of the live doctor/date/session queue.
+router.patch('/api/appointments/:id/check-in', requireAuth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment) return res.status(404).json({ success: false, message: 'Appointment not found' });
+    const patient = await Patient.findOne({ user_id: req.session.userId });
+    const doctor = await Doctor.findOne({ user_id: req.session.userId });
+    const allowed = (req.session.role === 'patient' && patient && String(patient._id) === String(appointment.patient_id)) ||
+      (req.session.role === 'doctor' && doctor && String(doctor._id) === String(appointment.doctor_id));
+    if (!allowed) return res.status(403).json({ success: false, message: 'Unauthorized' });
+    if (!['BOOKED', 'CHECKED_IN', 'WAITING', 'Scheduled'].includes(appointment.status)) {
+      return res.status(400).json({ success: false, message: 'This appointment cannot be checked in' });
+    }
+    if (!appointment.token_number) {
+      const counter = await Counter.findOneAndUpdate(
+        { name: queueKey(appointment.doctor_id, appointment.scheduled_time, appointment.queue_session) },
+        { $inc: { seq: 1 } }, { new: true, upsert: true }
+      );
+      appointment.token_number = counter.seq;
+    }
+    appointment.status = 'WAITING';
+    await appointment.save();
+    const queue = await emitQueueUpdate(req, appointment.doctor_id, appointment.scheduled_time, appointment.queue_session);
+    res.json({ success: true, message: 'Checked in to the queue', appointment, queue });
+  } catch (error) {
+    console.error('Queue check-in failed:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Doctor-only controls for the active queue: finish a consultation or skip an absent patient.
+router.patch('/api/doctor/queue/:id/:action', requireAuth, async (req, res) => {
+  try {
+    if (req.session.role !== 'doctor') return res.status(403).json({ success: false, message: 'Unauthorized' });
+    const doctor = await Doctor.findOne({ user_id: req.session.userId });
+    const appointment = await Appointment.findOne({ _id: req.params.id, doctor_id: doctor?._id });
+    if (!appointment) return res.status(404).json({ success: false, message: 'Queue entry not found' });
+    const actionStates = { complete: 'COMPLETED', skip: 'SKIPPED' };
+    const status = actionStates[req.params.action];
+    if (!status) return res.status(400).json({ success: false, message: 'Invalid queue action' });
+    if (req.params.action === 'complete' && appointment.status !== 'IN_PROGRESS') {
+      return res.status(400).json({ success: false, message: 'Only the patient in consultation can be completed' });
+    }
+    if (req.params.action === 'skip' && !['WAITING', 'IN_PROGRESS'].includes(appointment.status)) {
+      return res.status(400).json({ success: false, message: 'Only waiting or active patients can be skipped' });
+    }
+    appointment.status = status;
+    await appointment.save();
+    const queue = await emitQueueUpdate(req, doctor._id, appointment.scheduled_time, appointment.queue_session);
+    res.json({ success: true, appointment, queue });
+  } catch (error) {
+    console.error('Queue action failed:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// Calls the lowest real WAITING token. The doctor completes or skips the active patient first.
 router.patch('/api/doctor/call-next', requireAuth, async (req, res) => {
+  try {
+    if (req.session.role !== 'doctor') return res.status(403).json({ success: false, message: 'Unauthorized' });
+    const doctor = await Doctor.findOne({ user_id: req.session.userId }).populate('user_id');
+    if (!doctor) return res.status(404).json({ success: false, message: 'Doctor not found' });
+    const date = req.body?.date || new Date();
+    const session = req.body?.session || 'default';
+    const scheduled_time = { $gte: startOfDay(date), $lt: endOfDay(date) };
+    const active = await Appointment.findOne({ doctor_id: doctor._id, scheduled_time, queue_session: session, status: 'IN_PROGRESS' });
+    if (active) return res.status(400).json({ success: false, message: 'Complete or skip the current patient before calling the next one.' });
+    const next = await Appointment.findOneAndUpdate(
+      { doctor_id: doctor._id, scheduled_time, queue_session: session, status: 'WAITING' },
+      { $set: { status: 'IN_PROGRESS' } }, { new: true, sort: { token_number: 1 } }
+    ).populate({ path: 'patient_id', populate: { path: 'user_id' } });
+    const queue = await emitQueueUpdate(req, doctor._id, date, session);
+    if (!next) return res.json({ success: true, message: 'No waiting patients', currentToken: 0, queue });
+    const io = req.app.get('socketio');
+    const patientUserId = next.patient_id?.user_id?._id;
+    if (io && patientUserId) io.to(`user_${patientUserId}`).emit('turnAlert', {
+      doctorName: doctor.user_id.name, tokenNumber: next.token_number,
+      message: `It is your turn. Please proceed to Dr. ${doctor.user_id.name}'s room.`
+    });
+    if (patientUserId) await Notification.create({ role: 'patient', targetUserId: patientUserId, title: "It's your turn!", message: `Dr. ${doctor.user_id.name} is calling token ${next.token_number}.`, priority: 'urgent' });
+    res.json({ success: true, message: 'Next patient called', currentToken: next.token_number, appointment: next, queue });
+  } catch (error) {
+    console.error('Call next failed:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+router.patch('/api/doctor/call-next-legacy', requireAuth, async (req, res) => {
   try {
     if (req.session.role !== 'doctor') return res.status(403).json({ success: false, message: 'Unauthorized' });
     
